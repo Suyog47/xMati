@@ -1,0 +1,114 @@
+{
+  "version": "0.0.1",
+  "catchAll": {
+    "next": []
+  },
+  "startNode": "check-if-extracted",
+  "skillData": {
+    "retryAttempts": 3,
+    "contentElement": "builtin_text-5B3ZNw",
+    "notFoundElement": "builtin_text-T3Rr_0",
+    "turnExpiry": 3,
+    "intent": "get_insurance_quote",
+    "slotName": "age",
+    "entities": [
+      "number"
+    ]
+  },
+  "nodes": [
+    {
+      "name": "slot-extract",
+      "onEnter": [
+        "say #!builtin_text-5B3ZNw {}"
+      ],
+      "onReceive": [
+        "basic-skills/slot_fill {\"slotName\":\"age\",\"entities\":\"number\", \"turnExpiry\":3}"
+      ],
+      "next": [
+        {
+          "condition": "session.slots['age'] && (temp.valid === undefined || temp.valid == \"true\")",
+          "node": "extracted"
+        },
+        {
+          "condition": "true",
+          "node": "not-extracted"
+        }
+      ],
+      "id": "452725"
+    },
+    {
+      "name": "extracted",
+      "onEnter": [
+        "builtin/setVariable {\"type\":\"temp\",\"name\":\"extracted\",\"value\":\"true\"}"
+      ],
+      "next": [
+        {
+          "condition": "true",
+          "node": "#"
+        }
+      ],
+      "id": "801908"
+    },
+    {
+      "name": "not-extracted",
+      "onEnter": [
+        "basic-skills/slot_not_found {\"retryAttempts\":\"3\"}",
+        "say #!builtin_text-T3Rr_0 {}",
+        "builtin/setVariable {\"type\":\"temp\",\"name\":\"valid\",\"value\": \"true\"}"
+      ],
+      "onReceive": [
+        "basic-skills/slot_fill {\"slotName\":\"age\",\"entities\":\"number\", \"turnExpiry\":3}"
+      ],
+      "next": [
+        {
+          "condition": "session.slots['age'] && (temp.valid === undefined || temp.valid == \"true\")",
+          "node": "extracted"
+        },
+        {
+          "condition": "temp.notExtracted == \"true\"",
+          "node": "#"
+        },
+        {
+          "condition": "true",
+          "node": "not-extracted"
+        }
+      ],
+      "id": "250156"
+    },
+    {
+      "name": "check-if-extracted",
+      "onEnter": [
+        "basic-skills/slot_update_contexts {\"intentName\":\"get_insurance_quote\"}"
+      ],
+      "next": [
+        {
+          "condition": "session.slots['age'] !== undefined",
+          "node": "already-extracted"
+        },
+        {
+          "condition": "true",
+          "node": "slot-extract"
+        }
+      ],
+      "id": "579630"
+    },
+    {
+      "name": "already-extracted",
+      "onEnter": [
+        "builtin/setVariable {\"type\":\"temp\",\"name\":\"alreadyExtracted\",\"value\":\"true\"}",
+        "builtin/setVariable {\"type\":\"temp\",\"name\":\"valid\",\"value\": \"true\"}"
+      ],
+      "next": [
+        {
+          "condition": " (temp.valid === undefined || temp.valid == \"true\")",
+          "node": "#"
+        },
+        {
+          "condition": "true",
+          "node": "slot-extract"
+        }
+      ],
+      "id": "734877"
+    }
+  ]
+}

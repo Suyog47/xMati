@@ -1,0 +1,6 @@
+{
+  "fullName": "Integrations",
+  "integrations": "Integrations",
+  "amazonLex": "Amazon Lex",
+  "splashText": "This is the Integrations module where you can intergrate the available 3rd party chatbots into your flow."
+}

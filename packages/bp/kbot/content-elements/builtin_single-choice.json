@@ -1,0 +1,26 @@
+[
+  {
+    "id": "builtin_single-choice-Jva4tb",
+    "formData": {
+      "dropdownPlaceholder$en": "Select...",
+      "choices$en": [
+        {
+          "title": "4",
+          "value": "4"
+        },
+        {
+          "title": "6",
+          "value": "6"
+        }
+      ],
+      "markdown$en": false,
+      "disableFreeText$en": true,
+      "displayInMessage$en": false,
+      "typing$en": true,
+      "text$en": "What is 2+2"
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-03-18T06:15:29.486Z",
+    "modifiedOn": "2025-03-18T06:15:29.486Z"
+  }
+]

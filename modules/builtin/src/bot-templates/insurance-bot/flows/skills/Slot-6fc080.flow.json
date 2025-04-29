@@ -1,0 +1,114 @@
+{
+  "version": "0.0.1",
+  "catchAll": {
+    "next": []
+  },
+  "startNode": "check-if-extracted",
+  "skillData": {
+    "retryAttempts": 3,
+    "contentElement": "builtin_text-FvdKoA",
+    "notFoundElement": "builtin_text-cACP2M",
+    "turnExpiry": 3,
+    "intent": "renew_policy",
+    "slotName": "policy_number",
+    "entities": [
+      "any"
+    ]
+  },
+  "nodes": [
+    {
+      "name": "slot-extract",
+      "onEnter": [
+        "say #!builtin_text-FvdKoA {}"
+      ],
+      "onReceive": [
+        "basic-skills/slot_fill {\"slotName\":\"policy_number\",\"entities\":\"any\", \"turnExpiry\":3}"
+      ],
+      "next": [
+        {
+          "condition": "session.slots['policy_number'] && (temp.valid === undefined || temp.valid == \"true\")",
+          "node": "extracted"
+        },
+        {
+          "condition": "true",
+          "node": "not-extracted"
+        }
+      ],
+      "id": "101966"
+    },
+    {
+      "name": "extracted",
+      "onEnter": [
+        "builtin/setVariable {\"type\":\"temp\",\"name\":\"extracted\",\"value\":\"true\"}"
+      ],
+      "next": [
+        {
+          "condition": "true",
+          "node": "#"
+        }
+      ],
+      "id": "811581"
+    },
+    {
+      "name": "not-extracted",
+      "onEnter": [
+        "basic-skills/slot_not_found {\"retryAttempts\":\"3\"}",
+        "say #!builtin_text-cACP2M {}",
+        "builtin/setVariable {\"type\":\"temp\",\"name\":\"valid\",\"value\": \"true\"}"
+      ],
+      "onReceive": [
+        "basic-skills/slot_fill {\"slotName\":\"policy_number\",\"entities\":\"any\", \"turnExpiry\":3}"
+      ],
+      "next": [
+        {
+          "condition": "session.slots['policy_number'] && (temp.valid === undefined || temp.valid == \"true\")",
+          "node": "extracted"
+        },
+        {
+          "condition": "temp.notExtracted == \"true\"",
+          "node": "#"
+        },
+        {
+          "condition": "true",
+          "node": "not-extracted"
+        }
+      ],
+      "id": "466427"
+    },
+    {
+      "name": "check-if-extracted",
+      "onEnter": [
+        "basic-skills/slot_update_contexts {\"intentName\":\"renew_policy\"}"
+      ],
+      "next": [
+        {
+          "condition": "session.slots['policy_number'] !== undefined",
+          "node": "already-extracted"
+        },
+        {
+          "condition": "true",
+          "node": "slot-extract"
+        }
+      ],
+      "id": "902305"
+    },
+    {
+      "name": "already-extracted",
+      "onEnter": [
+        "builtin/setVariable {\"type\":\"temp\",\"name\":\"alreadyExtracted\",\"value\":\"true\"}",
+        "builtin/setVariable {\"type\":\"temp\",\"name\":\"valid\",\"value\": \"true\"}"
+      ],
+      "next": [
+        {
+          "condition": " (temp.valid === undefined || temp.valid == \"true\")",
+          "node": "#"
+        },
+        {
+          "condition": "true",
+          "node": "slot-extract"
+        }
+      ],
+      "id": "762516"
+    }
+  ]
+}

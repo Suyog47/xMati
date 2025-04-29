@@ -1,0 +1,114 @@
+[
+  {
+    "id": "builtin_single-choice-DKhlbt",
+    "formData": {
+      "dropdownPlaceholder$en": "Select...",
+      "choices$en": [
+        {
+          "title": "Get Insurance Quote",
+          "value": "1"
+        },
+        {
+          "title": "Policy Enquiry",
+          "value": "2"
+        },
+        {
+          "title": "Renew Policy",
+          "value": "3"
+        },
+        {
+          "title": "Customer Support",
+          "value": "4"
+        }
+      ],
+      "markdown$en": false,
+      "disableFreeText$en": true,
+      "displayInMessage$en": true,
+      "typing$en": true,
+      "text$en": "Select from below options to proceed"
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-03-04T05:39:46.792Z",
+    "modifiedOn": "2025-03-04T10:43:30.194Z"
+  },
+  {
+    "id": "builtin_single-choice-tAzW9Q",
+    "formData": {
+      "dropdownPlaceholder$en": "Select...",
+      "choices$en": [
+        {
+          "title": "Car",
+          "value": "car"
+        },
+        {
+          "title": "Health",
+          "value": "health"
+        },
+        {
+          "title": "Life",
+          "value": "life"
+        }
+      ],
+      "markdown$en": false,
+      "disableFreeText$en": true,
+      "displayInMessage$en": true,
+      "typing$en": true,
+      "text$en": "Select your Insurance type"
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-03-04T06:40:25.121Z",
+    "modifiedOn": "2025-03-04T10:33:57.319Z"
+  },
+  {
+    "id": "builtin_single-choice-liO5WG",
+    "formData": {
+      "dropdownPlaceholder$en": "Select...",
+      "choices$en": [
+        {
+          "title": "Call",
+          "value": "call"
+        },
+        {
+          "title": "Email",
+          "value": "email"
+        }
+      ],
+      "markdown$en": false,
+      "disableFreeText$en": true,
+      "displayInMessage$en": true,
+      "typing$en": true,
+      "text$en": "Select Preferred Contact mode"
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-03-04T07:33:42.307Z",
+    "modifiedOn": "2025-03-04T10:28:54.755Z"
+  },
+  {
+    "id": "builtin_single-choice-ZQeJKK",
+    "formData": {
+      "dropdownPlaceholder$en": "Select...",
+      "choices$en": [
+        {
+          "title": "Billing",
+          "value": "billing"
+        },
+        {
+          "title": "Claim",
+          "value": "claim"
+        },
+        {
+          "title": "Policy",
+          "value": "policy"
+        }
+      ],
+      "markdown$en": false,
+      "disableFreeText$en": true,
+      "displayInMessage$en": true,
+      "typing$en": true,
+      "text$en": "Select Issue type"
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-03-04T07:59:01.555Z",
+    "modifiedOn": "2025-03-04T07:59:01.555Z"
+  }
+]

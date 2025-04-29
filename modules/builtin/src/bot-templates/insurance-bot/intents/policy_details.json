@@ -1,0 +1,21 @@
+{
+  "name": "policy_details",
+  "utterances": {
+    "en": [
+      "\"What does my insurance policy cover?\""
+    ]
+  },
+  "slots": [
+    {
+      "id": "T4d69r02Nnw4THh5FNR2w",
+      "name": "policy_number",
+      "entities": [
+        "any"
+      ],
+      "color": 1
+    }
+  ],
+  "contexts": [
+    "global"
+  ]
+}

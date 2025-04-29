@@ -1,0 +1,21 @@
+{
+  "name": "dummy_intent",
+  "utterances": {
+    "en": [
+      "I﻿t is incorrect"
+    ]
+  },
+  "slots": [
+    {
+      "id": "oL49iV0kthtorlbypW3Ha",
+      "name": "dummy_slot",
+      "entities": [
+        "any"
+      ],
+      "color": 1
+    }
+  ],
+  "contexts": [
+    "global"
+  ]
+}

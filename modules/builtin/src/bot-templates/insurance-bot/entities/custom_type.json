@@ -1,0 +1,27 @@
+{
+  "id": "custom_type",
+  "name": "custom_type",
+  "type": "list",
+  "occurrences": [
+    {
+      "name": "car",
+      "synonyms": []
+    },
+    {
+      "name": "health",
+      "synonyms": []
+    },
+    {
+      "name": "life",
+      "synonyms": []
+    },
+    {
+      "name": "car, health, life",
+      "synonyms": []
+    }
+  ],
+  "sensitive": false,
+  "fuzzy": 0.8,
+  "examples": [],
+  "pattern": ""
+}

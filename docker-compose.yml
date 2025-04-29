@@ -1,0 +1,23 @@
+
+services:
+  integrations:
+    image: integrations
+    container_name: integrations
+    ports:
+      - "8000:8000"
+    networks:
+      - xmati-network
+
+  xmati:
+    image: xmati
+    container_name: xmati
+    depends_on:
+      - integrations     
+    networks:
+      - xmati-network
+    ports:
+      - "3000:3000" 
+
+networks:
+  xmati-network:
+    driver: bridge

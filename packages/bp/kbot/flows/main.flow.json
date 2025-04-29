@@ -1,0 +1,97 @@
+{
+  "version": "0.0.1",
+  "catchAll": {
+    "onReceive": [],
+    "next": []
+  },
+  "startNode": "entry",
+  "nodes": [
+    {
+      "id": "entry",
+      "name": "entry",
+      "next": [
+        {
+          "condition": "true",
+          "node": "choice-66d085"
+        }
+      ],
+      "onEnter": [
+        "say #!builtin_text-pZb5zE"
+      ],
+      "onReceive": null
+    },
+    {
+      "id": "skill-66d085",
+      "type": "skill-call",
+      "skill": "choice",
+      "name": "choice-66d085",
+      "flow": "skills/choice-66d085.flow.json",
+      "next": [
+        {
+          "caption": "User picked [4]",
+          "condition": "temp['skill-choice-ret-8rgcuum989'] == \"4\"",
+          "node": "CallAPI-522b7d"
+        },
+        {
+          "caption": "User picked [6]",
+          "condition": "temp['skill-choice-ret-8rgcuum989'] == \"6\"",
+          "node": "Slot-70ea42"
+        },
+        {
+          "caption": "On failure",
+          "condition": "true",
+          "node": ""
+        }
+      ],
+      "onEnter": null,
+      "onReceive": null
+    },
+    {
+      "id": "skill-522b7d",
+      "type": "skill-call",
+      "skill": "CallAPI",
+      "name": "CallAPI-522b7d",
+      "flow": "skills/CallAPI-522b7d.flow.json",
+      "next": [
+        {
+          "caption": "On success",
+          "condition": "temp.valid",
+          "node": ""
+        },
+        {
+          "caption": "On failure",
+          "condition": "!temp.valid",
+          "node": ""
+        }
+      ],
+      "onEnter": null,
+      "onReceive": null
+    },
+    {
+      "id": "skill-70ea42",
+      "type": "skill-call",
+      "skill": "Slot",
+      "name": "Slot-70ea42",
+      "flow": "skills/Slot-70ea42.flow.json",
+      "next": [
+        {
+          "caption": "On extracted",
+          "condition": "temp.extracted == \"true\"",
+          "node": ""
+        },
+        {
+          "caption": "On not found",
+          "condition": "temp.notExtracted == \"true\"",
+          "node": ""
+        },
+        {
+          "caption": "On already extracted",
+          "condition": "temp.alreadyExtracted == \"true\"",
+          "node": ""
+        }
+      ],
+      "onEnter": null,
+      "onReceive": null
+    }
+  ]
+}

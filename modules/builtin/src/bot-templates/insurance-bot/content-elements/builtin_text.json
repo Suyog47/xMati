@@ -1,0 +1,288 @@
+[
+  {
+    "id": "builtin_text-OWV7Nm",
+    "formData": {
+      "text$en": "Enter your Insurance type",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-03-03T12:43:24.876Z",
+    "modifiedOn": "2025-03-04T06:06:49.883Z"
+  },
+  {
+    "id": "builtin_text-qndBoE",
+    "formData": {
+      "text$en": "Enter correct insurance type",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-03-03T12:43:38.626Z",
+    "modifiedOn": "2025-03-04T06:07:17.477Z"
+  },
+  {
+    "id": "builtin_text-6JKQYO",
+    "formData": {
+      "text$en": "",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-03-03T12:44:45.253Z",
+    "modifiedOn": "2025-03-04T05:52:44.771Z"
+  },
+  {
+    "id": "builtin_text-rXxyTH",
+    "formData": {
+      "text$en": "{{session.slots.insurance_type.value}}",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-03-03T12:51:26.575Z",
+    "modifiedOn": "2025-03-03T12:51:26.575Z"
+  },
+  {
+    "id": "builtin_text-e6prBu",
+    "formData": {
+      "text$en": "Hii, Welcome to Helios Insurance company",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-03-04T05:33:19.676Z",
+    "modifiedOn": "2025-03-04T05:33:19.676Z"
+  },
+  {
+    "id": "builtin_text-qj8Gja",
+    "formData": {
+      "text$en": "Wrong option selected...Please select from the available options",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-03-04T05:54:37.362Z",
+    "modifiedOn": "2025-03-04T05:54:37.362Z"
+  },
+  {
+    "id": "builtin_text-5B3ZNw",
+    "formData": {
+      "text$en": "Enter your age",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-03-04T06:07:51.742Z",
+    "modifiedOn": "2025-03-04T06:07:51.742Z"
+  },
+  {
+    "id": "builtin_text-T3Rr_0",
+    "formData": {
+      "text$en": "Enter your correct age",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-03-04T06:08:00.053Z",
+    "modifiedOn": "2025-03-04T06:08:00.053Z"
+  },
+  {
+    "id": "builtin_text-ONsBTc",
+    "formData": {
+      "text$en": "Enter your coverage amount",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-03-04T06:08:17.893Z",
+    "modifiedOn": "2025-03-04T06:17:18.001Z"
+  },
+  {
+    "id": "builtin_text-vamAKV",
+    "formData": {
+      "text$en": "Enter your correct coverage amount",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-03-04T06:08:28.755Z",
+    "modifiedOn": "2025-03-04T06:17:23.532Z"
+  },
+  {
+    "id": "builtin_text-dXllZB",
+    "formData": {
+      "text$en": "{{session.slots.insurance_type.value}}",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-03-04T06:09:18.410Z",
+    "modifiedOn": "2025-03-04T06:19:48.572Z"
+  },
+  {
+    "id": "builtin_text-xQoVs6",
+    "formData": {
+      "text$en": "{{temp.age}}",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-03-04T06:09:38.934Z",
+    "modifiedOn": "2025-03-04T06:23:18.618Z"
+  },
+  {
+    "id": "builtin_text-6Un8EV",
+    "formData": {
+      "text$en": " {{temp.coverage_amount}}",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-03-04T06:10:00.106Z",
+    "modifiedOn": "2025-03-04T06:23:31.949Z"
+  },
+  {
+    "id": "builtin_text-ZOXYdd",
+    "formData": {
+      "text$en": "{{temp.insurance_type}}",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-03-04T06:23:56.861Z",
+    "modifiedOn": "2025-03-04T06:23:56.861Z"
+  },
+  {
+    "id": "builtin_text-FvdKoA",
+    "formData": {
+      "text$en": "Please enter your policy number",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-03-04T06:58:00.731Z",
+    "modifiedOn": "2025-03-04T06:58:00.731Z"
+  },
+  {
+    "id": "builtin_text-cACP2M",
+    "formData": {
+      "text$en": "Please enter your correct policy number",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-03-04T06:58:17.060Z",
+    "modifiedOn": "2025-03-04T06:58:17.060Z"
+  },
+  {
+    "id": "builtin_text-fDYZLi",
+    "formData": {
+      "text$en": "{{temp.policy_number}}",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-03-04T07:00:13.954Z",
+    "modifiedOn": "2025-03-04T07:00:13.954Z"
+  },
+  {
+    "id": "builtin_text-Miz-wM",
+    "formData": {
+      "text$en": "Please enter renewal date",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-03-04T07:16:10.940Z",
+    "modifiedOn": "2025-03-04T07:16:10.940Z"
+  },
+  {
+    "id": "builtin_text-_boQQS",
+    "formData": {
+      "text$en": "Please enter correct renewal date",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-03-04T07:16:20.927Z",
+    "modifiedOn": "2025-03-04T07:16:20.927Z"
+  },
+  {
+    "id": "builtin_text-0apkhF",
+    "formData": {
+      "text$en": "{{temp.renewal_date}}",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-03-04T07:18:17.709Z",
+    "modifiedOn": "2025-03-04T07:18:51.117Z"
+  },
+  {
+    "id": "builtin_text-DD4wpu",
+    "formData": {
+      "text$en": "{{temp.issue_type}}",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-03-04T07:56:29.714Z",
+    "modifiedOn": "2025-03-04T07:56:29.714Z"
+  },
+  {
+    "id": "builtin_text-kqPRdp",
+    "formData": {
+      "text$en": "{{temp.preferred_contact}}",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-03-04T07:56:56.989Z",
+    "modifiedOn": "2025-03-04T07:56:56.989Z"
+  },
+  {
+    "id": "builtin_text-rP57yR",
+    "formData": {
+      "text$en": "Here are your policy details:-\n\nPolicy Number: {{temp.policy_number}}\nPolicy Type: {{temp.insurance_type}} Insurance\nCoverage: ₹10,00,000\nPremium: ₹6,500 per year\nExpiration Date: 15th December 2025",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-03-04T10:45:26.172Z",
+    "modifiedOn": "2025-03-04T11:04:58.692Z"
+  },
+  {
+    "id": "builtin_text-sPKhHv",
+    "formData": {
+      "text$en": "Based on the details you provided, here are the estimated insurance quotes:-\n\nHealth Insurance: ₹5,000 per year\nCar Insurance: ₹7,500 per year\nLife Insurance (₹10L cover): ₹8,000 per year",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-03-04T10:47:12.940Z",
+    "modifiedOn": "2025-03-04T10:47:19.185Z"
+  },
+  {
+    "id": "builtin_text-vx4Aok",
+    "formData": {
+      "text$en": "Your insurance policy is due for renewal!\n\nCurrent Policy: Health Insurance\nExpiration Date: {{temp.renewal_date}}\nRenewal Cost: ₹6,200 per year",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-03-04T10:49:11.291Z",
+    "modifiedOn": "2025-03-04T10:58:34.431Z"
+  },
+  {
+    "id": "builtin_text-1VdV3g",
+    "formData": {
+      "text$en": "You will shortly recieve a response from our Customer Executive for \"{{temp.issue_type}}\" related issue through the selected communication mode - \"{{temp.preferred_contact}}\". ",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-03-04T10:52:10.396Z",
+    "modifiedOn": "2025-03-04T11:08:01.162Z"
+  }
+]

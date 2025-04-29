@@ -1,0 +1,14 @@
+FROM node:12.18.1 
+WORKDIR /app 
+COPY . . 
+RUN yarn install 
+RUN yarn cache clean 
+RUN yarn build 
+EXPOSE 3000 
+CMD ["yarn", "start"] 
+
+# docker build -t xmati -f Dockerfile.txt .
+# docker run -p 8080:3000 xmati
+# http://localhost:8080/
+# upload image to a container registry of a cloud provider
+# host it as per the cloud provider
