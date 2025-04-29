@@ -190,18 +190,20 @@ export class BotService {
 
       result = result.data
 
-      // convert the recieved data to buffer
-      const bufferData = Buffer.from(JSON.parse(result.data[0]['data']).data)
-      const buffer = Buffer.from(bufferData);
-      // console.log(buffer.slice(0, 50));
+      for (let i = 0; i < result.data.length; i++) {
+        // convert the recieved data to buffer
+        const bufferData = Buffer.from(JSON.parse(result.data[i]['data']).data)
+        const buffer = Buffer.from(bufferData);
+        // console.log(buffer.slice(0, 50));
 
-      // decompress the buffer
-      const decompressedFile = await this._decompressResponse(buffer)
-      //console.log(decompressedFile)
+        // decompress the buffer
+        const decompressedFile = await this._decompressResponse(buffer)
+        //console.log(decompressedFile)
 
-      // parse and save the bot inside folder 
-      const files = await this._parseBotFiles(JSON.parse(decompressedFile as string))
-      await this._saveFiles(result.data[0]['key'].toString().split('_')[1], files)
+        // parse and save the bot inside folder 
+        const files = await this._parseBotFiles(JSON.parse(decompressedFile as string))
+        await this._saveFiles(result.data[i]['key'].toString().split('_')[1], files)
+      }
     } catch (error) {
       console.log('Something went wrong in get bots', error)
     }
