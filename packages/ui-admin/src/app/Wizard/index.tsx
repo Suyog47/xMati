@@ -150,10 +150,11 @@ const CustomerWizard: React.FC = () => {
     }
   }
 
-  const validateStep = (): boolean => {
+  const validateStep = async (): Promise<boolean> => {
     const newErrors: Errors = {}
 
     if (step === 1) {
+
       if (!formData.fullName.trim()) {
         newErrors.fullName = 'Full Name is required'
       }
@@ -163,6 +164,10 @@ const CustomerWizard: React.FC = () => {
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
         if (!emailRegex.test(formData.email.trim())) {
           newErrors.email = newErrors.email = 'Please enter valid email id'
+        }
+
+        if (await checkUser()) {
+          newErrors.email = newErrors.email = 'This email already exists, please try another one'
         }
       }
       if (!formData.phoneNumber.trim()) {
@@ -184,6 +189,8 @@ const CustomerWizard: React.FC = () => {
       if (!formData.organisationName.trim()) {
         newErrors.organisationName = 'Organisation Name is required'
       }
+
+
     } else if (step === 2) {
       if (!formData.industryType.trim()) {
         newErrors.industryType = 'Industry Type is required'
@@ -232,8 +239,8 @@ const CustomerWizard: React.FC = () => {
     return Object.keys(newErrors).length === 0
   }
 
-  const nextStep = () => {
-    if (validateStep()) {
+  const nextStep = async () => {
+    if (await validateStep()) {
       setStep(step + 1)
     }
   }
@@ -243,28 +250,20 @@ const CustomerWizard: React.FC = () => {
   }
 
   const handleSubmit = async () => {
-    if (validateStep()) {
-      // const confirmation = window.confirm(
-      //   `Confirm Submission:\n${Object.entries(formData)
-      //     .map(([key, value]) => `${key}: ${value}`)
-      //     .join('\n')}`
-      // )
+    if (formData && typeof formData === 'object') {
 
-      if (formData && typeof formData === 'object') {
-
-        // setIsLoading(true)
-        let status = await register()
-        setIsLoading(false)
-        if (status) {
-          await setLocalData()
-          history.push({
-            pathname: '/login'
-          })
-          history.replace('/home')
-        }
-      } else {
-        console.error('formData is not a valid object:', formData)
+      // setIsLoading(true)
+      let status = await register()
+      setIsLoading(false)
+      if (status) {
+        await setLocalData()
+        history.push({
+          pathname: '/login'
+        })
+        history.replace('/home')
       }
+    } else {
+      console.error('formData is not a valid object:', formData)
     }
   }
 
@@ -329,6 +328,32 @@ const CustomerWizard: React.FC = () => {
     } catch (error) {
       setIsLoading(false)
       return { success: false, msg: 'Error uploading credentials to S3' }
+    }
+  }
+
+  const checkUser = async () => {
+    try {
+      const result = await fetch('http://localhost:8000/check-user', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+        }),
+      })
+
+      if (result.status === 400) {    // 400 means email already registered
+        return true
+      } else if (result.status === 200) {     // 200 means email is available to register                     
+        return false
+      }
+      else {       // 500 means something went wrong
+        return false;
+      }
+    } catch (error) {
+      setIsLoading(false)
+      return false
     }
   }
 
