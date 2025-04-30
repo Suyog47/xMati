@@ -81,12 +81,12 @@ class BotsRouter extends CustomAdminRouter {
       })
     )
 
-    const assertBotInWorkspace = async (botId: string, workspaceId?: string) => {
+    const assertBotInWorkspace = async (botId: string, workspaceId?: string, botName: string = '') => {
       const botExists = (await this.botService.getBotsIds()).includes(botId)
       const isBotInCurrentWorkspace = (await this.workspaceService.getBotRefs(workspaceId)).includes(botId)
 
       if (botExists && !isBotInCurrentWorkspace) {
-        throw new ConflictError(`Bot "${botId}" already exists in another workspace. Bot ID are unique server-wide`)
+        throw new ConflictError(`Bot "${botName}" already exists... Try creating with another name`)
       }
     }
 
@@ -114,18 +114,18 @@ class BotsRouter extends CustomAdminRouter {
         const messengerVerifyToken = <BotConfig>_.pick(req.body, ['messengerVerifyToken'])
 
 
-        await assertBotInWorkspace(bot.id, req.workspace)
+        await assertBotInWorkspace(bot.id, req.workspace, bot.name)
         const botExists = (await this.botService.getBotsIds()).includes(bot.id)
         const botLinked = (await this.workspaceService.getBotRefs()).includes(bot.id)
 
         bot.id = await this.botService.makeBotId(bot.id, req.workspace!)
 
         if (botExists && botLinked) {
-          throw new ConflictError(`Bot "${bot.id}" already exists and is already linked in workspace`)
+          throw new ConflictError(`Bot "${bot.name}" already exists... Try creating with another name`)
         }
 
         if (botExists) {
-          this.logger.warn(`Bot "${bot.id}" already exists. Linking to workspace`)
+          this.logger.warn(`Bot "${bot.name}" already exists. Linking to workspace`)
         } else {
           const pipeline = await this.workspaceService.getPipeline(req.workspace!)
 

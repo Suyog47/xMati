@@ -332,6 +332,7 @@ const CustomerWizard: React.FC = () => {
   }
 
   const checkUser = async () => {
+    setIsLoading(true)
     try {
       const result = await fetch('http://localhost:8000/check-user', {
         method: 'POST',
@@ -351,8 +352,9 @@ const CustomerWizard: React.FC = () => {
         return false
       }
     } catch (error) {
-      setIsLoading(false)
       return false
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -726,9 +728,27 @@ const CustomerWizard: React.FC = () => {
                 )}
               </div>
               <div className='button-container'>
-                <button className='nextButton' onClick={nextStep}>
+                <button className='nextButton' onClick={nextStep} disabled={isLoading}>
                   Next
                 </button>
+
+                {(isLoading) && (
+                  <div className='modal-overlay'>
+                    <div className='modal-content'>
+                      {isLoading ? (
+                        <>
+                          <div className='loader'></div>
+                          <p>Email is getting checked... Please wait.</p>
+                        </>
+                      ) : (
+                        <>
+                          {/* <p>{errorMessage}</p>
+                            <button onClick={() => setErrorMessage(null)}>Close</button> */}
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             </>
           )}
