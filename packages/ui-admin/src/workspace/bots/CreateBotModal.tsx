@@ -105,8 +105,9 @@ class CreateBotModal extends Component<Props, State> {
   }
 
   handleNameChanged = e => {
+    const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
     let botName = e.target.value
-    this.setState({ botName, botId: botName.toLowerCase().replace(/[^a-z0-9]/g, '') })
+    this.setState({ botName, botId: `${savedFormData.email.replace(/[^A-Za-z0-9]/g, '')}-${botName.toLowerCase().replace(/[^a-z0-9]/g, '')}` })
   }
 
   handlePromptChanged = e => {

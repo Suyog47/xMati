@@ -345,11 +345,10 @@ const CustomerWizard: React.FC = () => {
 
       if (result.status === 400) {    // 400 means email already registered
         return true
-      } else if (result.status === 200) {     // 200 means email is available to register                     
+      } else if (result.status === 200) {     // 200 means email is available to register
         return false
-      }
-      else {       // 500 means something went wrong
-        return false;
+      } else {       // 500 means something went wrong
+        return false
       }
     } catch (error) {
       setIsLoading(false)
@@ -413,7 +412,7 @@ const CustomerWizard: React.FC = () => {
   }
 
   const renderBotSetupInstructions = () => {
-    botId = formData.botName.toLowerCase().replace(/[^a-z0-9]/g, '')
+    botId = `${formData.email.replace(/[^A-Za-z0-9]/g, '')}-${formData.botName.toLowerCase().replace(/[^a-z0-9]/g, '')}`
     if (!verifyToken) {
       verifyToken = formData.email + 'tok' + formData.botName.toLocaleLowerCase()
     }
