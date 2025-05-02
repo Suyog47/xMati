@@ -46,8 +46,6 @@ export default class BasicAuthentication {
 
     auth.setToken(data.payload)
 
-
-
     await this.afterLoginRedirect(returnTo)
   }
 

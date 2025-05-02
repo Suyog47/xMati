@@ -94,7 +94,16 @@ class BotsRouter extends CustomAdminRouter {
       '/getBots',
       this.needPermissions('write', this.resource),
       this.asyncMiddleware(async (req, res) => {
-        await this.botService.getAndSaveBots(req.body.email)
+        let botIds = await this.botService.getAndSaveBots(req.body.email)
+        if (!botIds || !Array.isArray(botIds)) {
+          console.log('Something went wrong while adding bot reference');
+          return;
+        }
+
+        for (const id of botIds) {
+          await this.workspaceService.addBotRef(id, 'default');
+        }
+
         return sendSuccess(res, 'api called successfully')
       })
     )

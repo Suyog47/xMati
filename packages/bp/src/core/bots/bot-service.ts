@@ -190,6 +190,7 @@ export class BotService {
 
       result = result.data
 
+      let botIds: any[] = [];
       for (let i = 0; i < result.data.length; i++) {
         // convert the recieved data to buffer
         const bufferData = Buffer.from(JSON.parse(result.data[i]['data']).data)
@@ -203,9 +204,12 @@ export class BotService {
         // parse and save the bot inside folder 
         const files = await this._parseBotFiles(JSON.parse(decompressedFile as string))
         await this._saveFiles(result.data[i]['key'].toString().split('_')[1], files)
+        botIds.push(result.data[i]['key'].toString().split('_')[1]);
       }
+      return botIds;
     } catch (error) {
       console.log('Something went wrong in get bots', error)
+      return false;
     }
   }
 
