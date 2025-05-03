@@ -2,32 +2,69 @@ import { Button, FormGroup, InputGroup, Intent } from '@blueprintjs/core'
 import { lang } from 'botpress/shared'
 import React, { FC, useState } from 'react'
 import { PasswordStrengthMeter } from './PasswordStrengthMeter/PasswordStrengthMeter'
+import { useHistory } from 'react-router-dom'
 
 interface Props {
-  email?: string
-  onChangePassword: (newPassword, confirmPassword) => void
+  // email?: string
+  // onChangePassword: (newPassword, confirmPassword) => void
 }
 
 export const ChangePasswordForm: FC<Props> = props => {
   const [email, setEmail] = useState('')
   const [isEmailValid, setEmailValid] = useState(false)
-  const [newPassword, setNewPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
   const [emailChecked, setEmailChecked] = useState(false)
 
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [passSuccess, setPassSuccess] = useState(false)
+  const [passChecked, setPassChecked] = useState(false)
 
-  const onSubmit = e => {
+  const [isLoading, setIsLoading] = useState(false)
+  const history = useHistory()
+
+
+  const onSubmit = async e => {
     e.preventDefault()
-    //props.onChangePassword(newPassword, confirmPassword)
-    console.log(newPassword, ' ', confirmPassword)
+    await updatePass()
+  }
+
+  const updatePass = async () => {
+    setIsLoading(true)
+    setPassChecked(false)
+    try {
+      let result = await fetch('http://localhost:8000/forgot-pass', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password: newPassword,
+        }),
+      })
+
+      if (result.status === 200) {
+        setPassSuccess(true)
+        setPassChecked(true)
+        history.push({
+          pathname: '/login'
+        })
+      } else {
+        setPassSuccess(false)
+        setPassChecked(true)
+      }
+    } catch (error) {
+      setPassSuccess(false)
+      return 'Error uploading credentials to S3'
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const checkEmail = async e => {
     e.preventDefault()
     setIsLoading(true)
     setEmailChecked(false)
-    console.log(isLoading)
     try {
       const result = await fetch('http://localhost:8000/check-user', {
         method: 'POST',
@@ -60,11 +97,6 @@ export const ChangePasswordForm: FC<Props> = props => {
   return (
     <div className="form-container" style={{ position: 'relative' }}>
       <form onSubmit={isEmailValid ? onSubmit : checkEmail}>
-        {/* {props.email && (
-        <FormGroup label={lang.tr('email')}>
-          <InputGroup tabIndex={-1} value={props.email} disabled={true} type="text" id="email-change-password" />
-        </FormGroup>
-      )} */}
 
         <FormGroup label={'Email'}>
           <InputGroup
@@ -83,6 +115,7 @@ export const ChangePasswordForm: FC<Props> = props => {
             </div>
           )}
         </FormGroup>
+
         <Button
           tabIndex={2}
           type="submit"
@@ -118,6 +151,11 @@ export const ChangePasswordForm: FC<Props> = props => {
                 id="confirmPassword"
                 disabled={isLoading}
               />
+              {!passSuccess && passChecked && (
+                <div className="error-message" style={{ color: 'red', marginTop: '5px' }}>
+                  Password failed to update
+                </div>
+              )}
             </FormGroup>
 
             <PasswordStrengthMeter pwdCandidate={newPassword} />

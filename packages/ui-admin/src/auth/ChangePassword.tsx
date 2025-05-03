@@ -35,7 +35,7 @@ export const ChangePassword: React.FC = () => {
 
   return (
     <LoginContainer subtitle={''} error={error}>
-      <ChangePasswordForm onChangePassword={updatePassword} />
+      <ChangePasswordForm />
     </LoginContainer>
   )
 }
