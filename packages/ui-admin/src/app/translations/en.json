@@ -424,6 +424,7 @@
           "roleUpdateFail": "Could not update role: {msg}",
           "roleUpdateSuccess": "Role updated successfully",
           "showEmail": "Email: {email}",
+          "email": "Email",
           "showPassword": "Password: {password}",
           "signInHere": "Sign-in here: {link}"
         },

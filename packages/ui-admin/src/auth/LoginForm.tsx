@@ -39,6 +39,8 @@ export const LoginForm: FC<Props> = props => {
         />
       </FormGroup>
 
+      <Link to="/changePassword">Forgot password?</Link>
+
       <Button
         tabIndex={3}
         type="submit"

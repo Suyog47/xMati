@@ -12,12 +12,16 @@ interface CssExports {
   'card_text': string;
   'card_title': string;
   'centered_container': string;
+  'form-container': string;
   'homepage': string;
   'inner': string;
+  'loader-overlay': string;
+  'loader-spinner': string;
   'login_box': string;
   'login_btn': string;
   'logo': string;
   'middle': string;
+  'spin': string;
   'strenghtLabel': string;
   'strengthDetails': string;
   'strengthProgress': string;

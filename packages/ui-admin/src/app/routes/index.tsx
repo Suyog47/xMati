@@ -90,7 +90,7 @@ export const makeMainRoutes = () => {
             <Route path="/login/:strategy?/:workspace?" render={props => <LoginPage auth={auth} {...props} />} />
             <Route path="/register/:strategy?/:workspace?" render={props => <RegisterPage auth={auth} {...props} />} />
             <Route path="/setToken" component={ExtractToken} />
-            <Route path="/changePassword" render={props => <ChangePassword auth={auth} {...props} />} />
+            <Route path="/changePassword" component={ChangePassword} />
             <Route path="/noAccess" component={NoAccess} />
             <Route path="/chatAuthResult" component={ChatAuthResult} />
             <PrivateRoute path="/" auth={auth} component={App}>

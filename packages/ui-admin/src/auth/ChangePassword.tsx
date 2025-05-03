@@ -10,32 +10,32 @@ import LoginContainer from './LoginContainer'
 type RouterProps = RouteComponentProps<undefined, {}, { email: string; password: string; loginUrl: string }>
 type Props = { auth: BasicAuthentication } & RouterProps
 
-export const ChangePassword: FC<Props> = props => {
+export const ChangePassword: React.FC = () => {
   const [error, setError] = useState<string>()
-  const { email, password, loginUrl } = props.location.state
+  //const { email, password, loginUrl } = props.location.state
 
   const updatePassword = async (newPassword: string, confirmPassword: string) => {
     if (newPassword !== confirmPassword) {
       return setError(lang.tr('admin.passwordsDontMatch'))
     }
 
-    try {
-      setError(undefined)
-      await props.auth.login({ email, password, newPassword }, loginUrl)
-    } catch (err) {
-      setError(err.message)
-    }
+    // try {
+    //   setError(undefined)
+    //   await props.auth.login({ email, password, newPassword }, loginUrl)
+    // } catch (err) {
+    //   setError(err.message)
+    // }
   }
 
-  const subtitle = password === '' ? lang.tr('admin.firstTimeYouRun') : lang.tr('admin.setANewPassword')
+  // const subtitle = password === '' ? lang.tr('admin.firstTimeYouRun') : lang.tr('admin.setANewPassword')
 
-  if (props.auth.isAuthenticated() || !email || !loginUrl) {
-    return <Redirect to="/" />
-  }
+  // if (props.auth.isAuthenticated() || !email || !loginUrl) {
+  //   return <Redirect to="/" />
+  // }
 
   return (
-    <LoginContainer subtitle={subtitle} error={error}>
-      <ChangePasswordForm onChangePassword={updatePassword} email={email} />
+    <LoginContainer subtitle={''} error={error}>
+      <ChangePasswordForm onChangePassword={updatePassword} />
     </LoginContainer>
   )
 }
