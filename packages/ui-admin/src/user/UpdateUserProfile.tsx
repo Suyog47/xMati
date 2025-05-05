@@ -12,34 +12,64 @@ interface Props {
 }
 
 const UpdateUserProfile: FC<Props> = props => {
-  const [firstname, setFirstname] = useState<string>()
-  const [lastname, setLastname] = useState<string>()
-  const [picture_url, setPictureUrl] = useState<string>()
+  const [fullName, setFullname] = useState<string>('')
+  // const [lastname, setLastname] = useState<string>()
+  // const [picture_url, setPictureUrl] = useState<string>()
 
   useEffect(() => {
-    setFirstname(props.profile.firstname)
-    setLastname(props.profile.lastname)
-    setPictureUrl(props.profile.picture_url)
+    const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
+    if (savedFormData.fullName) {
+      setFullname(savedFormData.fullName)
+    } else {
+      setFullname('') // fallback
+    }
   }, [props.isOpen])
 
   const submit = async event => {
     event.preventDefault()
+    const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
 
     try {
-      await api.getSecured().post('/admin/user/profile', { firstname, lastname, picture_url })
+      const updatedFormData = { ...savedFormData, fullName }
+      let res = await s3Call(updatedFormData)
+      if (!res.success) {
+        toast.failure(res.msg)
+        return
+      }
 
-      props.fetchProfile()
       props.toggle()
+      toast.success(res.msg)
 
-      toast.success(lang.tr('admin.profileUpdatedSuccessfully'))
+      localStorage.setItem('formData', JSON.stringify(updatedFormData))
+
+      let data = JSON.parse(localStorage.getItem('formData') || '{}')
     } catch (err) {
       toast.failure(lang.tr('admin.errorUpdatingProfile', { msg: err.message }))
     }
   }
 
-  const uploadFieldChange = (url: string | undefined) => {
-    setPictureUrl(url)
+  const s3Call = async (data) => {
+    try {
+      const result = await fetch('http://localhost:8000/user-auth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          data,
+          from: 'updateProfile'
+        }),
+      })
+
+      return result.json()
+    } catch (error) {
+      return { success: false, msg: 'Error uploading credentials to S3' }
+    }
   }
+
+  // const uploadFieldChange = (url: string | undefined) => {
+  //   setPictureUrl(url)
+  // }
 
   const v1Client = api.getSecured({ useV1: true })
 
@@ -54,23 +84,23 @@ const UpdateUserProfile: FC<Props> = props => {
     >
       <form onSubmit={submit}>
         <div className={Classes.DIALOG_BODY}>
-          <FormGroup label={lang.tr('admin.firstName')} labelFor="input-firstname">
+          <FormGroup label={'Fullname'} labelFor="input-fullname">
             <InputGroup
-              id="input-firstname"
-              value={firstname}
-              onChange={e => setFirstname(e.target.value)}
+              id="input-fullname"
+              value={fullName}
+              onChange={e => setFullname(e.target.value)}
               tabIndex={1}
               autoFocus={true}
             />
           </FormGroup>
 
-          <FormGroup label={lang.tr('admin.lastName')} labelFor="input-lastname">
+          {/* <FormGroup label={lang.tr('admin.lastName')} labelFor="input-lastname">
             <InputGroup id="input-lastname" value={lastname} onChange={e => setLastname(e.target.value)} tabIndex={2} />
-          </FormGroup>
+          </FormGroup> */}
 
-          <FormGroup label={lang.tr('admin.profilePicture')}>
+          {/* <FormGroup label={lang.tr('admin.profilePicture')}>
             <FormFields.Upload axios={v1Client} onChange={uploadFieldChange} value={picture_url} type="image" />
-          </FormGroup>
+          </FormGroup> */}
         </div>
 
         <div className={Classes.DIALOG_FOOTER}>
@@ -81,6 +111,7 @@ const UpdateUserProfile: FC<Props> = props => {
               text={lang.tr('save')}
               tabIndex={3}
               intent={Intent.PRIMARY}
+              disabled={!fullName}
             />
           </div>
         </div>

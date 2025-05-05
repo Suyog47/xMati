@@ -181,36 +181,6 @@ const Login: FC<Props> = props => {
     }
   }
 
-  const parseBotFiles = (text) => {
-    const fileRegex = /\*\*Folder\*\*: (.*?)\s*```json\s*\n([\s\S]*?)\n```/g
-    const files: any = []
-    let match
-
-    while ((match = fileRegex.exec(text)) !== null) {
-      files.push({
-        name: match[1].trim(),
-        content: match[2].trim()
-      })
-    }
-
-    return files
-  }
-
-  // Helper: Save files to disk
-  const saveFiles = async (id, files) => {
-    // const ghostService = new GhostService('arg1', 'arg2', 'arg3', 'arg4') // Replace with actual arguments
-    // const scopedGhost = ghostService.forBot(id)
-    // await scopedGhost.upsertFiles('/', files, { ignoreLock: true })
-
-    // const baseDirectory = path.resolve(`./data/bots`)
-    // //Write files
-    // await Promise.all(files.map(file =>
-    //   fse.writeFile(
-    //     path.join(baseDirectory, botName, file.name),
-    //     file.content
-    //   )))
-  }
-
   if (isLoading || !strategies) {
     return null
   }

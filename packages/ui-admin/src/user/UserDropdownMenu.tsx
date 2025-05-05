@@ -63,7 +63,7 @@ const UserDropdownMenu: FC<Props> = props => {
         <Button id="btn-menu-user-dropdown" icon={icon} minimal rightIcon={<Icon color={Colors.WHITE} icon="caret-down" />} />
         <Menu>
           <MenuDivider title={lang.tr('admin.signedInAs', { name: savedFormData.email })} />
-          {/* <MenuItem id="btn-profile" icon="user" text={lang.tr('admin.updateProfile')} onClick={toggleProfile} /> */}
+          <MenuItem id="btn-profile" icon="user" text={lang.tr('admin.updateProfile')} onClick={toggleProfile} />
 
           {canChangePassword && (
             <MenuItem id="btn-changepass" icon="key" text={lang.tr('admin.changePassword')} onClick={togglePassword} />

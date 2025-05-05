@@ -28,8 +28,8 @@ const UpdatePassword: FC<Props> = props => {
       return
     }
 
-    const updatedData = { ...savedFormData, password: newPassword }
-    let res = await s3Call(updatedData)
+    const updatedFormData = { ...savedFormData, password: newPassword }
+    let res = await s3Call(updatedFormData)
     if (!res.success) {
       toast.failure(res.msg)
       return
@@ -38,7 +38,7 @@ const UpdatePassword: FC<Props> = props => {
     props.toggle()
     toast.success(res.msg)
 
-    localStorage.setItem('formData', JSON.stringify({ updatedData }))
+    localStorage.setItem('formData', JSON.stringify(updatedFormData))
   }
 
   const s3Call = async (data) => {
