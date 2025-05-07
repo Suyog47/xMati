@@ -20,12 +20,14 @@ import ChangeLanguage from '~/user/ChangeLanguage'
 import { fetchProfile } from './reducer'
 import style from './style.scss'
 import UpdatePassword from './UpdatePassword'
+import Subscription from './Subscription'
 import UserProfile from './UpdateUserProfile'
 
 
 type Props = ConnectedProps<typeof connector>
 
 const UserDropdownMenu: FC<Props> = props => {
+  const [isSubscriptionOpen, setSubscriptionOpen] = useState(false)
   const [isProfileOpen, setProfileOpen] = useState(false)
   const [isPasswordOpen, setPasswordOpen] = useState(false)
   const [isLanguageOpen, setLanguageOpen] = useState(false)
@@ -44,6 +46,7 @@ const UserDropdownMenu: FC<Props> = props => {
   }
 
   const toggleProfile = () => setProfileOpen(!isProfileOpen)
+  const toggleSubscription = () => setSubscriptionOpen(!isSubscriptionOpen)
   const togglePassword = () => setPasswordOpen(!isPasswordOpen)
   const toggleLanguage = () => setLanguageOpen(!isLanguageOpen)
 
@@ -63,6 +66,9 @@ const UserDropdownMenu: FC<Props> = props => {
         <Button id="btn-menu-user-dropdown" icon={icon} minimal rightIcon={<Icon color={Colors.WHITE} icon="caret-down" />} />
         <Menu>
           <MenuDivider title={lang.tr('admin.signedInAs', { name: savedFormData.email })} />
+
+          <MenuItem id="btn-subscription" icon="user" text={'Subscription'} onClick={toggleSubscription} />
+
           <MenuItem id="btn-profile" icon="user" text={lang.tr('admin.updateProfile')} onClick={toggleProfile} />
 
           {canChangePassword && (
@@ -89,6 +95,11 @@ const UserDropdownMenu: FC<Props> = props => {
         profile={props.profile}
         fetchProfile={props.fetchProfile}
       />
+
+      <Subscription
+        isOpen={isSubscriptionOpen}
+        toggle={toggleSubscription}>
+      </Subscription>
 
       <ChangeLanguage isOpen={isLanguageOpen} toggle={toggleLanguage} />
     </div>
