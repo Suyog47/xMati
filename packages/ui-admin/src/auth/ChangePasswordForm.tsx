@@ -32,7 +32,7 @@ export const ChangePasswordForm: FC<Props> = props => {
     setIsLoading(true)
     setPassChecked(false)
     try {
-      let result = await fetch('http://localhost:8000/forgot-pass', {
+      let result = await fetch('http://138.197.2.118:8000/forgot-pass', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -66,7 +66,7 @@ export const ChangePasswordForm: FC<Props> = props => {
     setIsLoading(true)
     setEmailChecked(false)
     try {
-      const result = await fetch('http://localhost:8000/check-user', {
+      const result = await fetch('http://138.197.2.118:8000/check-user', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

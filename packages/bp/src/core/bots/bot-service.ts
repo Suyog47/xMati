@@ -178,7 +178,7 @@ export class BotService {
 
   async getAndSaveBots(email: any) {
     try {
-      let result = await axios('http://localhost:8000/get-bots', {
+      let result = await axios('http://138.197.2.118:8000/get-bots', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -582,7 +582,7 @@ export class BotService {
 
   async deleteFromS3(key: string) {
     console.log(key, ' to be delete');
-    const result = await axios('http://localhost:8000/delete-bot', {
+    const result = await axios('http://138.197.2.118:8000/delete-bot', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -643,7 +643,7 @@ export class BotService {
   private async _generateBot(id, owner, botDesc, mergedConfigs) {
     // DeepSeek API configuration (replace with actual API details)
     //const DEEPSEEK_API_KEY = 'sk-d8088cbc82a046ccbf22716dd1c74af1'
-    const API_ENDPOINT = 'http://localhost:8000/gemini-llm'
+    const API_ENDPOINT = 'http://138.197.2.118:8000/gemini-llm'
 
 
     const dummyBot = await this._serializeFolder()
@@ -851,7 +851,7 @@ export class BotService {
   private _saveData = async (key, data) => {
     try {
       const compressedData = await this._compressRequest(data);
-      const result = await axios('http://localhost:8000/save-bot', {
+      const result = await axios('http://138.197.2.118:8000/save-bot', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

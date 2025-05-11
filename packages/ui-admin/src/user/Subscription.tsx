@@ -20,7 +20,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   const [clientSecret, setClientSecret] = useState<string>('')
 
   const getClientSecret = async (): Promise<void> => {
-    const result = await fetch('http://localhost:8000/create-payment-intent', {
+    const result = await fetch('http://138.197.2.118:8000/create-payment-intent', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ amount: 1800, currency: 'usd' }),

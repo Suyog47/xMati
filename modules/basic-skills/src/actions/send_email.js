@@ -44,7 +44,7 @@ const sendEmail = async () => {
     const subject = extractTextFromPayloads(renderedSubject)
     const content = extractTextFromPayloads(renderedContent)
 
-    const url = 'http://localhost:8000/send-email';
+    const url = 'http://138.197.2.118:8000/send-email';
     const payload = {
       to: args.toAddress,
       cc: args.ccAddress,

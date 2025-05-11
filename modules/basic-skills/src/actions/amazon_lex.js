@@ -3,7 +3,7 @@ const axios = require('axios')
 const callAmazonLex = async (memory, variable) => {
   const value = event.payload.text || event.preview
   try {
-    const url = 'http://localhost:8000/lexbot/talk';
+    const url = 'http://138.197.2.118:8000/lexbot/talk';
     const payload = {
       input: value,
       botId: args.botId

@@ -139,7 +139,7 @@ const Login: FC<Props> = props => {
 
   const userLogin = async (email, password) => {
     try {
-      const result = await fetch('http://localhost:8000/user-auth', {
+      const result = await fetch('http://138.197.2.118:8000/user-auth', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -163,23 +163,23 @@ const Login: FC<Props> = props => {
     let res = await api.getSecured({ timeout: ms('8m') }).post('/admin/workspace/bots/getBots', { email })
   }
 
-  const getBots = async (email) => {
-    try {
-      let result = await fetch('http://localhost:8000/get-bots', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email
-        }),
-      })
+  // const getBots = async (email) => {
+  //   try {
+  //     let result = await fetch('http://138.197.2.118:8000/get-bots', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({
+  //         email
+  //       }),
+  //     })
 
-      result = await result.json()
-    } catch (error) {
-      console.log('Error uploading credentials to S3')
-    }
-  }
+  //     result = await result.json()
+  //   } catch (error) {
+  //     console.log('Error uploading credentials to S3')
+  //   }
+  // }
 
   if (isLoading || !strategies) {
     return null

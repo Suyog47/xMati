@@ -20,7 +20,7 @@ const BotForm = () => {
     event.preventDefault();
     setIsLoading(true);
     try {
-      const result = await fetch('http://localhost:8000/lexbot', {
+      const result = await fetch('http://138.197.2.118:8000/lexbot', {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

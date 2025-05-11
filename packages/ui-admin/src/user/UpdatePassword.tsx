@@ -43,7 +43,7 @@ const UpdatePassword: FC<Props> = props => {
 
   const s3Call = async (data) => {
     try {
-      const result = await fetch('http://localhost:8000/user-auth', {
+      const result = await fetch('http://138.197.2.118:8000/user-auth', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
