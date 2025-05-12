@@ -641,38 +641,21 @@ export class BotService {
 
 
   private async _generateBot(id, owner, botDesc, mergedConfigs) {
+    console.log('called')
     // DeepSeek API configuration (replace with actual API details)
-    //const DEEPSEEK_API_KEY = 'sk-d8088cbc82a046ccbf22716dd1c74af1'
-    const API_ENDPOINT = 'http://138.197.2.118:8000/gemini-llm'
-
+    const DEEPSEEK_API_KEY = 'sk-d8088cbc82a046ccbf22716dd1c74af1'
+    const API_ENDPOINT = 'https://api.deepseek.com/v1/chat/completions'
+    //const API_ENDPOINT = 'http://138.197.2.118:8000/gemini-llm'
 
     const dummyBot = await this._serializeFolder()
 
     try {
-      // 1. Call DeepSeek API
-      // const response = await axios.post(API_ENDPOINT, {
-      //   prompt: `
-      //     Generate Botpress files for: ${botDesc}. 
-      //     Here is an example bot structure: ${dummyBot}
-      //     Analyze this folder structure and provide the response strictly according to the dummy structure provided.
-      //     some files have flow and ui json, please dont ignore any.
-      //     Format response with code blocks like:
-      //     **Folder**: flows/main.flow.json
-      //     \`\`\`json
-      //     { ... }
-      //     \`\`\`
-      //     `,
-      //   temperature: 0.7
-      // }, {
-      //   headers: 'application/json' //{ Authorization: `Bearer ${DEEPSEEK_API_KEY}` }
-      // })
-      const botContent = await axios(API_ENDPOINT, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        data: {
-          prompt: `
+      //1. Call DeepSeek API
+      const response = await axios.post(API_ENDPOINT, {
+        model: 'deepseek-chat',
+        messages: [{
+          role: 'user',
+          content: `
           Generate Botpress files for: ${botDesc}. 
           Here is an example bot structure: ${dummyBot}
           Analyze this folder structure and provide the response strictly according to the dummy structure provided.
@@ -681,17 +664,38 @@ export class BotService {
           **Folder**: flows/main.flow.json
           \`\`\`json
           { ... }
-          \`\`\` .
-          Please provide only the above response and not any explaination `,
-        },
+          \`\`\`
+          `}],
+        temperature: 0.7
+      }, {
+        headers: { Authorization: `Bearer ${DEEPSEEK_API_KEY}` }
       })
+      // const botContent = await axios(API_ENDPOINT, {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   data: {
+      //     prompt: `
+      //     Generate Botpress files for: ${botDesc}. 
+      //     Here is an example bot structure: ${dummyBot}
+      //     Analyze this folder structure and provide the response strictly according to the dummy structure provided.
+      //     some files have flow and ui json, please dont ignore any.
+      //     Format response with code blocks like:
+      //     **Folder**: flows/main.flow.json
+      //     \`\`\`json
+      //     { ... }
+      //     \`\`\` .
+      //     Please provide only the above response and not any explaination `,
+      //   },
+      // })
 
-      // // 2. Parse API response
-      // const botContent = response.data.choices[0].message.content
-      // //console.log(botContent)
+      // 2. Parse API response
+      const botContent = response.data.choices[0].message.content
+      //console.log(botContent)
 
       // 3. Extract files from response
-      const files = this._parseBotFiles(botContent.data.response)
+      const files = this._parseBotFiles(botContent)
       console.log(files)
 
       // 4. Save to folders

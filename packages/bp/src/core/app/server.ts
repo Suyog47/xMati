@@ -314,7 +314,7 @@ export class HTTPServer {
           return res
             .status(503)
             .send(
-              '<html><head><meta http-equiv="refresh" content="2"> </head><body>Botpress is loading. Please try again in a minute.</body></html>'
+              '<html><head><meta http-equiv="refresh" content="2"> </head><body>xMati is loading. Please try again in a minute.</body></html>'
             )
         }
       }
