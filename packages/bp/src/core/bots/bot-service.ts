@@ -677,19 +677,28 @@ export class BotService {
         },
         data: {
           prompt: `
-          Generate Botpress files for: ${botDesc}. 
+          You are a Botpress code generator. Your task is to generate Botpress bot files (flows, content, etc.) based on a user's description and a provided example. 
+          The provided example bot is a perfect and complete representation of the desired Botpress bot structure, including all necessary files and the exact JSON structure and content within those files.  You must adhere to it precisely.
+          Here are the key rules:
+          
+          1.  **Exact Replication:** The generated bot's folder structure, file names, JSON structure, keys, data types, and values *must* exactly match the structure and content of the example bot. Do not deviate in any way.
+          2.  **Complete Files:** Generate *all* necessary files for a functional Botpress bot, as demonstrated in the example. This includes '.flow.json' files, 'ui.json' files (when applicable), content files, and any other configuration files present in the example.
+          3.  **Flow and UI Consistency:** For any flow that has a corresponding user interface in the example bot, generate both the '.flow.json' file and the 'ui.json file, ensuring they are correctly linked.  The 'flow.json' should reference the UI elements defined in the 'ui.json' file, exactly as shown in the example.
+          4.  **No Extrapolation:** Do not attempt to extrapolate or guess any missing information. If a file or a specific JSON property is not present in the example bot, do not include it in the generated output.
+          5.  **Prioritize Example:** If the user description conflicts with the structure or content of the example bot, *always* prioritize the example bot. The example bot is the ultimate source of truth.
+          6.  **Strict Output Format:** Return the output as a series of code blocks. Each code block should start with the file path (e.g., '**Folder**: flows/main.flow.json') followed by a JSON code block.  
+          
+          Do not include any other text, explanations, or conversational elements. The JSON code should be valid and complete.
+          
           Here is an example bot structure: ${dummyBot}
-          Analyze this folder structure and provide the response strictly according to the dummy structure provided.
-          some files have flow and ui json files, please dont ignore any.
-          Format response with code blocks like:
-          **Folder**: flows/main.flow.json
-          \`\`\`json
-          { ... }
-          \`\`\` .
-          Please provide only the above response and not any explaination `,
+          Generate Botpress files for: ${botDesc}
+          
+          Return the output as a series of code blocks. Each code block should start with the file path (e.g., '**Folder**: flows/main.flow.json') followed by a JSON code block. 
+          Do *not* include any other text, explanations, or conversational elements. The JSON code should be valid and complete. `,
         },
       })
 
+      console.log('new bot prompt');
       // 2. Parse API response
       //const botContent = response.data.choices[0].message.content
       //console.log(botContent)
