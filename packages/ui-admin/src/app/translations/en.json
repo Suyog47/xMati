@@ -7,7 +7,7 @@
       "activeIncidents": "Active Incidents",
       "alertingAndIncidents": "Alerting & Incidents",
       "autoRefresh": "Auto-Refresh",
-      "makeSureEnabled": "Make sure that alerting is enabled in your Botpress Config (and that you have restarted the server if you just made the change).",
+      "makeSureEnabled": "Make sure that alerting is enabled in your xMati Config (and that you have restarted the server if you just made the change).",
       "notEnabled": "Alerting is not enabled or there is no statistics.",
       "resolvedIncidents": "Resolved Incidents",
       "timeFrame": "Time Frame",
@@ -15,7 +15,7 @@
       "timespanHours": "{nb} hours"
     },
     "authenticationFailed": "Authentication failed",
-    "botpressIsNotLicensed": "Botpress is currently not licensed. Please update your license to re-enable all features.",
+    "botpressIsNotLicensed": "xMati is currently not licensed. Please update your license to re-enable all features.",
     "change": "Change",
     "changeLanguage": "Change language",
     "changePassword": "Change Password",
@@ -25,7 +25,7 @@
     "confirmPassword": "Confirm Password",
     "invalidateActiveSessions": "Invalidate Active Sessions",
     "createAccount": "Create Account",
-    "createMasterAdminAccount": "This is the first time you run Botpress. Please create the master admin account.",
+    "createMasterAdminAccount": "This is the first time you run xMati. Please create the master admin account.",
     "currentPassword": "Current password",
     "passwordStrength": {
       "hint": "It is highly recommended to set a strong password. Consider using all kinds of characters.",
@@ -38,14 +38,14 @@
     "debug": {
       "confUpdated": "Debug configuration updated successfully!",
       "configureDebug": "Configure Debug",
-      "helpText": "This page allows you to enable or disable some debug scopes while using Botpress. This list is populated while features are being used, so some items may be missing",
+      "helpText": "This page allows you to enable or disable some debug scopes while using xMati. This list is populated while features are being used, so some items may be missing",
       "persist": "Persist",
       "persistChecked": "When checked, the selected debug options will be enabled after each server restart"
     },
     "errorUpdatingPassword": "Error while updating password: {msg}",
     "errorUpdatingProfile": "Error while updating profile: {msg}",
     "firstName": "First Name",
-    "firstTimeYouRun": "This is the first time you run Botpress. Please pick a password.",
+    "firstTimeYouRun": "This is the first time you run xMati. Please pick a password.",
     "languages": {
       "addLanguages": "Add Languages",
       "cannotBeEdited": "Languages cannot be edited as Language Server is read only",
@@ -77,8 +77,8 @@
         "areYouSure": "Are you sure?",
         "clusterFingerprint": "Cluster fingerprint",
         "copyToClipboard": "Copy to clipboard",
-        "enableMethod1": "You can enable Botpress Pro by manually editing the file {file} and setting the value {field} to true.",
-        "enablePro": "Enable Botpress Professional",
+        "enableMethod1": "You can enable xMati Pro by manually editing the file {file} and setting the value {field} to true.",
+        "enablePro": "Enable xMati Professional",
         "enabledAndReboot": "Enable Pro & Reboot Server",
         "enabledMethod2": "Click on the button below. This will enable the required configuration and will automatically reboot the server. Please note: Rebooting the server this way will prevent you from reading the logs on screen (except if you output logs to the file system).",
         "fingerprintNoMatch": "Your license fingerprint doesn't match your machine/cluster fingerprints.",
@@ -93,11 +93,11 @@
         "pro": "Pro",
         "renewDate": "Renew Date",
         "support": "Support",
-        "thisIsSupport": "This is the support offered by Botpress",
+        "thisIsSupport": "This is the support offered by xMati",
         "underLimits": "Under Limits",
         "unlicensed": "Unlicensed",
-        "unofficialBuild": "Unofficial Botpress Build",
-        "unofficialBuildText": "We noticed that you are running a custom build of Botpress, which doesn't contain the Botpress Professional extensions. Make sure you use an {official}. You won't be able to activate {pro} otherwise.",
+        "unofficialBuild": "Unofficial xMati Build",
+        "unofficialBuildText": "We noticed that you are running a custom build of xMati, which doesn't contain the xMati Professional extensions. Make sure you use an {official}. You won't be able to activate {pro} otherwise.",
         "useOfficial": "Make sure you use an {officialBinary}, you won't be able to activate pro otherwise.",
         "waitWhileReboot": "Please wait while the server reboots, this may take a couple of seconds."
       },
@@ -146,7 +146,7 @@
       "helpText": "Enabling/disabling a module will update its status in the configuration files. If running a cluster in production, a restart of each node will be required for the change to take effect. Otherwise, the change will be immediate.",
       "invalidModule": "The module archive appears to be invalid",
       "noDescription": "No description available",
-      "rebootRequired": "Your Botpress configuration file was updated successfully. The server must be restarted for changes to take effect.",
+      "rebootRequired": "Your xMati configuration file was updated successfully. The server must be restarted for changes to take effect.",
       "restartNow": "Restart server now",
       "selectArchive": "Select Archive",
       "stable": "Stable Modules",
@@ -181,7 +181,7 @@
       "restartInProgress": "Server restart in progress. To know when the server is back up, watch the uptime for that server in the Overview. You can close this window safely.",
       "restartNow": "Restart server now",
       "serverControl": "Server Control",
-      "youAreAboutToRestart": "You are about to restart the Botpress server hosted on"
+      "youAreAboutToRestart": "You are about to restart the xMati server hosted on"
     },
     "netPromotingScore": {
       "addComment": "Added Comment",
@@ -193,7 +193,7 @@
       "modalTitle": "Type your comment:",
       "moreContent": "Provide Additional Feedback",
       "question": "How likely are you to recommend us to your friends and colleagues?",
-      "title": "Send Feedback to Botpress",
+      "title": "Send Feedback to xMati",
       "worstLabel": "Not at all likely"
     },
     "newPassword": "New Password",
@@ -207,12 +207,12 @@
     "requirements": {
       "alsoRequired": "To use this feature, these features are also required:",
       "confNotUpdated": "Could not update configuration: {msg}",
-      "confUpdated": "Configuration updated successfully! Restart Botpress for changes to take effect",
+      "confUpdated": "Configuration updated successfully! Restart xMati for changes to take effect",
       "enableFeature": "Enable this feature",
       "featureDisabled": "Feature disabled",
       "missing": "Missing requirements",
       "monitoring": "Monitoring must be enabled",
-      "pro": "Botpress Pro must be enabled with a valid license",
+      "pro": "xMati Pro must be enabled with a valid license",
       "redis": "Redis must be enabled and correctly configured",
       "toUseRestart": "To use this feature, click on the button below. A server restart will be required for changes to take effect."
     },
@@ -242,7 +242,7 @@
     "signedInAs": "Signed in as {name}",
     "successfullyAuthenticated": "Successfully authenticated. You can close this window.",
     "uiLanguage": "Language of the user interface",
-    "uiLanguageHelper": "This settings only affects the user interface of Botpress and does not change the language of your bots.",
+    "uiLanguageHelper": "This settings only affects the user interface of xMati and does not change the language of your bots.",
     "updateProfile": "Update Profile",
     "updateYourProfile": "Update your profile",
     "versioning": {
@@ -275,7 +275,7 @@
     },
     "workspace": {
       "bots": {
-        "alwaysAssignedToWorkspace": "In Botpress, bots are always assigned to a workspace.",
+        "alwaysAssignedToWorkspace": "In xMati, bots are always assigned to a workspace.",
         "approvedPromotion": "Approved bot promotion to next stage",
         "bots": "Bots",
         "confirmDelete": "Are you sure you want to delete this bot? This can't be undone.",
@@ -347,7 +347,7 @@
         "new": "New Bot",
         "noBotMatches": "No bot matches your query",
         "noBotYet": "This workspace has no bots, yet",
-        "noSpecifiedLanguage": "You have bots without specified language. Default language is mandatory since Botpress 11.8. Please set bot language in the bot config page.",
+        "noSpecifiedLanguage": "You have bots without specified language. Default language is mandatory since xMati 11.8. Please set bot language in the bot config page.",
         "promoted": "Bot promoted to next stage",
         "remounted": "Bot remounted successfully",
         "revisionsCreated": "Revisions created",

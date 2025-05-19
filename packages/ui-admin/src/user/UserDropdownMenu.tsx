@@ -21,6 +21,7 @@ import { fetchProfile } from './reducer'
 import style from './style.scss'
 import UpdatePassword from './UpdatePassword'
 import Subscription from './Subscription'
+import VoiceRecorder from './VoicetoText'
 import UserProfile from './UpdateUserProfile'
 
 
@@ -28,6 +29,7 @@ type Props = ConnectedProps<typeof connector>
 
 const UserDropdownMenu: FC<Props> = props => {
   const [isSubscriptionOpen, setSubscriptionOpen] = useState(false)
+  const [isGemini, setGemini] = useState(false)
   const [isProfileOpen, setProfileOpen] = useState(false)
   const [isPasswordOpen, setPasswordOpen] = useState(false)
   const [isLanguageOpen, setLanguageOpen] = useState(false)
@@ -47,6 +49,7 @@ const UserDropdownMenu: FC<Props> = props => {
 
   const toggleProfile = () => setProfileOpen(!isProfileOpen)
   const toggleSubscription = () => setSubscriptionOpen(!isSubscriptionOpen)
+  const toggleGemini = () => setGemini(!isGemini)
   const togglePassword = () => setPasswordOpen(!isPasswordOpen)
   const toggleLanguage = () => setLanguageOpen(!isLanguageOpen)
 
@@ -68,6 +71,8 @@ const UserDropdownMenu: FC<Props> = props => {
           <MenuDivider title={lang.tr('admin.signedInAs', { name: savedFormData.email })} />
 
           <MenuItem id="btn-subscription" icon="user" text={'Subscription'} onClick={toggleSubscription} />
+
+          <MenuItem id="btn-gemini" icon="user" text={'Gemini Speech'} onClick={toggleGemini} />
 
           <MenuItem id="btn-profile" icon="user" text={lang.tr('admin.updateProfile')} onClick={toggleProfile} />
 
@@ -100,6 +105,11 @@ const UserDropdownMenu: FC<Props> = props => {
         isOpen={isSubscriptionOpen}
         toggle={toggleSubscription}>
       </Subscription>
+
+      <VoiceRecorder
+        isOpen={isGemini}
+        toggle={toggleGemini}>
+      </VoiceRecorder>
 
       <ChangeLanguage isOpen={isLanguageOpen} toggle={toggleLanguage} />
     </div>

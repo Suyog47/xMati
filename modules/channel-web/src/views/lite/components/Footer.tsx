@@ -24,8 +24,8 @@ const Footer = () => {
                 </i>
               ),
               link: (
-                <a href={'https://botpress.com'} target="_blank">
-                  {'Botpress'}
+                <a href={'https://staging.xmati.ai'} target="_blank">
+                  {'xMati'}
                 </a>
               )
             }}
