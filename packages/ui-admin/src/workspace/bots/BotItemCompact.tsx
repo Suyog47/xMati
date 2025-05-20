@@ -118,14 +118,14 @@ const BotItemCompact: FC<Props> = props => {
                   onClick={props.rollback}
                 />
               </AccessControl> */}
-              {/* <AccessControl resource="admin.bots.archive" operation="read">
+              <AccessControl resource="admin.bots.archive" operation="read">
                 <MenuItem
                   text={lang.tr('admin.workspace.bots.item.export')}
                   icon="export"
                   id="btn-export-bot-item"
                   onClick={props.exportBot}
                 />
-              </AccessControl> */}
+              </AccessControl>
               <AccessControl resource="admin.bots.*" operation="write">
                 <MenuItem
                   text={lang.tr('admin.workspace.bots.item.delete')}

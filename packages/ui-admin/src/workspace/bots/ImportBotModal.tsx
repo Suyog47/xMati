@@ -159,7 +159,18 @@ class ImportBotModal extends Component<Props, State> {
           }}
         >
           <div className={Classes.DIALOG_BODY}>
-            <FormGroup
+            <span>
+              {this.state.isIdTaken && (
+                <div>
+                  <Callout intent={Intent.DANGER}>{lang.tr('admin.workspace.bots.import.alreadyInUse')}</Callout>
+                </div>
+              )}
+              {this.state.isExistingBot && (
+                <Callout intent={Intent.WARNING}>{lang.tr('admin.workspace.bots.import.alreadyExists')}</Callout>
+              )}
+              {/* {lang.tr('admin.workspace.bots.create.id')}{' '} */}
+            </span>
+            {/* <FormGroup
               label={
                 <span>
                   {this.state.isIdTaken && (
@@ -188,7 +199,7 @@ class ImportBotModal extends Component<Props, State> {
                 onChange={this.handleBotIdChanged}
                 autoFocus={true}
               />
-            </FormGroup>
+            </FormGroup> */}
             <FormGroup label={lang.tr('admin.workspace.bots.import.archive')} labelInfo="*" labelFor="archive">
               <FileInput
                 tabIndex={2}

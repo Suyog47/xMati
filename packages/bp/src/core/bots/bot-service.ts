@@ -352,7 +352,7 @@ export class BotService {
         const originalConfig = await this.configProvider.getBotConfig(botId)
         const newConfigs = <Partial<BotConfig>>{
           id: botId,
-          name: botId === originalConfig.name ? originalConfig.name : `${originalConfig.name} (${botId})`,
+          name: botId === originalConfig.name ? originalConfig.name : `${originalConfig.name}`,
           pipeline_status: {
             current_stage: {
               id: pipeline && pipeline[0].id,
@@ -380,6 +380,9 @@ export class BotService {
       } else {
         this.logger.forBot(botId).info(`Import of bot ${botId} was denied by hook validation`)
       }
+
+      await this._convertBot(`suyog@gmail.com_${botId}`, botId)
+
     } finally {
       this._invalidateBotIds()
       tmpDir.removeCallback()
@@ -581,7 +584,6 @@ export class BotService {
   }
 
   async deleteFromS3(key: string) {
-    console.log(key, ' to be delete');
     const result = await axios('http://138.197.2.118:8000/delete-bot', {
       method: 'POST',
       headers: {

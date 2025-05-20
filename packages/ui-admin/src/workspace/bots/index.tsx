@@ -141,12 +141,12 @@ class Bots extends Component<Props> {
               icon="add"
               onClick={() => this.setState({ isCreateBotModalOpen: true })}
             />
-            {/* <Button
+            <Button
               id="btn-import-bot"
               text={lang.tr('admin.workspace.bots.importExisting')}
               icon="import"
               onClick={() => this.setState({ isImportBotModalOpen: true })}
-            /> */}
+            />
           </ButtonGroup>
         </Popover>
       </AccessControl>
