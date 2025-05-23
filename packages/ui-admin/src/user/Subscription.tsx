@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect, useMemo } from 'react'
+import React, { FC, useState, useEffect, useMemo, useCallback } from 'react'
 import {
   Elements,
   CardElement,
@@ -19,37 +19,67 @@ interface Props {
 const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   const [clientSecret, setClientSecret] = useState<string>('')
   const [selectedTab, setSelectedTab] = useState('Business Starter')
+  const [isLoadingSecret, setIsLoadingSecret] = useState(false)
+  const [paymentError, setPaymentError] = useState('')
 
-  const getClientSecret = async (): Promise<void> => {
-    const result = await fetch('http://138.197.2.118:8000/create-payment-intent', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount: selectedTab === 'Business Starter' ? 1800 : 10000, currency: 'usd' }),
-    }).then(res => res.json())
-
-    setClientSecret(result.client_secret)
-  }
-
-  // useEffect(() => {
-  //   if (!isOpen) {
-  //     return
-  //   }
-
-  //   getClientSecret()
-  // }, [isOpen])
+  // Calculate amount dynamically based on selectedTab
+  const amount = useMemo(() => (
+    selectedTab === 'Business Starter' ? 1800 : 10000
+  ), [selectedTab])
 
 
-  const CheckoutForm = () => {
+  // Fetch client secret with error handling
+  const getClientSecret = useCallback(async () => {
+    setIsLoadingSecret(true)
+    setPaymentError('')
+
+    try {
+      const result = await fetch('http://138.197.2.118:8000/create-payment-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount, currency: 'usd' }), // Use memoized amount
+      })
+
+      if (!result.ok) {
+        throw new Error('Payment setup failed')
+      }
+
+      const data = await result.json()
+      if (!data.client_secret) {
+        throw new Error('Invalid server response')
+      }
+
+      setClientSecret(data.client_secret)
+    } catch (err: any) {
+      setPaymentError(err.message)
+      setClientSecret('')
+    } finally {
+      setIsLoadingSecret(false)
+    }
+  }, [amount]) // Re-run when amount changes
+
+  // Refresh client secret when tab changes or dialog opens
+  useEffect(() => {
+    if (isOpen) {
+      void (async () => {
+        try {
+          await getClientSecret()
+        } catch (error) {
+          console.error('Payment setup failed:', error)
+          // Set error state here if needed
+        }
+      })()
+    }
+  }, [isOpen, getClientSecret]) // Add getClientSecret to dependencies
+
+
+
+  const CheckoutForm = useMemo(() => () => {
     const stripe = useStripe()
     const elements = useElements()
     const [error, setError] = useState('')
     const [isProcessing, setIsProcessing] = useState(false)
     const [paymentRequest, setPaymentRequest] = useState<PaymentRequest | null>(null)
-
-    // Calculate amount dynamically based on selectedTab
-    const amount = useMemo(() => (
-      selectedTab === 'Business Starter' ? 1800 : 10000
-    ), [selectedTab])
 
     // Initialize PaymentRequest (Apple/Google Pay)
     useEffect(() => {
@@ -75,20 +105,18 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
 
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault()
-      if (!stripe || !elements) {
-        return
+      if (!stripe || !elements || !clientSecret) {
+        return // Add clientSecret check
       }
 
       setIsProcessing(true)
       setError('')
 
       try {
-        // Validate CardElement
         const cardElement = elements.getElement(CardElement)
         if (!cardElement) {
           throw new Error('Card details missing')
         }
-
         const { error: paymentError } = await stripe.confirmCardPayment(clientSecret, {
           payment_method: { card: cardElement }
         })
@@ -96,6 +124,8 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         if (paymentError) {
           throw paymentError
         }
+
+        await setSubscriber()
         alert('Payment succeeded!')
         toggle()
       } catch (err: any) {
@@ -105,18 +135,36 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       }
     }
 
+
+    const setSubscriber = async () => {
+      console.log('Setting subscriber')
+      try {
+        const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
+        const { email } = savedFormData
+
+        const result = await fetch('http://localhost:8000/save-subscription', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key: email, subscription: selectedTab }),
+        })
+
+        if (!result.ok) {
+          throw new Error('Subscriber saving failed')
+        }
+
+        const data = await result.json()
+        if (!data.client_secret) {
+          throw new Error('Invalid server response')
+        }
+      } catch (err: any) {
+
+      }
+    }
+
     return (
       <div style={{ padding: 20 }}>
         {/* Dedicated Card Section */}
         <form onSubmit={handleSubmit}>
-          {/* <div style={{
-            fontSize: '24px',
-            fontWeight: 'bold',
-            marginBottom: '20px',
-            textAlign: 'center'
-          }}>
-            Total Amount: $18.00
-          </div> */}
 
           <FormGroup label="Credit/Debit Card Details">
             <CardElement
@@ -140,7 +188,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
             fill
             style={{ marginTop: '20px' }}
           >
-            {isProcessing ? 'Processing...' : selectedTab === 'Business Starter' ? 'Pay $18.00' : 'Pay $100.00'}
+            {isProcessing ? 'Processing...' : `Pay $${amount / 100}`}
           </Button>
         </form>
 
@@ -152,7 +200,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         )}
       </div>
     )
-  }
+  }, [clientSecret, amount, toggle]) // Add required dependencies
 
   return (
     <Dialog
@@ -246,14 +294,22 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
             color: '#666',
             fontSize: 14
           }}>
-            {clientSecret ? (
+
+            {isLoadingSecret && (
+              <div style={{ padding: 20, textAlign: 'center' }}>
+                Loading payment details...
+              </div>
+            )}
+
+            {/* Show errors */}
+            {paymentError && (
+              <div style={{ color: 'red', margin: '15px 0' }}>{paymentError}</div>
+            )}
+
+            {!isLoadingSecret && clientSecret && (
               <Elements stripe={stripePromise} options={{ clientSecret }}>
                 <CheckoutForm />
               </Elements>
-            ) : (
-              <div style={{ padding: 20, textAlign: 'center' }}>
-                Initializing payment...
-              </div>
             )}
           </div>
 
