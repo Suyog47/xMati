@@ -30,6 +30,7 @@ export function getChatUserAuth(): ChatUserAuth | undefined {
 }
 
 interface LoginCredentials {
+  owner: string
   email: string
   password: string
   newPassword?: string
@@ -46,7 +47,13 @@ export default class BasicAuthentication {
 
     auth.setToken(data.payload)
 
+    await this.backupBot(credentials.owner)
+
     await this.afterLoginRedirect(returnTo)
+  }
+
+  backupBot = async (email) => {
+    await api.getSecured({ timeout: ms('8m') }).post('/admin/workspace/bots/getBots', { email })
   }
 
   afterLoginRedirect = async (redirectTo?: string) => {

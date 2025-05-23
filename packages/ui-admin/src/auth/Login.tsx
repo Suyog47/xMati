@@ -127,9 +127,8 @@ const Login: FC<Props> = props => {
       }
 
       await setLocalData(status.s3Data)
-      await props.auth.login({ email: 'admin@gmail.com', password: 'Admin@123' }, loginUrl, redirectTo)
-      await saveBot(status.s3Data.email)
-      fetchBots()
+      await props.auth.login({ owner: status.s3Data.email, email: 'admin@gmail.com', password: 'Admin@123' }, loginUrl, redirectTo)
+
     } catch (err) {
       if (err.type === 'PasswordExpiredError') {
         props.history.push({ pathname: '/changePassword', state: { email, password, loginUrl } })
@@ -159,10 +158,6 @@ const Login: FC<Props> = props => {
     } catch (error) {
       return { success: false, msg: 'Error uploading credentials to S3' }
     }
-  }
-
-  const saveBot = async (email) => {
-    let res = await api.getSecured({ timeout: ms('8m') }).post('/admin/workspace/bots/getBots', { email })
   }
 
   // const getBots = async (email) => {

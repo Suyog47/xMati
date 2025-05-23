@@ -10,10 +10,13 @@ interface Props {
 export const LoginForm: FC<Props> = props => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
 
   const onSubmit = e => {
     e.preventDefault()
+    setLoading(true)
     props.onLogin(email, password)
+    setLoading(false)
   }
 
   return (
@@ -46,7 +49,7 @@ export const LoginForm: FC<Props> = props => {
         type="submit"
         id="btn-signin"
         text={lang.tr('admin.signIn')}
-        disabled={!email || !password}
+        disabled={!email || !password || loading}
         intent={Intent.WARNING}
       /> <br />
 
