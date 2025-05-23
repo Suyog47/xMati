@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect } from 'react'
+import React, { FC, useState, useEffect, useMemo } from 'react'
 import {
   Elements,
   CardElement,
@@ -18,12 +18,13 @@ interface Props {
 
 const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   const [clientSecret, setClientSecret] = useState<string>('')
+  const [selectedTab, setSelectedTab] = useState('Business Starter')
 
   const getClientSecret = async (): Promise<void> => {
     const result = await fetch('http://138.197.2.118:8000/create-payment-intent', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount: 1800, currency: 'usd' }),
+      body: JSON.stringify({ amount: selectedTab === 'Business Starter' ? 1800 : 10000, currency: 'usd' }),
     }).then(res => res.json())
 
     setClientSecret(result.client_secret)
@@ -45,6 +46,11 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     const [isProcessing, setIsProcessing] = useState(false)
     const [paymentRequest, setPaymentRequest] = useState<PaymentRequest | null>(null)
 
+    // Calculate amount dynamically based on selectedTab
+    const amount = useMemo(() => (
+      selectedTab === 'Business Starter' ? 1800 : 10000
+    ), [selectedTab])
+
     // Initialize PaymentRequest (Apple/Google Pay)
     useEffect(() => {
       void (async () => {
@@ -52,20 +58,20 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
           return
         }
 
+        console.log(amount)
         const pr = stripe.paymentRequest({
           country: 'US',
           currency: 'usd',
-          total: { label: 'Total', amount: 1800 }, // $18.00
+          total: { label: 'Total', amount },
           requestPayerName: true,
           requestPayerEmail: true,
         })
-
         const result = await pr.canMakePayment()
         if (result) {
           setPaymentRequest(pr)
         }
       })
-    }, [stripe])
+    }, [stripe, amount])
 
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault()
@@ -103,14 +109,14 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       <div style={{ padding: 20 }}>
         {/* Dedicated Card Section */}
         <form onSubmit={handleSubmit}>
-          <div style={{
+          {/* <div style={{
             fontSize: '24px',
             fontWeight: 'bold',
             marginBottom: '20px',
             textAlign: 'center'
           }}>
             Total Amount: $18.00
-          </div>
+          </div> */}
 
           <FormGroup label="Credit/Debit Card Details">
             <CardElement
@@ -134,7 +140,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
             fill
             style={{ marginTop: '20px' }}
           >
-            {isProcessing ? 'Processing...' : 'Pay $18.00'}
+            {isProcessing ? 'Processing...' : selectedTab === 'Business Starter' ? 'Pay $18.00' : 'Pay $100.00'}
           </Button>
         </form>
 
@@ -156,17 +162,121 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       onClose={toggle}
       style={{ width: '500px' }}
     >
-      {clientSecret ? (
-        <Elements stripe={stripePromise} options={{ clientSecret }}>
-          <CheckoutForm />
-        </Elements>
-      ) : (
-        <div style={{ padding: 20, textAlign: 'center' }}>
-          Initializing payment...
+      <div style={{ padding: 20 }}>
+        {/* Tabs */}
+        <div style={{
+          display: 'flex',
+          marginBottom: 20,
+          borderBottom: '1px solid #e0e0e0'
+        }}>
+          {['Business Starter', 'Business Professional'].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setSelectedTab(tab)}
+              style={{
+                flex: 1,
+                padding: '12px 0',
+                border: 'none',
+                outline: 'none', // Removes focus border
+                background: selectedTab === tab ? '#fff' : '#f5f5f5',
+                borderBottom: selectedTab === tab ? '2px solid #2196f3' : 'none',
+                cursor: 'pointer',
+                fontWeight: 500,
+                color: selectedTab === tab ? '#2196f3' : '#666',
+                margin: '0 4px', // Adds space between tabs
+                borderRadius: '4px 4px 0 0',
+                boxShadow: 'none', // Removes any shadow on click
+              }}
+            >
+              {tab}
+            </button>
+          ))}
         </div>
-      )}
-    </Dialog>
 
+        {/* Pricing Card */}
+        <div style={{
+          border: '1px solid #e0e0e0',
+          borderRadius: 8,
+          padding: 20,
+          paddingBottom: 10,
+          marginBottom: 10
+        }}>
+          <h2 style={{ marginTop: 0, marginBottom: 16 }}>
+            {selectedTab === 'Business Starter' ? '$18/month' : '$100/month'}
+          </h2>
+
+          <div style={{
+            marginBottom: 16,
+            padding: '12px',
+            background: '#f8f9fa',
+            borderRadius: 4
+          }}>
+            <strong>
+              {selectedTab === 'Business Starter' ? '3 bots included' : '5 bots included'}
+            </strong>
+          </div>
+
+          {/* Common Features */}
+          <div style={{ marginBottom: 20 }}>
+            <div style={{
+              color: '#666',
+              marginBottom: 12,
+              paddingBottom: 12,
+              borderBottom: '1px solid #eee'
+            }}>
+              Includes:
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
+              <span style={{ color: '#4caf50', marginRight: 8 }}>✓</span>
+              LLM Support
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
+              <span style={{ color: '#4caf50', marginRight: 8 }}>✓</span>
+              HITL (Human in the Loop) Enabled
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
+              <span style={{ color: '#4caf50', marginRight: 8 }}>✓</span>
+              Bot Analytics
+            </div>
+          </div>
+
+          <div style={{
+            textAlign: 'center',
+            color: '#666',
+            fontSize: 14
+          }}>
+            {clientSecret ? (
+              <Elements stripe={stripePromise} options={{ clientSecret }}>
+                <CheckoutForm />
+              </Elements>
+            ) : (
+              <div style={{ padding: 20, textAlign: 'center' }}>
+                Initializing payment...
+              </div>
+            )}
+          </div>
+
+
+          {/* <button
+            style={{
+              width: '100%',
+              padding: '12px',
+              background: '#2196f3',
+              color: 'white',
+              border: 'none',
+              borderRadius: 4,
+              cursor: 'pointer',
+              fontWeight: 500
+            }}
+            onClick={getClientSecret}
+          >
+            Subscribe to {selectedTab}
+          </button> */}
+        </div>
+      </div>
+
+    </Dialog>
   )
 }
 

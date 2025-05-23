@@ -4,6 +4,7 @@ import { get } from 'lodash'
 import React, { FC, useEffect, useState } from 'react'
 import { RouteComponentProps } from 'react-router'
 import { GhostService } from '../../../bp/dist/core/bpfs'
+import { fetchBots } from '~/workspace/bots/reducer'
 import api from '~/app/api'
 import { ExtendedHistory } from '~/app/history'
 import BasicAuthentication, { setActiveWorkspace, setChatUserAuth } from '~/auth/basicAuth'
@@ -107,7 +108,7 @@ const Login: FC<Props> = props => {
     }
 
     // if (isFirstUser) {
-    //   props.history.push({ pathname: '/login', state: { registerUrl } })
+    //   props.history.push({ pathname: '/register', state: { registerUrl } })
     //   //props.history.push({ pathname: '/wizard' })
     // } else {
 
@@ -128,6 +129,7 @@ const Login: FC<Props> = props => {
       await setLocalData(status.s3Data)
       await props.auth.login({ email: 'admin@gmail.com', password: 'Admin@123' }, loginUrl, redirectTo)
       await saveBot(status.s3Data.email)
+      fetchBots()
     } catch (err) {
       if (err.type === 'PasswordExpiredError') {
         props.history.push({ pathname: '/changePassword', state: { email, password, loginUrl } })

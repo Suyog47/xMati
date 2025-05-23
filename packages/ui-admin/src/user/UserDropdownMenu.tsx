@@ -72,7 +72,7 @@ const UserDropdownMenu: FC<Props> = props => {
 
           <MenuItem id="btn-subscription" icon="user" text={'Subscription'} onClick={toggleSubscription} />
 
-          <MenuItem id="btn-gemini" icon="user" text={'Gemini Speech'} onClick={toggleGemini} />
+          {/* <MenuItem id="btn-gemini" icon="user" text={'Gemini Speech'} onClick={toggleGemini} /> */}
 
           <MenuItem id="btn-profile" icon="user" text={lang.tr('admin.updateProfile')} onClick={toggleProfile} />
 
@@ -106,10 +106,10 @@ const UserDropdownMenu: FC<Props> = props => {
         toggle={toggleSubscription}>
       </Subscription>
 
-      <VoiceRecorder
+      {/* <VoiceRecorder
         isOpen={isGemini}
         toggle={toggleGemini}>
-      </VoiceRecorder>
+      </VoiceRecorder> */}
 
       <ChangeLanguage isOpen={isLanguageOpen} toggle={toggleLanguage} />
     </div>
