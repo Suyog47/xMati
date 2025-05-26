@@ -160,24 +160,6 @@ const Login: FC<Props> = props => {
     }
   }
 
-  // const getBots = async (email) => {
-  //   try {
-  //     let result = await fetch('http://138.197.2.118:8000/get-bots', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({
-  //         email
-  //       }),
-  //     })
-
-  //     result = await result.json()
-  //   } catch (error) {
-  //     console.log('Error uploading credentials to S3')
-  //   }
-  // }
-
   if (isLoading || !strategies) {
     return null
   }

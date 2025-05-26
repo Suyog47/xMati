@@ -1,4 +1,4 @@
-import { Button, FormGroup, InputGroup, Intent } from '@blueprintjs/core'
+import { Button, FormGroup, InputGroup, Intent, Spinner, SpinnerSize } from '@blueprintjs/core'
 import { lang } from 'botpress/shared'
 import React, { FC, useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -51,6 +51,7 @@ export const LoginForm: FC<Props> = props => {
         text={lang.tr('admin.signIn')}
         disabled={!email || !password || loading}
         intent={Intent.WARNING}
+        rightIcon={loading ? <Spinner size={SpinnerSize.SMALL} /> : null}
       /> <br />
 
       <p>

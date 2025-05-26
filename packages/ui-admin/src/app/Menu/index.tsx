@@ -155,7 +155,7 @@ const Menu: FC<Props> = props => {
           operation="read"
         /> */}
         {/* <MenuItem text={lang.tr('sideMenu.modules')} id="btn-menu-modules" icon="control" url="/modules" /> */}
-        {renderWorkspaceApps()}
+        {/* {renderWorkspaceApps()} */}
 
         {/* <AccessControl superAdmin={true}>
           <MenuItem

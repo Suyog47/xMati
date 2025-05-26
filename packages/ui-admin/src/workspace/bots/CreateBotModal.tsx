@@ -214,7 +214,7 @@ class CreateBotModal extends Component<Props, State> {
           <li>Navigate to your <b>Slack Apps</b> page.</li>
           <li>Click <b>Create New App</b>, choose <b>From scratch</b>, and give your app a name. Make sure to remember this name—you'll need it later.</li>
           <li>Go to the <b>Features</b> section, select <b>Interactivity & Shortcuts</b>, and toggle <b>Interactivity</b> to On.</li>
-          <li>Set the Request URL to:- <b>'http://138.197.2.118:3000/api/v1/messaging/webhooks/${botId}/slack/interactive'</b></li>
+          <li>Set the Request URL to:- <b>'https://www.app.xmati.ai/api/v1/messaging/webhooks/${botId}/slack/interactive'</b></li>
           <li>Click <b>Save Changes.</b></li>
           <li>In <b>Features</b>, open <b>OAuth & Permissions</b> and add the following under <b>Bot Token Scopes</b>:- 'chat:write'</li>
           <li>Still under <b>Features</b>, go to <b>App Home</b>. Under <b>Show Tabs</b>, enable the option <b>Allow users to send Slash commands and messages from the messages tab.</b></li>
@@ -223,7 +223,7 @@ class CreateBotModal extends Component<Props, State> {
           <li>Locate the <b>Signing Secret</b> in the <b>Basic Information</b> section, and paste it as well.</li>
           <li>Click <b>Submit</b> button here and wait for the bot to be created.</li>
           <li>Go back to the <b>Slack App</b> page, navigate to <b>Features > Event Subscriptions</b>, and enable <b>Event Subscriptions</b>.</li>
-          <li>Set the Request URL to:- <b>'http://138.197.2.118:3000/api/v1/messaging/webhooks/${botId}/slack/events'</b></li>
+          <li>Set the Request URL to:- <b>'https://www.app.xmati.ai/api/v1/messaging/webhooks/${botId}/slack/events'</b></li>
           <li>Under <b>Subscribe to Bot Events</b>, add the following events: - <b>'message.im'</b> and <b>'message.channels'</b></li>
           <li>Wait for the <b>Verified</b> confirmation next to the URL and save your changes.</li>
           <li>A yellow banner may appear at the top—click <b>Reinstall your app</b>, then click Allow.</li>
@@ -264,7 +264,7 @@ class CreateBotModal extends Component<Props, State> {
           <li>After successful linking, click on <b>Generate</b> button on the right side and copy the <b>Access token</b></li>
           <li>Come back here and paste the <b>App Secret</b> and <b>Access Token</b> you copied earlier</li>
           <li>Click <b>Submit</b> button and wait for the bot to be created.</li>
-          <li>Go back to the <b>Facebook App</b> page and under <b>Configure Webhooks</b>, Enter the Callback URL:- <b>http://138.197.2.118:3000/api/v1/messaging/webhooks/${botId}/messenger</b></li>
+          <li>Go back to the <b>Facebook App</b> page and under <b>Configure Webhooks</b>, Enter the Callback URL:- <b>https://www.app.xmati.ai/api/v1/messaging/webhooks/${botId}/messenger</b></li>
           <li>Paste the verify token that you have copied earlier from point 8.</li>
           <li>Click on <b>'Verify and save'</b>.</li>
           <li>Make sure you enable <b>messages</b> and <b>messaging_postbacks</b> inside <b>Subscription Fields</b></li>

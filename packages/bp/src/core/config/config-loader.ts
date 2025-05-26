@@ -258,17 +258,17 @@ export class ConfigProvider {
     const defaultConfig = {
       admin: {
         title: 'xMati Admin Panel',
-        favicon: 'assets/studio/ui/public/img/project-icon-3.svg',
+        favicon: 'assets/studio/ui/public/img/xmati.png',
         customCss: ''
       },
       studio: {
         title: 'xMati Studio',
-        favicon: 'assets/studio/ui/public/img/project-icon-3.svg',
+        favicon: 'assets/studio/ui/public/img/xmati.png',
         customCss: ''
       },
       webchat: {
         title: 'xMati Webchat',
-        favicon: 'assets/studio/ui/public/img/project-icon-3.svg',
+        favicon: 'assets/studio/ui/public/img/xmati.png',
         customCss: ''
       }
     }
