@@ -1,4 +1,4 @@
-import { Button, FormGroup, InputGroup, Intent } from '@blueprintjs/core'
+import { Button, FormGroup, InputGroup, Intent, Spinner, SpinnerSize } from '@blueprintjs/core'
 import { lang } from 'botpress/shared'
 import React, { FC, useState } from 'react'
 import { PasswordStrengthMeter } from './PasswordStrengthMeter/PasswordStrengthMeter'
@@ -123,6 +123,7 @@ export const ChangePasswordForm: FC<Props> = props => {
           id="btn-check-email"
           disabled={isLoading || isEmailValid || !email}
           intent={Intent.WARNING}
+          rightIcon={isLoading ? <Spinner size={SpinnerSize.SMALL} /> : null}
         />
         <br /><br />
 
@@ -173,6 +174,7 @@ export const ChangePasswordForm: FC<Props> = props => {
               id="btn-change-pass"
               disabled={!newPassword || !confirmPassword || newPassword !== confirmPassword}
               intent={Intent.WARNING}
+              rightIcon={isLoading ? <Spinner size={SpinnerSize.SMALL} /> : null}
             />
           </>
         )}

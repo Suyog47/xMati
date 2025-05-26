@@ -13,6 +13,7 @@ import { AuthMethodPicker } from './AuthMethodPicker'
 import LoginContainer from './LoginContainer'
 import { LoginForm } from './LoginForm'
 import ms from 'ms'
+import { Spinner, SpinnerSize } from '@blueprintjs/core/lib/esm/components/spinner/spinner'
 
 type RouterProps = RouteComponentProps<
   { strategy: string; workspace: string },
@@ -118,6 +119,7 @@ const Login: FC<Props> = props => {
 
   const loginUser = async (email: string, password: string) => {
     try {
+      // setLoading(true)
       setError(undefined)
 
       let status = await userLogin(email, password)
@@ -135,6 +137,8 @@ const Login: FC<Props> = props => {
       } else {
         setError(get(err, 'response.data.message', err.message))
       }
+    } finally {
+      // setLoading(false)
     }
   }
 

@@ -4,7 +4,7 @@ import React, { FC, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 interface Props {
-  onLogin: (email, password) => void
+  onLogin: (email, password) => Promise<void>
 }
 
 export const LoginForm: FC<Props> = props => {
@@ -12,10 +12,10 @@ export const LoginForm: FC<Props> = props => {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const onSubmit = e => {
+  const onSubmit = async e => {
     e.preventDefault()
     setLoading(true)
-    props.onLogin(email, password)
+    await props.onLogin(email, password)
     setLoading(false)
   }
 
