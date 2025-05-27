@@ -291,6 +291,10 @@ const CustomerWizard: React.FC = () => {
 
       // create the bot
       let status = await createBot()
+
+      // create subscription for the user
+      await setSubscriber()
+
       return status
     } catch (error) {
       const errorMsg =
@@ -328,6 +332,21 @@ const CustomerWizard: React.FC = () => {
     } catch (error) {
       setIsLoading(false)
       return { success: false, msg: 'Error uploading credentials to S3' }
+    }
+  }
+
+  const setSubscriber = async () => {
+    try {
+      const result = await fetch('http://localhost:8000/save-subscription', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: formData.email, subscription: 'trial' }),
+      })
+
+      return result.json()
+    } catch (err: any) {
+      setIsLoading(false)
+      return { success: false, msg: 'Error uploading subscription to S3' }
     }
   }
 
@@ -397,7 +416,6 @@ const CustomerWizard: React.FC = () => {
       return false
     }
   }
-
 
   const setLocalData = async () => {
     const updatedFormData = {

@@ -128,7 +128,13 @@ const Login: FC<Props> = props => {
         return
       }
 
-      await setLocalData(status.s3Data)
+      let subStatus = await userSubscription(email)
+      if (subStatus.success) {
+        setError(subStatus.msg)
+        return
+      }
+
+      await setLocalData(status.s3Data, subStatus.data)
       await props.auth.login({ owner: status.s3Data.email, email: 'admin@gmail.com', password: 'Admin@123' }, loginUrl, redirectTo)
 
     } catch (err) {
@@ -157,6 +163,23 @@ const Login: FC<Props> = props => {
           from: 'login'
         }),
       })
+      return result.json()
+    } catch (error) {
+      return { success: false, msg: 'Error uploading credentials to S3' }
+    }
+  }
+
+  const userSubscription = async (email) => {
+    try {
+      const result = await fetch('http://localhost:8000/get-subscription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          key: email,
+        }),
+      })
 
       return result.json()
     } catch (error) {
@@ -168,7 +191,7 @@ const Login: FC<Props> = props => {
     return null
   }
 
-  const setLocalData = async (formData) => {
+  const setLocalData = async (formData, subdata) => {
     const updatedFormData = {
       fullName: formData.fullName,
       email: formData.email,
@@ -179,7 +202,16 @@ const Login: FC<Props> = props => {
       subIndustryType: formData.subIndustryType,
     }
 
+    const updatedSubData = {
+      subscription: subdata.subscription,
+      createdAt: subdata.createdAt,
+      till: subdata.till
+    }
+
+    console.log(updatedSubData)
+
     localStorage.setItem('formData', JSON.stringify(updatedFormData))
+    localStorage.setItem('subData', JSON.stringify(updatedSubData))
   }
 
 

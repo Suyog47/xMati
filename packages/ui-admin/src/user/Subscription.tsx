@@ -18,13 +18,13 @@ interface Props {
 
 const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   const [clientSecret, setClientSecret] = useState<string>('')
-  const [selectedTab, setSelectedTab] = useState('Business Starter')
+  const [selectedTab, setSelectedTab] = useState('Starter')
   const [isLoadingSecret, setIsLoadingSecret] = useState(false)
   const [paymentError, setPaymentError] = useState('')
 
   // Calculate amount dynamically based on selectedTab
   const amount = useMemo(() => (
-    selectedTab === 'Business Starter' ? 1800 : 10000
+    selectedTab === 'Starter' ? 1800 : 10000
   ), [selectedTab])
 
 
@@ -137,7 +137,6 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
 
 
     const setSubscriber = async () => {
-      console.log('Setting subscriber')
       try {
         const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
         const { email } = savedFormData
@@ -217,7 +216,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
           marginBottom: 20,
           borderBottom: '1px solid #e0e0e0'
         }}>
-          {['Business Starter', 'Business Professional'].map((tab) => (
+          {['Starter', 'Professional'].map((tab) => (
             <button
               key={tab}
               onClick={() => setSelectedTab(tab)}
@@ -250,7 +249,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
           marginBottom: 10
         }}>
           <h2 style={{ marginTop: 0, marginBottom: 16 }}>
-            {selectedTab === 'Business Starter' ? '$18/month' : '$100/month'}
+            {selectedTab === 'Starter' ? '$18/month' : '$100/month'}
           </h2>
 
           <div style={{
@@ -260,7 +259,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
             borderRadius: 4
           }}>
             <strong>
-              {selectedTab === 'Business Starter' ? '3 bots included' : '5 bots included'}
+              {selectedTab === 'Starter' ? '3 bots included' : '5 bots included'}
             </strong>
           </div>
 
