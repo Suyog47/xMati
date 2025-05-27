@@ -191,7 +191,7 @@ const Login: FC<Props> = props => {
     return null
   }
 
-  const setLocalData = async (formData, subdata) => {
+  const setLocalData = async (formData, subData) => {
     const updatedFormData = {
       fullName: formData.fullName,
       email: formData.email,
@@ -202,13 +202,15 @@ const Login: FC<Props> = props => {
       subIndustryType: formData.subIndustryType,
     }
 
-    const updatedSubData = {
-      subscription: subdata.subscription,
-      createdAt: subdata.createdAt,
-      till: subdata.till
-    }
+    const currentUTC = new Date().toISOString() // Always UTC
+    const tillDateUTC = new Date(subData.till).toISOString()
 
-    console.log(updatedSubData)
+    const updatedSubData = {
+      subscription: subData.subscription,
+      createdAt: subData.createdAt,
+      till: subData.till,
+      expired: currentUTC > tillDateUTC
+    }
 
     localStorage.setItem('formData', JSON.stringify(updatedFormData))
     localStorage.setItem('subData', JSON.stringify(updatedSubData))

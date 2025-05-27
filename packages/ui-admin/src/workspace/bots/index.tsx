@@ -56,7 +56,8 @@ class Bots extends Component<Props> {
     archiveName: '',
     filter: '',
     showFilters: false,
-    needApprovalFilter: false
+    needApprovalFilter: false,
+    isExpired: false,
   }
 
   componentDidMount() {
@@ -71,6 +72,12 @@ class Bots extends Component<Props> {
     if (!this.props.licensing) {
       this.props.fetchLicensing()
     }
+
+    // Check subscription expiry from localStorage
+    const subData = JSON.parse(localStorage.getItem('subData') || '{}')
+    const isExpired = subData.expired
+
+    this.setState({ isExpired })
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     telemetry.startFallback(api.getSecured({ useV1: true })).catch()
@@ -381,6 +388,38 @@ class Bots extends Component<Props> {
   render() {
     if (!this.props.bots) {
       return <LoadingSection />
+    }
+
+    // Check if the trial period has expired
+    if (this.state.isExpired) {
+      return (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'white', zIndex: 1000 }}>
+          <div
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '400px',
+              padding: '20px',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+              borderRadius: '8px',
+              textAlign: 'center',
+              backgroundColor: 'white',
+            }}
+          >
+            <h2>Your 15-Day Trial Period Has Expired</h2>
+            <p style={{ margin: '20px 0' }}>
+              To continue using the platform, please purchase a subscription.
+            </p>
+            <Button
+              intent={Intent.PRIMARY}
+              text="Subscribe Now"
+              onClick={() => window.location.href = '/subscription'} // Redirect to subscription page
+            />
+          </div>
+        </div>
+      )
     }
 
     return (
