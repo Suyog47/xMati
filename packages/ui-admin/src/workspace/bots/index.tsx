@@ -390,7 +390,7 @@ class Bots extends Component<Props> {
       return <LoadingSection />
     }
 
-    // Check if the trial period has expired
+    //Check if the trial period has expired
     if (this.state.isExpired) {
       return (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'white', zIndex: 1000 }}>

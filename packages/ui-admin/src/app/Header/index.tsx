@@ -13,9 +13,11 @@ import { HelpMenu } from './Help'
 import style from './style.scss'
 
 type Props = ConnectedProps<typeof connector>
-const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
-
 const Header: FC<Props> = props => {
+  const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
+  // const savedSubData = JSON.parse(localStorage.getItem('subData') || '{}')
+
+  console.log('savedFormData', savedFormData)
   return (
     <header className={cx('bp-header', style.header)}>
       <Navbar>
@@ -31,9 +33,9 @@ const Header: FC<Props> = props => {
             </div>
           </Navbar.Heading>
         </Navbar.Group>
-        {/* <p style={{ textAlign: 'center', paddingTop: '10px', width: '90%', fontSize: '20px', fontWeight: 'bold', color: 'white' }}>Welcome! {savedFormData.fullName}</p> */}
+        <p style={{ textAlign: 'center', paddingTop: '10px', width: '90%', fontSize: '20px', fontWeight: 'bold', color: 'white' }}>Welcome {savedFormData.fullName}</p>
         <Navbar.Group align={Alignment.RIGHT}>
-          <WorkspaceSelect />
+          {/* <WorkspaceSelect /> */}
           <div className={cx(style['menu-container'])}>
             <div>
               <HelpMenu />

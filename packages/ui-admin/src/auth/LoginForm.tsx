@@ -42,7 +42,17 @@ export const LoginForm: FC<Props> = props => {
         />
       </FormGroup>
 
-      <Link to="/changePassword">Forgot password?</Link>
+      <Link
+        to="/changePassword"
+        onClick={e => loading && e.preventDefault()} // Prevent navigation if loading is true
+        style={{
+          pointerEvents: loading ? 'none' : 'auto', // Disable interaction when loading
+          color: loading ? 'gray' : '#04A9E1', // Change color to indicate disabled state
+          textDecoration: loading ? 'none' : 'underline', // Optional: visually indicate disabled state
+        }}
+      >
+        Forgot password?
+      </Link>
 
       <Button
         tabIndex={3}
@@ -55,7 +65,14 @@ export const LoginForm: FC<Props> = props => {
       /> <br />
 
       <p>
-        Don't have an account? <Link to="/botCreation">Register</Link>
+        Don't have an account?
+        <Link to="/botCreation"
+          onClick={e => loading && e.preventDefault()} // Prevent navigation if loading is true
+          style={{
+            pointerEvents: loading ? 'none' : 'auto', // Disable interaction when loading
+            color: loading ? 'gray' : '#04A9E1', // Change color to indicate disabled state
+            textDecoration: loading ? 'none' : 'underline', // Optional: visually indicate disabled state
+          }}> Register</Link>
       </p>
     </form>
   )
