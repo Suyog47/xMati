@@ -23,6 +23,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   const [paymentError, setPaymentError] = useState<string>('')
   const [subscription, setSubscription] = useState<string>('')
   const [expiryTill, setExpiryTill] = useState<string>('')
+  const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false)
 
 
   const amount = useMemo(() => (
@@ -68,10 +69,10 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: true, // Use 12-hour format
+        // hour: '2-digit',
+        // minute: '2-digit',
+        // second: '2-digit',
+        // hour12: true, // Use 12-hour format
       })
       : ''
     setExpiryTill(formattedExpiryTill)
@@ -84,6 +85,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     const [error, setError] = useState('')
     const [isProcessing, setIsProcessing] = useState(false)
     const [paymentRequest, setPaymentRequest] = useState<PaymentRequest | null>(null)
+    const [selectedDuration, setSelectedDuration] = useState<string>('monthly')
 
     // Initialize PaymentRequest (Apple/Google Pay)
     useEffect(() => {
@@ -130,6 +132,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
 
         await setSubscriber()
         alert('Payment succeeded!')
+        await togglePaymentDialog(false)
         toggle()
       } catch (err: any) {
         setError(err.message)
@@ -164,7 +167,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     }
 
     return (
-      <div style={{ padding: 20 }}>
+      <div style={{ padding: 10 }}>
         {/* Dedicated Card Section */}
         <form onSubmit={handleSubmit}>
 
@@ -182,6 +185,55 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
 
           {error && <div style={{ color: 'red', margin: '15px 0' }}>{error}</div>}
 
+          {/* Radio Buttons for Half-yearly and Yearly Options */}
+          <div style={{ marginTop: '20px' }}>
+            <h4>Select Subscription Duration</h4>
+            <p style={{ fontSize: '0.85em', color: '#666' }}>
+              If you purchase a Half-Yearly plan, you will get a <strong>3% discount</strong>, and with a Yearly plan, you will get a <strong>5% discount</strong> and no discount for Monthly.
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'row', gap: '30px' }}>
+              <label>
+                <input
+                  type="radio"
+                  name="subscriptionDuration"
+                  value="monthly"
+                  checked={selectedDuration === 'monthly'}
+                  disabled={isProcessing} // Disable radio buttons when processing
+                  onChange={() =>
+                    setSelectedDuration(selectedDuration === 'monthly' ? '' : 'monthly')
+                  }
+                />
+                Monthly
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="subscriptionDuration"
+                  value="half-yearly"
+                  checked={selectedDuration === 'half-yearly'}
+                  disabled={isProcessing} // Disable radio buttons when processing
+                  onChange={() =>
+                    setSelectedDuration(selectedDuration === 'half-yearly' ? '' : 'half-yearly')
+                  }
+                />
+                Half-yearly
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="subscriptionDuration"
+                  value="yearly"
+                  checked={selectedDuration === 'yearly'}
+                  disabled={isProcessing} // Disable radio buttons when processing
+                  onChange={() =>
+                    setSelectedDuration(selectedDuration === 'yearly' ? '' : 'yearly')
+                  }
+                />
+                Yearly
+              </label>
+            </div>
+          </div>
+
           <Button
             type="submit"
             intent="primary"
@@ -190,32 +242,38 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
             fill
             style={{ marginTop: '20px' }}
           >
-            {isProcessing ? 'Processing...' : 'Pay'}
+            {isProcessing ? 'Processing...' : `Pay $${amount / 100}`}
           </Button>
-        </form>
 
-        {/* Apple/Google Pay Section */}
+        </form>
+        {/* Apple/Google Pay Section
         {paymentRequest && (
           <div style={{ marginTop: 30 }}>
             <PaymentRequestButtonElement options={{ paymentRequest }} />
           </div>
-        )}
+        )} */}
       </div>
     )
   }, [clientSecret, amount, toggle]) // Add required dependencies
 
 
+  const togglePaymentDialog = async (val) => {
+    setIsPaymentDialogOpen(val)
+
+    await new Promise(resolve => setTimeout(resolve, 500))   // A delay of 500 milliseconds to ensure the dialog opens/closes after the state update
+  }
+
   return (
-    <Dialog
+    <><Dialog
       title="Subscribe & Pay"
       isOpen={isOpen}
       onOpening={getClientSecret}
       onClose={toggle}
       style={{ width: '600px' }}
     >
-      <div style={{ padding: 15 }}> {/* Reduced padding */}
+      <div style={{ padding: 10 }}> {/* Reduced padding */}
 
-        <div style={{ marginBottom: '10px', textAlign: 'center', fontSize: '1em', color: '#666' }}>
+        <div style={{ marginBottom: '5px', textAlign: 'center', fontSize: '1em', color: '#666' }}>
           {subscription && expiryTill && (
             <p>
               Your current subscription plan is <strong><u>{subscription}</u></strong> and it is valid till <strong><u>{expiryTill}</u></strong>.
@@ -223,13 +281,13 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
           )}
         </div>
 
-        <h1 style={{ marginBottom: '10px', fontSize: '1.2em' }}>Choose Your Subscription Plan</h1>
+        <h1 style={{ marginBottom: '5px', fontSize: '1.2em' }}>Choose Your Subscription Plan</h1>
 
         {/* Subscription Plans Container */}
         <div style={{
           display: 'flex',
           gap: '15px', // Reduced gap
-          marginBottom: '15px', // Smaller margin
+          marginBottom: '10px', // Smaller margin
           justifyContent: 'space-between'
         }}>
           {['Starter', 'Professional'].map((plan) => (
@@ -321,7 +379,27 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
             </div>
           ))}
         </div>
+        <Button
+          type="submit"
+          intent="primary"
+          // disabled={!stripe || isProcessing}
+          // loading={isProcessing}
+          fill
+          style={{ marginTop: '10px' }}
+          onClick={() => togglePaymentDialog(true)}
+        >
+          Subscribe Now
+        </Button>
+      </div>
+    </Dialog>
 
+      <Dialog
+        isOpen={isPaymentDialogOpen}
+        onClose={() => togglePaymentDialog(false)}
+        title="Payment"
+        icon="dollar"
+        canOutsideClickClose={false}
+      >
         {/* Payment Section */}
         <div style={{ borderTop: '1px solid #e0e0e0', paddingTop: '10px' }}>
           {isLoadingSecret && (
@@ -340,8 +418,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
             </Elements>
           )}
         </div>
-      </div>
-    </Dialog>
+      </Dialog></>
   )
 }
 

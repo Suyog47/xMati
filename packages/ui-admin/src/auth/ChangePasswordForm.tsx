@@ -18,10 +18,46 @@ export const ChangePasswordForm: FC<Props> = props => {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [passSuccess, setPassSuccess] = useState(false)
   const [passChecked, setPassChecked] = useState(false)
+  const [passwordError, setPasswordError] = useState<string | null>(null)
 
   const [isLoading, setIsLoading] = useState(false)
   const history = useHistory()
 
+
+  const validatePassword = (password: string) => {
+    const minLength = 8
+    const maxLength = 16
+    const hasUpperCase = /[A-Z]/.test(password)
+    const hasLowerCase = /[a-z]/.test(password)
+    const hasNumber = /[0-9]/.test(password)
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password)
+
+    if (password.length < minLength) {
+      return `Password must be at least ${minLength} characters long`
+    }
+    if (password.length > maxLength) {
+      return `Password must not be more than ${maxLength} characters`
+    }
+    if (!hasUpperCase) {
+      return 'Password must contain at least one uppercase letter'
+    }
+    if (!hasLowerCase) {
+      return 'Password must contain at least one lowercase letter'
+    }
+    if (!hasNumber) {
+      return 'Password must contain at least one number'
+    }
+    if (!hasSpecialChar) {
+      return 'Password must contain at least one special character'
+    }
+    return null
+  }
+
+  const handlePasswordChange = (password: string) => {
+    setNewPassword(password)
+    const error = validatePassword(password)
+    setPasswordError(error)
+  }
 
   const onSubmit = async e => {
     e.preventDefault()
@@ -133,14 +169,21 @@ export const ChangePasswordForm: FC<Props> = props => {
               <InputGroup
                 tabIndex={3}
                 value={newPassword}
-                onChange={e => setNewPassword(e.target.value)}
+                onChange={e => handlePasswordChange(e.target.value)}
                 type="password"
                 name="newPassword"
                 id="newPassword"
                 autoFocus
                 disabled={isLoading}
               />
+              {passwordError && (
+                <div className="error-message" style={{ color: 'red', marginTop: '5px' }}>
+                  {passwordError}
+                </div>
+              )}
             </FormGroup>
+
+
 
             <FormGroup label={lang.tr('admin.confirmPassword')}>
               <InputGroup
@@ -152,18 +195,19 @@ export const ChangePasswordForm: FC<Props> = props => {
                 id="confirmPassword"
                 disabled={isLoading}
               />
-              {!passSuccess && passChecked && (
-                <div className="error-message" style={{ color: 'red', marginTop: '5px' }}>
-                  Password failed to update
-                </div>
-              )}
+
             </FormGroup>
 
-            <PasswordStrengthMeter pwdCandidate={newPassword} />
-
+            {/* <PasswordStrengthMeter pwdCandidate={newPassword} /> */}
             {newPassword && confirmPassword && newPassword !== confirmPassword && (
               <div className="error-message" style={{ color: 'red' }}>
                 Passwords don't match
+              </div>
+            )}
+
+            {!passSuccess && passChecked && (
+              <div className="error-message" style={{ color: 'red', marginTop: '5px' }}>
+                Password failed to update
               </div>
             )}
 
@@ -172,7 +216,7 @@ export const ChangePasswordForm: FC<Props> = props => {
               type="submit"
               text={lang.tr('admin.change')}
               id="btn-change-pass"
-              disabled={!newPassword || !confirmPassword || newPassword !== confirmPassword}
+              disabled={!newPassword || !confirmPassword || newPassword !== confirmPassword || !!passwordError}
               intent={Intent.WARNING}
               rightIcon={isLoading ? <Spinner size={SpinnerSize.SMALL} /> : null}
             />

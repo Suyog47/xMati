@@ -439,6 +439,10 @@ class Bots extends Component<Props> {
       <PageContainer title={lang.tr('admin.workspace.bots.bots')}>
         <SplitPage sideMenu={(this.state.isExpired) ? !this.isPipelineView : !this.isPipelineView && this.renderCreateNewBotButton()}>
           <Fragment>
+            <Subscription
+              isOpen={this.state.isSubscriptionOpen}
+              toggle={this.toggleSubscription}
+            />
             {this.state.isExpired && (
               <div
                 style={{
@@ -458,11 +462,11 @@ class Bots extends Component<Props> {
                 <p style={{ margin: '20px 0' }}>
                   To continue using the platform, please purchase a subscription.
                 </p>
-                {/* <Button
+                <Button
                   intent={Intent.PRIMARY}
                   text="Subscribe"
                   onClick={this.toggleSubscription}
-                /> */}
+                />
               </div>
             )}
 
