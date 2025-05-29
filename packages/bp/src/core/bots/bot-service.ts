@@ -178,7 +178,7 @@ export class BotService {
 
   async getAndSaveBots(email: any) {
     try {
-      let result = await axios('http://138.197.2.118:8000/get-bots', {
+      let result = await axios('https://www.app.xmati.ai/apis/get-bots', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -584,7 +584,7 @@ export class BotService {
   }
 
   async deleteFromS3(key: string) {
-    const result = await axios('http://138.197.2.118:8000/delete-bot', {
+    const result = await axios('https://www.app.xmati.ai/apis/delete-bot', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -647,7 +647,7 @@ export class BotService {
     // DeepSeek API configuration (replace with actual API details)
     const DEEPSEEK_API_KEY = 'sk-d8088cbc82a046ccbf22716dd1c74af1'
     const API_ENDPOINT = 'https://api.deepseek.com/v1/chat/completions'
-    //const API_ENDPOINT = 'http://138.197.2.118:8000/gemini-llm'
+    //const API_ENDPOINT = 'https://www.app.xmati.ai/apis/gemini-llm'
 
     const dummyBot = await this._serializeFolder()
 
@@ -857,7 +857,7 @@ export class BotService {
   private _saveData = async (key, data) => {
     try {
       const compressedData = await this._compressRequest(data);
-      const result = await axios('http://138.197.2.118:8000/save-bot', {
+      const result = await axios('https://www.app.xmati.ai/apis/save-bot', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

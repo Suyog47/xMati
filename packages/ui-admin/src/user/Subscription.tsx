@@ -9,7 +9,11 @@ import {
 import { loadStripe, PaymentRequest } from '@stripe/stripe-js'
 import { Dialog, Button, FormGroup } from '@blueprintjs/core'
 
-const stripePromise = loadStripe('pk_test_51RLimpPBSMPLjWxm3IUaX63iUb4TqhU5prbUsg7A5RwG2sZsukOa7doAAhPu2RpEkYXZ2dRLNrOA4Pby9IscZOse00unCEcNDG')
+
+//const stripePromise = loadStripe('pk_test_51RLimpPBSMPLjWxm3IUaX63iUb4TqhU5prbUsg7A5RwG2sZsukOa7doAAhPu2RpEkYXZ2dRLNrOA4Pby9IscZOse00unCEcNDG')
+
+// For production use
+const stripePromise = loadStripe('pk_live_51RPPI0EncrURrNgDF2LNkLrh5Wf53SIe3WjqPqjtzqbJWDGfDFeG4VvzUXuC4nCmrPTNOTeFENuAqRBw1mvbNJg600URDxPnuc')
 
 interface Props {
   isOpen: boolean
@@ -17,6 +21,7 @@ interface Props {
 }
 
 const Subscription: FC<Props> = ({ isOpen, toggle }) => {
+  const savedSubData = JSON.parse(localStorage.getItem('subData') || '{}')
   const [clientSecret, setClientSecret] = useState<string>('')
   const [selectedTab, setSelectedTab] = useState<string>('Starter')
   const [isLoadingSecret, setIsLoadingSecret] = useState(false)
@@ -24,6 +29,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   const [subscription, setSubscription] = useState<string>('')
   const [expiryTill, setExpiryTill] = useState<string>('')
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false)
+  const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false)
 
 
   const amount = useMemo(() => (
@@ -35,7 +41,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     setPaymentError('')
 
     try {
-      const result = await fetch('http://138.197.2.118:8000/create-payment-intent', {
+      const result = await fetch('https://www.app.xmati.ai/apis/create-payment-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount, currency: 'usd' }),
@@ -61,7 +67,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     if (isOpen) {
       void getClientSecret()
     }
-    const savedSubData = JSON.parse(localStorage.getItem('subData') || '{}')
+
     setSubscription(savedSubData.subscription || '')
 
     const formattedExpiryTill = savedSubData.till
@@ -131,7 +137,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         }
 
         await setSubscriber()
-        alert('Payment succeeded!')
+        setIsSuccessDialogOpen(true)
         await togglePaymentDialog(false)
         toggle()
       } catch (err: any) {
@@ -147,7 +153,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
         const { email } = savedFormData
 
-        const result = await fetch('http://localhost:8000/save-subscription', {
+        const result = await fetch('https://www.app.xmati.ai/apis/save-subscription', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ key: email, subscription: selectedTab }),
@@ -185,13 +191,19 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
 
           {error && <div style={{ color: 'red', margin: '15px 0' }}>{error}</div>}
 
+          {/* Divider */}
+          <div style={{
+            borderTop: '1px solid #e0e0e0',
+            margin: '20px 0',
+          }}></div>
+
           {/* Radio Buttons for Half-yearly and Yearly Options */}
-          <div style={{ marginTop: '20px' }}>
+          <div style={{ marginTop: '20px', textAlign: 'center' }}>
             <h4>Select Subscription Duration</h4>
             <p style={{ fontSize: '0.85em', color: '#666' }}>
-              If you purchase a Half-Yearly plan, you will get a <strong>3% discount</strong>, and with a Yearly plan, you will get a <strong>5% discount</strong> and no discount for Monthly.
+              If you purchase a Half-Yearly plan, you will get a <strong>3% discount</strong>, and with a Yearly plan, you will get a <strong>5% discount</strong> and no discount for Monthly plan.
             </p>
-            <div style={{ display: 'flex', flexDirection: 'row', gap: '30px' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '30px' }}>
               <label>
                 <input
                   type="radio"
@@ -271,12 +283,12 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       onClose={toggle}
       style={{ width: '600px' }}
     >
-      <div style={{ padding: 10 }}> {/* Reduced padding */}
+      <div style={{ padding: 15 }}> {/* Reduced padding */}
 
         <div style={{ marginBottom: '5px', textAlign: 'center', fontSize: '1em', color: '#666' }}>
           {subscription && expiryTill && (
             <p>
-              Your current subscription plan is <strong><u>{subscription}</u></strong> and it is valid till <strong><u>{expiryTill}</u></strong>.
+              Your current subscription plan is <strong><u>{subscription}</u></strong> and it {savedSubData.expired === true ? 'was' : 'is'} valid till <strong><u>{expiryTill}</u></strong>.
             </p>
           )}
         </div>
@@ -304,13 +316,23 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                 backgroundColor: selectedTab === plan ? '#f8fbff' : 'white'
               }}
             >
-              <h2 style={{
+              <h3 style={{
+                margin: '0',
+                padding: '0',
+                textAlign: 'center', // Center-align the header
+                fontSize: '1.1em', // Larger font size for the header
+                marginBottom: '10px'
+              }}>
+                {plan}
+              </h3>
+
+              <h3 style={{
                 marginTop: 0,
                 marginBottom: '12px', // Tighter spacing
                 fontSize: '1.2em' // Slightly smaller font
               }}>
                 {plan === 'Starter' ? '$18/month' : '$100/month'}
-              </h2>
+              </h3>
 
               <div style={{
                 marginBottom: '12px',
@@ -418,7 +440,30 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
             </Elements>
           )}
         </div>
-      </Dialog></>
+      </Dialog>
+
+      <Dialog
+        isOpen={isSuccessDialogOpen}
+        onClose={() => setIsSuccessDialogOpen(false)}
+        title="Payment Successful"
+        icon="tick-circle"
+        canOutsideClickClose={true}
+      >
+        <div style={{ padding: '20px', textAlign: 'center' }}>
+          <h2 style={{ color: '#4caf50', marginBottom: '10px' }}>Thank You!</h2>
+          <p style={{ fontSize: '1em', color: '#666' }}>
+            Your payment was successful. Your subscription has been activated.
+          </p>
+          <Button
+            intent="primary"
+            onClick={() => setIsSuccessDialogOpen(false)}
+            style={{ marginTop: '20px' }}
+          >
+            Close
+          </Button>
+        </div>
+      </Dialog>
+    </>
   )
 }
 

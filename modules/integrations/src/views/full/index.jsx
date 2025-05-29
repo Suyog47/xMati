@@ -20,7 +20,7 @@ const BotForm = () => {
     event.preventDefault();
     setIsLoading(true);
     try {
-      const result = await fetch('http://138.197.2.118:8000/lexbot', {
+      const result = await fetch('https://www.app.xmati.ai/apis/lexbot', {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -91,7 +91,7 @@ const BotForm = () => {
     // }
 
     try {
-      const result = await fetch('https://bbf0-154-84-217-208.ngrok-free.app/telegram/setwebhook', {   // for localhost - http://localhost:8000/telegram/setwebhook
+      const result = await fetch('https://www.app.xmati.ai/apis/telegram/setwebhook', {   // for localhost - http://localhost:8000/telegram/setwebhook
         method: "POST",
         headers: {
           "Content-Type": "application/json",

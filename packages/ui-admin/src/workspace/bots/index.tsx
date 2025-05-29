@@ -45,6 +45,7 @@ const botFilterFields = ['name', 'id', 'description']
 type Props = ConnectedProps<typeof connector> & RouteComponentProps
 
 class Bots extends Component<Props> {
+  subData = JSON.parse(localStorage.getItem('subData') || '{}')
   state = {
     isCreateBotModalOpen: false,
     isRollbackModalOpen: false,
@@ -396,45 +397,6 @@ class Bots extends Component<Props> {
       return <LoadingSection />
     }
 
-    // //Check if the trial period has expired
-    // if (this.state.isExpired) {
-    //   return (
-    //     <PageContainer title={lang.tr('admin.workspace.bots.bots')}>
-    //       <Subscription
-    //         isOpen={this.state.isSubscriptionOpen}
-    //         toggle={this.toggleSubscription}
-    //       />
-    //       <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: '', zIndex: 1000 }}>
-    //         {/* Only show the expired message if subscription dialog is closed */}
-    //         {!this.state.isSubscriptionOpen && (
-    //           <div style={{
-    //             position: 'absolute',
-    //             top: '50%',
-    //             left: '50%',
-    //             transform: 'translate(-50%, -50%)',
-    //             width: '400px',
-    //             padding: '20px',
-    //             boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    //             borderRadius: '8px',
-    //             textAlign: 'center',
-    //             backgroundColor: 'white',
-    //           }}>
-    //             <h2>Your 15-Day Trial Period Has Expired</h2>
-    //             <p style={{ margin: '20px 0' }}>
-    //               To continue using the platform, please purchase a subscription.
-    //             </p>
-    //             <Button
-    //               intent={Intent.PRIMARY}
-    //               text="Subscribe"
-    //               onClick={this.toggleSubscription}
-    //             />
-    //           </div>
-    //         )}
-    //       </div>
-    //     </PageContainer>
-    //   )
-    // }
-
     return (
       <PageContainer title={lang.tr('admin.workspace.bots.bots')}>
         <SplitPage sideMenu={(this.state.isExpired) ? !this.isPipelineView : !this.isPipelineView && this.renderCreateNewBotButton()}>
@@ -458,7 +420,8 @@ class Bots extends Component<Props> {
                   backgroundColor: 'white',
                 }}
               >
-                <h2>Your 15-Day Trial Period Has Expired</h2>
+                <h3>Your {(this.subData.subscription === 'trail') ?
+                  '15-Day Trial' : this.subData.subscription} subscription and 3 day complimentary trail has been Expired</h3>
                 <p style={{ margin: '20px 0' }}>
                   To continue using the platform, please purchase a subscription.
                 </p>

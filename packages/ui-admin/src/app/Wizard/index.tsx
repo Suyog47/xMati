@@ -317,7 +317,7 @@ const CustomerWizard: React.FC = () => {
         subIndustryType: formData.subIndustryType,
       }
 
-      const result = await fetch('http://138.197.2.118:8000/user-auth', {
+      const result = await fetch('https://www.app.xmati.ai/apis/user-auth', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -337,7 +337,7 @@ const CustomerWizard: React.FC = () => {
 
   const setSubscriber = async () => {
     try {
-      const result = await fetch('http://localhost:8000/save-subscription', {
+      const result = await fetch('https://www.app.xmati.ai/apis/save-subscription', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key: formData.email, subscription: 'trial' }),
@@ -353,7 +353,7 @@ const CustomerWizard: React.FC = () => {
   const checkUser = async () => {
     setIsLoading(true)
     try {
-      const result = await fetch('http://138.197.2.118:8000/check-user', {
+      const result = await fetch('https://www.app.xmati.ai/apis/check-user', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

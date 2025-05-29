@@ -44,7 +44,7 @@ const sendEmail = async () => {
     const subject = extractTextFromPayloads(renderedSubject)
     const content = extractTextFromPayloads(renderedContent)
 
-    const url = 'http://138.197.2.118:8000/send-email';
+    const url = 'https://www.app.xmati.ai/apis/send-email';
     const payload = {
       to: args.toAddress,
       cc: args.ccAddress,

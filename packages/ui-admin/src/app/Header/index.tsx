@@ -31,7 +31,9 @@ const Header: FC<Props> = props => {
             </div>
           </Navbar.Heading>
         </Navbar.Group>
-        <p style={{ textAlign: 'center', paddingTop: '10px', width: '90%', fontSize: '20px', fontWeight: 'bold', color: 'white' }}>Welcome {savedFormData.fullName}</p>
+        <p style={{ textAlign: 'center', paddingTop: '10px', width: '90%', fontSize: '18px', color: 'white' }}>
+          Welcome <strong>{savedFormData.fullName}</strong>
+        </p>
         <Navbar.Group align={Alignment.RIGHT}>
           {/* <WorkspaceSelect /> */}
           <div className={cx(style['menu-container'])}>

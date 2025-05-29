@@ -50,7 +50,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ isOpen, toggle }) => {
       const formData = new FormData()
       formData.append('audio', audioBlob, 'recording.webm')
 
-      const response = await fetch('http://localhost:8000/gemini-voice', {
+      const response = await fetch('https://www.app.xmati.ai/apis/gemini-voice', {
         method: 'POST',
         body: formData,
       })
