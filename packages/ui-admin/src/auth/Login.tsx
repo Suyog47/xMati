@@ -205,6 +205,9 @@ const Login: FC<Props> = props => {
     const currentUTC = new Date().toISOString() // Always UTC
     const tillDateUTC = new Date(subData.till).toISOString()
 
+    console.log('Current UTC:', currentUTC)
+    console.log('Till Date UTC:', tillDateUTC)
+
     const updatedSubData = {
       subscription: subData.subscription,
       createdAt: subData.createdAt,

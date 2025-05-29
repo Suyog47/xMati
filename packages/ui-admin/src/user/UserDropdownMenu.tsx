@@ -33,9 +33,15 @@ const UserDropdownMenu: FC<Props> = props => {
   const [isProfileOpen, setProfileOpen] = useState(false)
   const [isPasswordOpen, setPasswordOpen] = useState(false)
   const [isLanguageOpen, setLanguageOpen] = useState(false)
+  const [isExpired, setExpiry] = useState(false)
+
 
   useEffect(() => {
     !props.profile && props.fetchProfile()
+
+    const subData = JSON.parse(localStorage.getItem('subData') || '{}')
+    setExpiry(subData?.expired || false)
+
   }, [])
 
   const logout = async () => {
@@ -74,18 +80,18 @@ const UserDropdownMenu: FC<Props> = props => {
 
           {/* <MenuItem id="btn-gemini" icon="user" text={'Gemini Speech'} onClick={toggleGemini} /> */}
 
-          <MenuItem id="btn-profile" icon="user" text={lang.tr('admin.updateProfile')} onClick={toggleProfile} />
+          {!isExpired && (<MenuItem id="btn-profile" icon="user" text={lang.tr('admin.updateProfile')} onClick={toggleProfile} />)}
 
-          {canChangePassword && (
+          {canChangePassword && !isExpired && (
             <MenuItem id="btn-changepass" icon="key" text={lang.tr('admin.changePassword')} onClick={togglePassword} />
           )}
 
-          <MenuItem
+          {!isExpired && (<MenuItem
             id="btn-changeLanguage"
             icon="translate"
             text={lang.tr('admin.changeLanguage')}
             onClick={toggleLanguage}
-          />
+          />)}
 
           <MenuDivider />
           <MenuItem id="btn-logout" icon="log-out" text={lang.tr('admin.logout')} onClick={logout} />

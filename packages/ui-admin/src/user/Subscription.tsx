@@ -18,17 +18,17 @@ interface Props {
 
 const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   const [clientSecret, setClientSecret] = useState<string>('')
-  const [selectedTab, setSelectedTab] = useState('Starter')
+  const [selectedTab, setSelectedTab] = useState<string>('Starter')
   const [isLoadingSecret, setIsLoadingSecret] = useState(false)
-  const [paymentError, setPaymentError] = useState('')
+  const [paymentError, setPaymentError] = useState<string>('')
+  const [subscription, setSubscription] = useState<string>('')
+  const [expiryTill, setExpiryTill] = useState<string>('')
 
-  // Calculate amount dynamically based on selectedTab
+
   const amount = useMemo(() => (
     selectedTab === 'Starter' ? 1800 : 10000
   ), [selectedTab])
 
-
-  // Fetch client secret with error handling
   const getClientSecret = useCallback(async () => {
     setIsLoadingSecret(true)
     setPaymentError('')
@@ -37,18 +37,16 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       const result = await fetch('http://138.197.2.118:8000/create-payment-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount, currency: 'usd' }), // Use memoized amount
+        body: JSON.stringify({ amount, currency: 'usd' }),
       })
 
       if (!result.ok) {
         throw new Error('Payment setup failed')
       }
-
       const data = await result.json()
       if (!data.client_secret) {
         throw new Error('Invalid server response')
       }
-
       setClientSecret(data.client_secret)
     } catch (err: any) {
       setPaymentError(err.message)
@@ -56,22 +54,28 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     } finally {
       setIsLoadingSecret(false)
     }
-  }, [amount]) // Re-run when amount changes
+  }, [amount])
 
-  // Refresh client secret when tab changes or dialog opens
   useEffect(() => {
     if (isOpen) {
-      void (async () => {
-        try {
-          await getClientSecret()
-        } catch (error) {
-          console.error('Payment setup failed:', error)
-          // Set error state here if needed
-        }
-      })()
+      void getClientSecret()
     }
-  }, [isOpen, getClientSecret]) // Add getClientSecret to dependencies
+    const savedSubData = JSON.parse(localStorage.getItem('subData') || '{}')
+    setSubscription(savedSubData.subscription || '')
 
+    const formattedExpiryTill = savedSubData.till
+      ? new Date(savedSubData.till).toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true, // Use 12-hour format
+      })
+      : ''
+    setExpiryTill(formattedExpiryTill)
+  }, [isOpen, getClientSecret])
 
 
   const CheckoutForm = useMemo(() => () => {
@@ -88,7 +92,6 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
           return
         }
 
-        console.log(amount)
         const pr = stripe.paymentRequest({
           country: 'US',
           currency: 'usd',
@@ -187,7 +190,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
             fill
             style={{ marginTop: '20px' }}
           >
-            {isProcessing ? 'Processing...' : `Pay $${amount / 100}`}
+            {isProcessing ? 'Processing...' : 'Pay'}
           </Button>
         </form>
 
@@ -201,136 +204,143 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     )
   }, [clientSecret, amount, toggle]) // Add required dependencies
 
+
   return (
     <Dialog
       title="Subscribe & Pay"
       isOpen={isOpen}
       onOpening={getClientSecret}
       onClose={toggle}
-      style={{ width: '500px' }}
+      style={{ width: '600px' }}
     >
-      <div style={{ padding: 20 }}>
-        {/* Tabs */}
+      <div style={{ padding: 15 }}> {/* Reduced padding */}
+
+        <div style={{ marginBottom: '10px', textAlign: 'center', fontSize: '1em', color: '#666' }}>
+          {subscription && expiryTill && (
+            <p>
+              Your current subscription plan is <strong><u>{subscription}</u></strong> and it is valid till <strong><u>{expiryTill}</u></strong>.
+            </p>
+          )}
+        </div>
+
+        <h1 style={{ marginBottom: '10px', fontSize: '1.2em' }}>Choose Your Subscription Plan</h1>
+
+        {/* Subscription Plans Container */}
         <div style={{
           display: 'flex',
-          marginBottom: 20,
-          borderBottom: '1px solid #e0e0e0'
+          gap: '15px', // Reduced gap
+          marginBottom: '15px', // Smaller margin
+          justifyContent: 'space-between'
         }}>
-          {['Starter', 'Professional'].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setSelectedTab(tab)}
+          {['Starter', 'Professional'].map((plan) => (
+            <div
+              key={plan}
+              onClick={() => setSelectedTab(plan)}
               style={{
                 flex: 1,
-                padding: '12px 0',
-                border: 'none',
-                outline: 'none', // Removes focus border
-                background: selectedTab === tab ? '#fff' : '#f5f5f5',
-                borderBottom: selectedTab === tab ? '2px solid #2196f3' : 'none',
+                border: `2px solid ${selectedTab === plan ? '#2196f3' : '#e0e0e0'}`,
+                borderRadius: '6px', // Slightly smaller radius
+                padding: '15px', // Reduced padding
                 cursor: 'pointer',
-                fontWeight: 500,
-                color: selectedTab === tab ? '#2196f3' : '#666',
-                margin: '0 4px', // Adds space between tabs
-                borderRadius: '4px 4px 0 0',
-                boxShadow: 'none', // Removes any shadow on click
+                transition: 'all 0.2s ease',
+                backgroundColor: selectedTab === plan ? '#f8fbff' : 'white'
               }}
             >
-              {tab}
-            </button>
+              <h2 style={{
+                marginTop: 0,
+                marginBottom: '12px', // Tighter spacing
+                fontSize: '1.2em' // Slightly smaller font
+              }}>
+                {plan === 'Starter' ? '$18/month' : '$100/month'}
+              </h2>
+
+              <div style={{
+                marginBottom: '12px',
+                padding: '10px', // Smaller padding
+                background: '#f8f9fa',
+                borderRadius: '3px'
+              }}>
+                <strong style={{ fontSize: '0.95em' }}>
+                  {plan === 'Starter' ? '3 bots included' : '5 bots included'}
+                </strong>
+              </div>
+
+              <div style={{ marginBottom: '15px' }}>
+                <div style={{
+                  color: '#666',
+                  marginBottom: '10px',
+                  paddingBottom: '10px',
+                  borderBottom: '1px solid #eee',
+                  fontSize: '0.95em'
+                }}>
+                  Includes:
+                </div>
+
+                {/* Features list */}
+                {['LLM Support', 'HITL (Human in the Loop) Enabled', 'Bot Analytics'].map((feature) => (
+                  <div
+                    key={feature}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      marginBottom: '6px',
+                      fontSize: '0.9em'
+                    }}
+                  >
+                    <span style={{ color: '#4caf50', marginRight: '6px' }}>✓</span>
+                    {feature}
+                  </div>
+                ))}
+
+                <div style={{
+                  color: '#666',
+                  marginBottom: '10px',
+                  paddingBottom: '10px',
+                  borderBottom: '1px solid #eee',
+                  fontSize: '0.95em'
+                }}>
+                  Supported Channels:
+                </div>
+
+                {/* Features list */}
+                {['Web Channel', 'Telegram', 'Slack', 'Facebook Messenger'].map((feature) => (
+                  <div
+                    key={feature}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      marginBottom: '6px',
+                      fontSize: '0.9em'
+                    }}
+                  >
+                    <span style={{ color: '#4caf50', marginRight: '6px' }}>✓</span>
+                    {feature}
+                  </div>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
 
-        {/* Pricing Card */}
-        <div style={{
-          border: '1px solid #e0e0e0',
-          borderRadius: 8,
-          padding: 20,
-          paddingBottom: 10,
-          marginBottom: 10
-        }}>
-          <h2 style={{ marginTop: 0, marginBottom: 16 }}>
-            {selectedTab === 'Starter' ? '$18/month' : '$100/month'}
-          </h2>
-
-          <div style={{
-            marginBottom: 16,
-            padding: '12px',
-            background: '#f8f9fa',
-            borderRadius: 4
-          }}>
-            <strong>
-              {selectedTab === 'Starter' ? '3 bots included' : '5 bots included'}
-            </strong>
-          </div>
-
-          {/* Common Features */}
-          <div style={{ marginBottom: 20 }}>
-            <div style={{
-              color: '#666',
-              marginBottom: 12,
-              paddingBottom: 12,
-              borderBottom: '1px solid #eee'
-            }}>
-              Includes:
+        {/* Payment Section */}
+        <div style={{ borderTop: '1px solid #e0e0e0', paddingTop: '10px' }}>
+          {isLoadingSecret && (
+            <div style={{ padding: '20px', textAlign: 'center' }}>
+              Loading payment details...
             </div>
+          )}
 
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
-              <span style={{ color: '#4caf50', marginRight: 8 }}>✓</span>
-              LLM Support
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
-              <span style={{ color: '#4caf50', marginRight: 8 }}>✓</span>
-              HITL (Human in the Loop) Enabled
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
-              <span style={{ color: '#4caf50', marginRight: 8 }}>✓</span>
-              Bot Analytics
-            </div>
-          </div>
+          {paymentError && (
+            <div style={{ color: 'red', margin: '15px 0' }}>{paymentError}</div>
+          )}
 
-          <div style={{
-            textAlign: 'center',
-            color: '#666',
-            fontSize: 14
-          }}>
-
-            {isLoadingSecret && (
-              <div style={{ padding: 20, textAlign: 'center' }}>
-                Loading payment details...
-              </div>
-            )}
-
-            {/* Show errors */}
-            {paymentError && (
-              <div style={{ color: 'red', margin: '15px 0' }}>{paymentError}</div>
-            )}
-
-            {!isLoadingSecret && clientSecret && (
-              <Elements stripe={stripePromise} options={{ clientSecret }}>
-                <CheckoutForm />
-              </Elements>
-            )}
-          </div>
-
-
-          {/* <button
-            style={{
-              width: '100%',
-              padding: '12px',
-              background: '#2196f3',
-              color: 'white',
-              border: 'none',
-              borderRadius: 4,
-              cursor: 'pointer',
-              fontWeight: 500
-            }}
-            onClick={getClientSecret}
-          >
-            Subscribe to {selectedTab}
-          </button> */}
+          {!isLoadingSecret && clientSecret && (
+            <Elements stripe={stripePromise} options={{ clientSecret }}>
+              <CheckoutForm />
+            </Elements>
+          )}
         </div>
       </div>
-
     </Dialog>
   )
 }

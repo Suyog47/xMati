@@ -16,8 +16,6 @@ type Props = ConnectedProps<typeof connector>
 const Header: FC<Props> = props => {
   const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
   // const savedSubData = JSON.parse(localStorage.getItem('subData') || '{}')
-
-  console.log('savedFormData', savedFormData)
   return (
     <header className={cx('bp-header', style.header)}>
       <Navbar>

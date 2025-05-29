@@ -18,7 +18,7 @@ import _ from 'lodash'
 import React, { Component, Fragment } from 'react'
 import { connect, ConnectedProps } from 'react-redux'
 import { generatePath, RouteComponentProps } from 'react-router'
-
+import Subscription from '~/user/Subscription'
 import api from '~/app/api'
 import { Downloader } from '~/app/common/Downloader'
 import LoadingSection from '~/app/common/LoadingSection'
@@ -58,6 +58,7 @@ class Bots extends Component<Props> {
     showFilters: false,
     needApprovalFilter: false,
     isExpired: false,
+    isSubscriptionOpen: false
   }
 
   componentDidMount() {
@@ -75,9 +76,10 @@ class Bots extends Component<Props> {
 
     // Check subscription expiry from localStorage
     const subData = JSON.parse(localStorage.getItem('subData') || '{}')
-    const isExpired = subData.expired
+    const expiry = subData.expired
 
-    this.setState({ isExpired })
+    console.log(expiry)
+    this.setState({ isExpired: expiry })
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     telemetry.startFallback(api.getSecured({ useV1: true })).catch()
@@ -190,6 +192,10 @@ class Bots extends Component<Props> {
       focusedBot: typeof botId === 'string' ? botId : null,
       isRollbackModalOpen: !this.state.isRollbackModalOpen
     })
+  }
+
+  toggleSubscription = () => {
+    this.setState({ isSubscriptionOpen: !this.state.isSubscriptionOpen })
   }
 
   handleRollbackSuccess = () => {
@@ -390,72 +396,110 @@ class Bots extends Component<Props> {
       return <LoadingSection />
     }
 
-    //Check if the trial period has expired
-    if (this.state.isExpired) {
-      return (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'white', zIndex: 1000 }}>
-          <div
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              width: '400px',
-              padding: '20px',
-              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-              borderRadius: '8px',
-              textAlign: 'center',
-              backgroundColor: 'white',
-            }}
-          >
-            <h2>Your 15-Day Trial Period Has Expired</h2>
-            <p style={{ margin: '20px 0' }}>
-              To continue using the platform, please purchase a subscription.
-            </p>
-            <Button
-              intent={Intent.PRIMARY}
-              text="Subscribe Now"
-              onClick={() => window.location.href = '/subscription'} // Redirect to subscription page
-            />
-          </div>
-        </div>
-      )
-    }
+    // //Check if the trial period has expired
+    // if (this.state.isExpired) {
+    //   return (
+    //     <PageContainer title={lang.tr('admin.workspace.bots.bots')}>
+    //       <Subscription
+    //         isOpen={this.state.isSubscriptionOpen}
+    //         toggle={this.toggleSubscription}
+    //       />
+    //       <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: '', zIndex: 1000 }}>
+    //         {/* Only show the expired message if subscription dialog is closed */}
+    //         {!this.state.isSubscriptionOpen && (
+    //           <div style={{
+    //             position: 'absolute',
+    //             top: '50%',
+    //             left: '50%',
+    //             transform: 'translate(-50%, -50%)',
+    //             width: '400px',
+    //             padding: '20px',
+    //             boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+    //             borderRadius: '8px',
+    //             textAlign: 'center',
+    //             backgroundColor: 'white',
+    //           }}>
+    //             <h2>Your 15-Day Trial Period Has Expired</h2>
+    //             <p style={{ margin: '20px 0' }}>
+    //               To continue using the platform, please purchase a subscription.
+    //             </p>
+    //             <Button
+    //               intent={Intent.PRIMARY}
+    //               text="Subscribe"
+    //               onClick={this.toggleSubscription}
+    //             />
+    //           </div>
+    //         )}
+    //       </div>
+    //     </PageContainer>
+    //   )
+    // }
 
     return (
       <PageContainer title={lang.tr('admin.workspace.bots.bots')}>
-        <SplitPage sideMenu={!this.isPipelineView && this.renderCreateNewBotButton()}>
+        <SplitPage sideMenu={(this.state.isExpired) ? !this.isPipelineView : !this.isPipelineView && this.renderCreateNewBotButton()}>
           <Fragment>
-            <Downloader url={this.state.archiveUrl} filename={this.state.archiveName} />
-            {this.renderBots()}
+            {this.state.isExpired && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: '400px',
+                  padding: '20px',
+                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                  borderRadius: '8px',
+                  textAlign: 'center',
+                  backgroundColor: 'white',
+                }}
+              >
+                <h2>Your 15-Day Trial Period Has Expired</h2>
+                <p style={{ margin: '20px 0' }}>
+                  To continue using the platform, please purchase a subscription.
+                </p>
+                {/* <Button
+                  intent={Intent.PRIMARY}
+                  text="Subscribe"
+                  onClick={this.toggleSubscription}
+                /> */}
+              </div>
+            )}
 
-            <AccessControl resource="admin.bots.*" operation="write">
-              <RollbackBotModal
-                botId={this.state.focusedBot}
-                isOpen={this.state.isRollbackModalOpen}
-                toggle={this.toggleRollbackModal}
-                onRollbackSuccess={this.handleRollbackSuccess}
-              />
-              <EditStageModal
-                workspace={this.props.workspace}
-                stage={this.state.selectedStage}
-                isOpen={this.state.isEditStageModalOpen}
-                toggle={this.toggleEditStage}
-                onEditSuccess={this.handleEditStageSuccess}
-              />
-              <CreateBotModal
-                isOpen={this.state.isCreateBotModalOpen}
-                // isChannelOpen={false}
-                toggle={this.toggleCreateBotModal}
-                existingBots={this.props.bots}
-                onCreateBotSuccess={this.props.fetchBots}
-              />
-              <ImportBotModal
-                isOpen={this.state.isImportBotModalOpen}
-                toggle={this.toggleImportBotModal}
-                onCreateBotSuccess={this.props.fetchBots}
-              />
-            </AccessControl>
+            {/* Render the rest of the content if not expired */}
+            {!this.state.isExpired && (
+              <>
+                <Downloader url={this.state.archiveUrl} filename={this.state.archiveName} />
+                {this.renderBots()}
+
+                <AccessControl resource="admin.bots.*" operation="write">
+                  <RollbackBotModal
+                    botId={this.state.focusedBot}
+                    isOpen={this.state.isRollbackModalOpen}
+                    toggle={this.toggleRollbackModal}
+                    onRollbackSuccess={this.handleRollbackSuccess}
+                  />
+                  <EditStageModal
+                    workspace={this.props.workspace}
+                    stage={this.state.selectedStage}
+                    isOpen={this.state.isEditStageModalOpen}
+                    toggle={this.toggleEditStage}
+                    onEditSuccess={this.handleEditStageSuccess}
+                  />
+                  <CreateBotModal
+                    isOpen={this.state.isCreateBotModalOpen}
+                    toggle={this.toggleCreateBotModal}
+                    existingBots={this.props.bots}
+                    onCreateBotSuccess={this.props.fetchBots}
+                  />
+                  <ImportBotModal
+                    isOpen={this.state.isImportBotModalOpen}
+                    toggle={this.toggleImportBotModal}
+                    onCreateBotSuccess={this.props.fetchBots}
+                  />
+                </AccessControl>
+              </>
+            )}
           </Fragment>
         </SplitPage>
       </PageContainer>
