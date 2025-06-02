@@ -202,17 +202,26 @@ const Login: FC<Props> = props => {
       subIndustryType: formData.subIndustryType,
     }
 
-    const currentUTC = new Date().toISOString() // Always UTC
-    const tillDateUTC = new Date(subData.till).toISOString()
+    const currentUTC = new Date().toISOString().split('T')[0] // Always UTC
+    const tillDateUTC = new Date(subData.till).toISOString().split('T')[0]
 
-    console.log('Current UTC:', currentUTC)
     console.log('Till Date UTC:', tillDateUTC)
+
+    // Calculate days remaining
+    const currentDate = new Date(currentUTC)
+    const tillDate = new Date(tillDateUTC)
+    const timeDifference = tillDate.getTime() - currentDate.getTime()
+    const daysRemaining = Math.ceil(timeDifference / (1000 * 60 * 60 * 24)) // Ensure non-negative value
+
+    console.log('day remaining:', daysRemaining)
 
     const updatedSubData = {
       subscription: subData.subscription,
       createdAt: subData.createdAt,
       till: subData.till,
-      expired: currentUTC > tillDateUTC
+      expired: currentUTC > tillDateUTC,
+      daysRemaining,
+      promptRun: false  // set the prompt run to false 
     }
 
     localStorage.setItem('formData', JSON.stringify(updatedFormData))

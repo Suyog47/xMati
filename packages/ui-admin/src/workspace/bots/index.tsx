@@ -59,7 +59,9 @@ class Bots extends Component<Props> {
     showFilters: false,
     needApprovalFilter: false,
     isExpired: false,
-    isSubscriptionOpen: false
+    isSubscriptionOpen: false,
+    showExpiryPrompt: false,
+    expiryMessage: ''
   }
 
   componentDidMount() {
@@ -76,11 +78,32 @@ class Bots extends Component<Props> {
     }
 
     // Check subscription expiry from localStorage
-    const subData = JSON.parse(localStorage.getItem('subData') || '{}')
-    const expiry = subData.expired
+    const expiry = this.subData.expired
+    const daysRemaining = this.subData.daysRemaining || 0
+    const subscription = this.subData.subscription || 'trial'
+    const promptRun = this.subData.promptRun || false
 
-    console.log(expiry)
     this.setState({ isExpired: expiry })
+
+    if (!promptRun) {
+      if (daysRemaining === 15 || daysRemaining === 7 || daysRemaining === 3 || daysRemaining === 1) {
+        if (daysRemaining === 15 && subscription === 'trial') {
+          return
+        }
+
+        this.setState({
+          showExpiryPrompt: true,
+          expiryMessage: `You have ${daysRemaining} days left for expiry. Please renew your subscription on time to continue uninterrupted access to the platform.`
+        })
+
+        localStorage.setItem('subData', JSON.stringify({ ... this.subData, promptRun: true }))  // set prompt run to false
+
+        // Hide the prompt after 2 seconds
+        setTimeout(() => {
+          this.setState({ showExpiryPrompt: false })
+        }, 5000)
+      }
+    }
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     telemetry.startFallback(api.getSecured({ useV1: true })).catch()
@@ -393,12 +416,21 @@ class Bots extends Component<Props> {
   }
 
   render() {
+    const { showExpiryPrompt, expiryMessage } = this.state
+
     if (!this.props.bots) {
       return <LoadingSection />
     }
 
     return (
       <PageContainer title={lang.tr('admin.workspace.bots.bots')}>
+        {/* Expiry Prompt */}
+        {showExpiryPrompt && (
+          <div className={style.expiryPrompt}>
+            {expiryMessage}
+          </div>
+        )}
+
         <SplitPage sideMenu={(this.state.isExpired) ? !this.isPipelineView : !this.isPipelineView && this.renderCreateNewBotButton()}>
           <Fragment>
             <Subscription

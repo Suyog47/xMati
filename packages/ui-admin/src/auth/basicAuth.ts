@@ -49,6 +49,9 @@ export default class BasicAuthentication {
 
     await this.backupBot(credentials.owner)
 
+    // Add a 1 second hold before proceeding
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+
     await this.afterLoginRedirect(returnTo)
   }
 
