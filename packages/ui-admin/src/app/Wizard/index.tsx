@@ -444,7 +444,7 @@ const CustomerWizard: React.FC = () => {
           <ol>
             <li>Below are the scripts that you have to implement inside your website code.</li>
             <li><code>
-              {'<script src="http://localhost:3000/assets/modules/channel-web/inject.js"></script>'}
+              {'<script src="https://www.app.xmati.ai/assets/modules/channel-web/inject.js"></script>'}
             </code></li>
             <li> <code>
               {`<script>\n

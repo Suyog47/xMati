@@ -74,8 +74,8 @@ export const ChangePasswordForm: FC<Props> = props => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email,
-          password: newPassword,
+          email: email.trim(),
+          password: newPassword.trim(),
         }),
       })
 
@@ -108,7 +108,7 @@ export const ChangePasswordForm: FC<Props> = props => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email,
+          email: email.trim(),
         }),
       })
 

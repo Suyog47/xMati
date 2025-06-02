@@ -15,7 +15,7 @@ export const LoginForm: FC<Props> = props => {
   const onSubmit = async e => {
     e.preventDefault()
     setLoading(true)
-    await props.onLogin(email, password)
+    await props.onLogin(email.trim(), password.trim()) // Trim email here
     setLoading(false)
   }
 

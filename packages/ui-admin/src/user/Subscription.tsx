@@ -9,11 +9,11 @@ import {
 import { loadStripe, PaymentRequest } from '@stripe/stripe-js'
 import { Dialog, Button, FormGroup } from '@blueprintjs/core'
 
-
-//const stripePromise = loadStripe('pk_test_51RLimpPBSMPLjWxm3IUaX63iUb4TqhU5prbUsg7A5RwG2sZsukOa7doAAhPu2RpEkYXZ2dRLNrOA4Pby9IscZOse00unCEcNDG')
+// For development use
+const stripePromise = loadStripe('pk_test_51RLimpPBSMPLjWxm3IUaX63iUb4TqhU5prbUsg7A5RwG2sZsukOa7doAAhPu2RpEkYXZ2dRLNrOA4Pby9IscZOse00unCEcNDG')
 
 // For production use
-const stripePromise = loadStripe('pk_live_51RPPI0EncrURrNgDF2LNkLrh5Wf53SIe3WjqPqjtzqbJWDGfDFeG4VvzUXuC4nCmrPTNOTeFENuAqRBw1mvbNJg600URDxPnuc')
+// const stripePromise = loadStripe('pk_live_51RPPI0EncrURrNgDF2LNkLrh5Wf53SIe3WjqPqjtzqbJWDGfDFeG4VvzUXuC4nCmrPTNOTeFENuAqRBw1mvbNJg600URDxPnuc')
 
 interface Props {
   isOpen: boolean
@@ -30,18 +30,23 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   const [expiryTill, setExpiryTill] = useState<string>('')
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false)
   const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false)
+  const [selectedDuration, setSelectedDuration] = useState<string>('monthly')
 
-
-  const amount = useMemo(() => (
-    selectedTab === 'Starter' ? 1800 : 10000
-  ), [selectedTab])
+  const amount = useMemo(() => {
+    if (selectedDuration === 'half-yearly') {
+      return selectedTab === 'Starter' ? 1800 * 6 * 0.97 : 10000 * 6 * 0.97 // 3% discount
+    } else if (selectedDuration === 'yearly') {
+      return selectedTab === 'Starter' ? 1800 * 12 * 0.95 : 10000 * 12 * 0.95 // 5% discount
+    }
+    return selectedTab === 'Starter' ? 1800 : 10000 // Default monthly price
+  }, [selectedTab, selectedDuration])
 
   const getClientSecret = useCallback(async () => {
     setIsLoadingSecret(true)
     setPaymentError('')
 
     try {
-      const result = await fetch('https://www.app.xmati.ai/apis/create-payment-intent', {
+      const result = await fetch('http://localhost:8000/create-payment-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount, currency: 'usd' }),
@@ -91,7 +96,6 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     const [error, setError] = useState('')
     const [isProcessing, setIsProcessing] = useState(false)
     const [paymentRequest, setPaymentRequest] = useState<PaymentRequest | null>(null)
-    const [selectedDuration, setSelectedDuration] = useState<string>('monthly')
 
     // Initialize PaymentRequest (Apple/Google Pay)
     useEffect(() => {
@@ -153,10 +157,10 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
         const { email } = savedFormData
 
-        const result = await fetch('https://www.app.xmati.ai/apis/save-subscription', {
+        const result = await fetch('http://localhost:8000/save-subscription', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ key: email, subscription: selectedTab }),
+          body: JSON.stringify({ key: email, subscription: selectedTab, duration: selectedDuration }),
         })
 
         if (!result.ok) {
