@@ -3,7 +3,7 @@ import { lang } from 'botpress/shared'
 import cx from 'classnames'
 import React, { FC } from 'react'
 
-import logo from './media/project-icon-3.png'
+import logo from './media/xmati.png'
 import style from './style.scss'
 
 interface Props {

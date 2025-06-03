@@ -113,7 +113,7 @@ class RootStore {
     return (
       this.botInfo?.details?.avatarUrl ||
       this.config?.avatarUrl ||
-      (this.config.isEmulator && `${window.ROOT_PATH}/assets/modules/channel-web/images/project-icon-3.png`)
+      (this.config.isEmulator && `${window.ROOT_PATH}/assets/modules/channel-web/images/xmati.png`)
     )
   }
 

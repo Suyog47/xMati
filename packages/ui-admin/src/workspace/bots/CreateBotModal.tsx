@@ -235,12 +235,12 @@ class CreateBotModal extends Component<Props, State> {
       webchat: `
         <ol>
           <li>Below are the scripts that you have to implement inside your website code.</li>
-          <li><code>&lt;script src="http://localhost:3000/assets/modules/channel-web/inject.js"&gt;&lt;/script&gt;</code></li>
+          <li><code>&lt;script src="https://www.app.xmati.ai/assets/modules/channel-web/inject.js"&gt;&lt;/script&gt;</code></li>
           <li>
             <code>
               &lt;script&gt;<br/>
               &nbsp;&nbsp;window.botpressWebChat.init({<br/>
-              &nbsp;&nbsp;&nbsp;&nbsp;host: "http://localhost:3000",<br/>
+              &nbsp;&nbsp;&nbsp;&nbsp;host: "https://www.app.xmati.ai",<br/>
               &nbsp;&nbsp;&nbsp;&nbsp;botId: "${botId}"<br/>
               &nbsp;&nbsp;})<br/>
               &lt;/script&gt;

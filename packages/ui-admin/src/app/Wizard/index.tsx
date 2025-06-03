@@ -13,7 +13,6 @@ import ms from 'ms'
 import { AnyRecord } from 'dns'
 
 
-
 interface FormData {
   fullName: string
   email: string
@@ -449,7 +448,7 @@ const CustomerWizard: React.FC = () => {
             <li> <code>
               {`<script>\n
                 window.botpressWebChat.init({\n
-                host: "http://localhost:3000",\n
+                host: "https://www.app.xmati.ai",\n
                 botId: "${botId}"\n
               })\n
               </script>`}

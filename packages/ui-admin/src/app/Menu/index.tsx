@@ -14,7 +14,7 @@ import { getActiveWorkspace } from '~/auth/basicAuth'
 import { fetchCurrentVersion, fetchLatestVersions } from '~/releases/reducer'
 import { addModuleIcon } from '~/workspace/bots/WorkspaceAppItems'
 import { AppState } from '../rootReducer'
-import logo from './project-icon-3.png'
+import logo from './xmati.png'
 import style from './style.scss'
 
 type Props = ConnectedProps<typeof connector> & RouteComponentProps
