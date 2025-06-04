@@ -78,22 +78,37 @@ class Bots extends Component<Props> {
     }
 
     // Check subscription expiry from localStorage
-    const expiry = this.subData.expired
+    let expiry
     const daysRemaining = this.subData.daysRemaining || 0
     const subscription = this.subData.subscription || 'trial'
     const promptRun = this.subData.promptRun || false
 
+    if (subscription === 'trial') {
+      expiry = this.subData.expired || false
+    } else {
+      expiry = this.subData.expired && daysRemaining === -4
+    }
+
     this.setState({ isExpired: expiry })
 
     if (!promptRun) {
-      if (daysRemaining === 15 || daysRemaining === 7 || daysRemaining === 3 || daysRemaining === 1) {
-        if (daysRemaining === 15 && subscription === 'trial') {
-          return
-        }
+      let msg
+      if ((daysRemaining === 15 && subscription === 'trial') || (daysRemaining < 0 && subscription === 'trial')) {
+        return
+      }
 
+      if (daysRemaining === 15 || daysRemaining === 7 || daysRemaining === 3 || daysRemaining === 1) {
+        msg = `You have ${daysRemaining} days left for expiry. Please renew your subscription on time to continue uninterrupted access to the platform.`
+      }
+
+      if (daysRemaining === -1 || daysRemaining === -2 || daysRemaining === -3) {
+        msg = `Currently your subscription has expired. But you have ${Math.abs(daysRemaining + 4)} complimentary days to renew your subscription.`
+      }
+
+      if (msg) {
         this.setState({
           showExpiryPrompt: true,
-          expiryMessage: `You have ${daysRemaining} days left for expiry. Please renew your subscription on time to continue uninterrupted access to the platform.`
+          expiryMessage: msg
         })
 
         localStorage.setItem('subData', JSON.stringify({ ... this.subData, promptRun: true }))  // set prompt run to false
@@ -103,6 +118,7 @@ class Bots extends Component<Props> {
           this.setState({ showExpiryPrompt: false })
         }, 5000)
       }
+
     }
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -452,8 +468,8 @@ class Bots extends Component<Props> {
                   backgroundColor: 'white',
                 }}
               >
-                <h3>Your {(this.subData.subscription === 'trail') ?
-                  '15-Day Trial' : this.subData.subscription} subscription and 3 day complimentary trail has been Expired</h3>
+                <h3>Your {(this.subData.subscription === 'trial') ?
+                  '15-Day Trial' : this.subData.subscription} subscription {(this.subData.subscription !== 'trial') ? 'and a 3 day complimentary trail' : ''} has been Expired</h3>
                 <p style={{ margin: '20px 0' }}>
                   To continue using the platform, please purchase a subscription.
                 </p>

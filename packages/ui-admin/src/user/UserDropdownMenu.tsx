@@ -38,9 +38,18 @@ const UserDropdownMenu: FC<Props> = props => {
 
   useEffect(() => {
     !props.profile && props.fetchProfile()
-
+    let expiry
     const subData = JSON.parse(localStorage.getItem('subData') || '{}')
-    setExpiry(subData?.expired || false)
+    const subscription = subData?.subscription || 'trial'
+    const daysRemaining = subData.daysRemaining || 0
+    const expired = subData.expired || 0
+
+    if (subscription === 'trial') {
+      expiry = expired || false
+    } else {
+      expiry = expired && daysRemaining === -4
+    }
+    setExpiry(expiry)
 
   }, [])
 

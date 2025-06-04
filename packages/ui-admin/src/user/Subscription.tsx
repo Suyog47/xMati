@@ -155,12 +155,12 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     const setSubscriber = async () => {
       try {
         const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
-        const { email } = savedFormData
+        const { fullName, email } = savedFormData
 
         const result = await fetch('http://localhost:8000/save-subscription', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ key: email, subscription: selectedTab, duration: selectedDuration }),
+          body: JSON.stringify({ key: email, name: fullName, subscription: selectedTab, duration: selectedDuration }),
         })
 
         if (!result.ok) {

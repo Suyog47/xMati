@@ -339,7 +339,7 @@ const CustomerWizard: React.FC = () => {
       const result = await fetch('https://www.app.xmati.ai/apis/save-subscription', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key: formData.email, subscription: 'trial' }),
+        body: JSON.stringify({ key: formData.email, name: formData.fullName, subscription: 'trial' }),
       })
 
       return result.json()
