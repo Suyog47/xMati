@@ -132,12 +132,17 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         if (!cardElement) {
           throw new Error('Card details missing')
         }
-        const { error: paymentError } = await stripe.confirmCardPayment(clientSecret, {
+        const { error: paymentError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
           payment_method: { card: cardElement }
         })
 
         if (paymentError) {
           throw paymentError
+        }
+
+        // Check the payment status
+        if (paymentIntent?.status !== 'succeeded') {
+          throw new Error('Payment failed. Please try again or use a different payment method.')
         }
 
         await setSubscriber()
@@ -146,11 +151,30 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         toggle()
       } catch (err: any) {
         setError(err.message)
+        void paymentFailedEmail()
       } finally {
         setIsProcessing(false)
       }
     }
 
+
+    const paymentFailedEmail = async () => {
+      try {
+        const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
+        const { fullName, email } = savedFormData
+
+        const result = await fetch('http://localhost:8000/failed-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, name: fullName, subscription: selectedTab, amount: `$${amount / 100}` }),
+        })
+        if (!result.ok) {
+          throw new Error('Failed to send payment failure email')
+        }
+      } catch (err: any) {
+        console.error('Error sending payment failure email:', err.message)
+      }
+    }
 
     const setSubscriber = async () => {
       try {
@@ -160,7 +184,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         const result = await fetch('http://localhost:8000/save-subscription', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ key: email, name: fullName, subscription: selectedTab, duration: selectedDuration }),
+          body: JSON.stringify({ key: email, name: fullName, subscription: selectedTab, duration: selectedDuration, amount: `$${amount / 100}` }),
         })
 
         if (!result.ok) {
