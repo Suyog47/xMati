@@ -178,7 +178,7 @@ export class BotService {
 
   async getAndSaveBots(email: any) {
     try {
-      let result = await axios('http://localhost:8000/get-bots', {
+      let result = await axios('https://www.app.xmati.ai/apis/get-bots', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
