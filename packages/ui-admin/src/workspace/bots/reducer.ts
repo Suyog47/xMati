@@ -28,6 +28,7 @@ interface BotState {
   workspaceAppsBotId?: string
   // Fetches the list of languages available with the NLU
   nluLanguages: string[]
+  numberOfBots?: number
 }
 
 const initialState: BotState = {
@@ -121,6 +122,7 @@ export const fetchBotCategories = (): AppThunk => {
 }
 
 export const fetchBots = (): AppThunk => {
+  console.log('Fetching bots...')
   return async dispatch => {
     dispatch({ type: FETCH_BOTS_REQUESTED })
 
@@ -133,16 +135,26 @@ export const fetchBots = (): AppThunk => {
     const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
     const { email } = savedFormData
 
+    // Filter bots based on the owner's email
     data.payload.bots.forEach(b => {
-
       if (b.owner === email) {
-        return filteredBots.push(b)
+        filteredBots.push(b)
       }
     })
 
+    // Calculate the number of bots
+    const numberOfBots = filteredBots.length
+
+    // Update formData in localStorage with the number of bots
+    const updatedFormData = {
+      ...savedFormData,
+      numberOfBots
+    }
+    localStorage.setItem('formData', JSON.stringify(updatedFormData))
+
     dispatch({
       type: FETCH_BOTS_RECEIVED,
-      bots: filteredBots, //data.payload.bots,
+      bots: filteredBots,
       workspace: data.payload.workspace
     })
   }

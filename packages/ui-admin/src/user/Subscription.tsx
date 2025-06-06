@@ -142,6 +142,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
 
         // Check the payment status
         if (paymentIntent?.status !== 'succeeded') {
+          void paymentFailedEmail()
           throw new Error('Payment failed. Please try again or use a different payment method.')
         }
 
@@ -151,7 +152,6 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         toggle()
       } catch (err: any) {
         setError(err.message)
-        void paymentFailedEmail()
       } finally {
         setIsProcessing(false)
       }

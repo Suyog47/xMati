@@ -45,6 +45,7 @@ const botFilterFields = ['name', 'id', 'description']
 type Props = ConnectedProps<typeof connector> & RouteComponentProps
 
 class Bots extends Component<Props> {
+  formData = JSON.parse(localStorage.getItem('formData') || '{}')
   subData = JSON.parse(localStorage.getItem('subData') || '{}')
   state = {
     isCreateBotModalOpen: false,
@@ -61,7 +62,8 @@ class Bots extends Component<Props> {
     isExpired: false,
     isSubscriptionOpen: false,
     showExpiryPrompt: false,
-    expiryMessage: ''
+    expiryMessage: '',
+    numberOfBots: this.formData.numberOfBots || 0, // Initialize from localStorage
   }
 
   componentDidMount() {
@@ -125,6 +127,12 @@ class Bots extends Component<Props> {
     telemetry.startFallback(api.getSecured({ useV1: true })).catch()
   }
 
+  componentDidUpdate(prevProps: Props) {
+    if (prevProps.numberOfBots !== this.props.numberOfBots) {
+      this.setState({ numberOfBots: this.props.numberOfBots })
+    }
+  }
+
   toggleCreateBotModal = () => {
     this.setState({ isCreateBotModalOpen: !this.state.isCreateBotModalOpen })
   }
@@ -174,6 +182,17 @@ class Bots extends Component<Props> {
   }
 
   renderCreateNewBotButton() {
+    const { subscription } = this.subData
+    const { numberOfBots } = this.state
+
+    // Determine the bot limit based on the subscription type
+    const botLimit = subscription === 'Professional' ? 5 : 3
+
+    // Check if the number of bots exceeds the limit
+    if (numberOfBots >= botLimit) {
+      return null // Do not render the button if the limit is reached
+    }
+
     return (
       <AccessControl resource="admin.bots.*" operation="write">
         <Popover minimal interactionKind={PopoverInteractionKind.HOVER} position={Position.BOTTOM}>
@@ -530,7 +549,8 @@ const mapStateToProps = (state: AppState) => ({
   loading: state.bots.loadingBots,
   licensing: state.licensing.license,
   profile: state.user.profile,
-  language: state.bots.nluLanguages
+  language: state.bots.nluLanguages,
+  numberOfBots: state.bots.numberOfBots, // Add numberOfBots
 })
 
 const mapDispatchToProps = {

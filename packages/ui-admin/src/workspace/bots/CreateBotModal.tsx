@@ -72,6 +72,8 @@ const defaultState = {
 }
 
 class CreateBotModal extends Component<Props, State> {
+  savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
+  savedSubData = JSON.parse(localStorage.getItem('subData') || '{}')
   private _form: HTMLFormElement | null = null
   private _form2: HTMLFormElement | null = null
 
@@ -105,9 +107,8 @@ class CreateBotModal extends Component<Props, State> {
   }
 
   handleNameChanged = e => {
-    const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
     let botName = e.target.value
-    this.setState({ botName, botId: `${savedFormData.email.replace(/[^A-Za-z0-9]/g, '')}-${botName.toLowerCase().replace(/[^a-z0-9]/g, '')}` })
+    this.setState({ botName, botId: `${this.savedFormData.email.replace(/[^A-Za-z0-9]/g, '')}-${botName.toLowerCase().replace(/[^a-z0-9]/g, '')}` })
   }
 
   handlePromptChanged = e => {
@@ -145,6 +146,9 @@ class CreateBotModal extends Component<Props, State> {
       console.log('create called')
       this.props.onCreateBotSuccess()
       this.closeChannelDialog()
+      setTimeout(() => {
+        window.location.reload()    // reloading for the bot creation limit check
+      }, 1000)
     } catch (error) {
       this.setState({ error: error.message, isProcessing: false })
     }
@@ -197,8 +201,54 @@ class CreateBotModal extends Component<Props, State> {
     return false
   }
 
+  get isBotLimitExceeded() {
+    const { subscription } = this.savedSubData
+    const numberOfBots = this.savedFormData.numberOfBots || 0
+
+    // Determine the bot limit based on the subscription type
+    const botLimit = subscription === 'Professional' ? 5 : 3
+
+    // Check if the number of bots exceeds the limit
+    return numberOfBots >= botLimit
+  }
+
   render() {
     const { botId, verifyToken } = this.state // Get the current botId from state
+
+    if (this.isBotLimitExceeded) {
+      return (
+        <Dialog
+          title="Bot Limit Exceeded"
+          icon="error"
+          isOpen={this.props.isOpen}
+          onClose={this.toggleDialog}
+          transitionDuration={0}
+          canOutsideClickClose={false}
+        >
+          <div className={Classes.DIALOG_BODY}>
+            <Callout intent="danger">
+              <h4>You have reached the maximum number of bots allowed for your subscription plan.</h4>
+              <p>
+                Your current subscription plan ({this.savedFormData.subscription}) allows a maximum of{' '}
+                {this.savedFormData.subscription === 'Professional' ? 5 : 3} bots.
+              </p>
+              <p>
+                To create more bots, please upgrade your subscription or delete an existing bot.
+              </p>
+            </Callout>
+          </div>
+          <div className={Classes.DIALOG_FOOTER}>
+            <div className={Classes.DIALOG_FOOTER_ACTIONS}>
+              <Button
+                text="Close"
+                onClick={this.toggleDialog}
+                intent={Intent.PRIMARY}
+              />
+            </div>
+          </div>
+        </Dialog>
+      )
+    }
 
     const channelInstructions = {
       telegram: `
@@ -303,7 +353,8 @@ class CreateBotModal extends Component<Props, State> {
                   required
                   value={this.state.botName}
                   onChange={this.handleNameChanged}
-                  autoFocus />
+                  autoFocus
+                />
               </FormGroup>
 
               <FormGroup
@@ -326,14 +377,20 @@ class CreateBotModal extends Component<Props, State> {
                     resize: 'none', // Disables resizing
                     height: '100px', // Fixed height
                     width: '100%', // Full width
-                    overflow: 'auto' // Adds scrollbars if content exceeds the box
-                  }} />
+                    overflow: 'auto', // Adds scrollbars if content exceeds the box
+                  }}
+                />
               </FormGroup>
 
-              <p style={{ textAlign: 'center' }}><b>Or</b></p>
+              <p style={{ textAlign: 'center' }}>
+                <b>Or</b>
+              </p>
 
               {this.state.templates.length > 0 && (
-                <FormGroup label={lang.tr('admin.workspace.bots.create.template')} labelFor="template">
+                <FormGroup
+                  label={lang.tr('admin.workspace.bots.create.template')}
+                  labelFor="template"
+                >
                   <Select
                     id="select-bot-templates"
                     tabIndex="4"
@@ -343,10 +400,10 @@ class CreateBotModal extends Component<Props, State> {
                       this.setState({ selectedTemplate: selectedTemplate as any })
                     }}
                     getOptionLabel={o => o.name}
-                    getOptionValue={o => o.id} />
+                    getOptionValue={o => o.id}
+                  />
                 </FormGroup>
               )}
-
             </div>
             <div className={Classes.DIALOG_FOOTER}>
               <div className={Classes.DIALOG_FOOTER_ACTIONS}>
@@ -356,7 +413,8 @@ class CreateBotModal extends Component<Props, State> {
                   text={this.state.isProcessing ? lang.tr('pleaseWait') : 'Next'}
                   onClick={this.openChannelDialog}
                   disabled={this.isButtonDisabled}
-                  intent={Intent.PRIMARY} />
+                  intent={Intent.PRIMARY}
+                />
               </div>
             </div>
           </form>
