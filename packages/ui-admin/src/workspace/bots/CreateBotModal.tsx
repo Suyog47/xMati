@@ -257,19 +257,20 @@ class CreateBotModal extends Component<Props, State> {
           <li>Visit the <b>Facebook for Developers</b> website.</li>
           <li>Click <b>My Apps</b> from the top menu and create a new app.</li>
           <li>After creating one, In the left sidebar, expand <b>Settings</b> → <b>Basic</b>.</li>
-          <li>Click <b>Show</b> next to <b>App Secret</b> and copy the value. You will need it later</li>
+          <li>Click <b>Show</b> next to <b>App Secret</b> and copy the value and paste it here</li>
           <li>Copy this verify token <b>'${verifyToken}'</b> as well</li>
-          <li>In <b>Facebook App</b>, go to <b>Products</b> → <b>Messenger</b> → <b>Messanger Api Settings</b>. You need to add it first.</li>
-          <li>Go to <b>Generate Access Tokens</b> and link your Facebook page.</li>
+          <li>Enable the <b>Messenger</b> app inside <b>Dashboard</b></li>
+          <li>Then go to <b>Messenger</b> → <b>Messanger Api Settings</b>.</li>
+          <li>Go to <b>Generate Access Tokens</b> section and link your Facebook page.</li>
           <li>After successful linking, click on <b>Generate</b> button on the right side and copy the <b>Access token</b></li>
-          <li>Come back here and paste the <b>App Secret</b> and <b>Access Token</b> you copied earlier</li>
-          <li>Click <b>Submit</b> button and wait for the bot to be created.</li>
-          <li>Go back to the <b>Facebook App</b> page and under <b>Configure Webhooks</b>, Enter the Callback URL:- <b>https://www.app.xmati.ai/api/v1/messaging/webhooks/${botId}/messenger</b></li>
+          <li>Paste the <b>Access Token</b> here</li>
+          <li>Click <b>Create Bot</b> button and wait for the bot to be created.</li>
+          <li>Go back to the <b>Facebook App</b> and under <b>Configure Webhooks</b>, Enter the Callback URL:- <b>https://www.app.xmati.ai/api/v1/messaging/webhooks/${botId}/messenger</b></li>
           <li>Paste the verify token that you have copied earlier from point 8.</li>
           <li>Click on <b>'Verify and save'</b>.</li>
-          <li>Make sure you enable <b>messages</b> and <b>messaging_postbacks</b> inside <b>Subscription Fields</b></li>
-          <li>Open your facebook page and select the <b>Messenger</b> button</li>
-          <li>You can now start chatting with your Chat bot in <b>Messenger</b>.</li>
+          <li>Make sure you enable <b>messages</b> and <b>messaging_postbacks</b> inside <b>Webhook Subscription</b> field inside <b>Generate access tokens</b> itself</li>
+          <li>Open your facebook and click on the <b>Messenger</b> button</li>
+          <li>Search for your Facebook page name and now you can start chatting with your Chat bot.</li>
         </ol>
       `,
     }
