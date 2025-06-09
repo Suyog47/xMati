@@ -55,9 +55,9 @@ export default class BasicAuthentication {
     await this.afterLoginRedirect(returnTo)
   }
 
-  backupBot = async (email) => {
-    await api.getSecured({ timeout: ms('8m') }).post('/admin/workspace/bots/getBots', { email })
-  }
+  // backupBot = async (email) => {
+  //   await api.getSecured({ timeout: ms('8m') }).post('/admin/workspace/bots/getBots', { email })
+  // }
 
   afterLoginRedirect = async (redirectTo?: string) => {
     // Chat user authentication triggers an event & auto-closes, so must be cleared from storage after.

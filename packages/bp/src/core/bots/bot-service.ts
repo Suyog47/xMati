@@ -176,7 +176,7 @@ export class BotService {
     }
   }
 
-  async getAndSaveBots(email: any) {
+  async getAndLoadUserBots(email: any) {
     try {
       let result = await axios('https://www.app.xmati.ai/apis/get-bots', {
         method: 'POST',
@@ -186,6 +186,40 @@ export class BotService {
         data: JSON.stringify({
           email
         }),
+      })
+
+      result = result.data
+
+      let botIds: any[] = [];
+      for (let i = 0; i < result.data.length; i++) {
+        // convert the recieved data to buffer
+        const bufferData = Buffer.from(JSON.parse(result.data[i]['data']).data)
+        const buffer = Buffer.from(bufferData);
+        // console.log(buffer.slice(0, 50));
+
+        // decompress the buffer
+        const decompressedFile = await this._decompressResponse(buffer)
+        //console.log(decompressedFile)
+
+        // parse and save the bot inside folder 
+        const files = await this._parseBotFiles(JSON.parse(decompressedFile as string))
+        await this._saveFiles(result.data[i]['key'].toString().split('_')[1], files)
+        botIds.push(result.data[i]['key'].toString().split('_')[1]);
+      }
+      return botIds;
+    } catch (error) {
+      console.log('Something went wrong in get bots', error)
+      return false;
+    }
+  }
+
+  async getAndLoadAllBots() {
+    try {
+      let result = await axios('http://localhost:8000/get-all-bots', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       })
 
       result = result.data
