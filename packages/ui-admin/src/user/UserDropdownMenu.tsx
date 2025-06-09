@@ -23,6 +23,7 @@ import UpdatePassword from './UpdatePassword'
 import Subscription from './Subscription'
 import VoiceRecorder from './VoicetoText'
 import UserProfile from './UpdateUserProfile'
+import AdminControl from './AdminControl'
 
 
 type Props = ConnectedProps<typeof connector>
@@ -30,6 +31,7 @@ type Props = ConnectedProps<typeof connector>
 const UserDropdownMenu: FC<Props> = props => {
   const [isSubscriptionOpen, setSubscriptionOpen] = useState(false)
   const [isGemini, setGemini] = useState(false)
+  const [isAdminControl, setAdminControl] = useState(false)
   const [isProfileOpen, setProfileOpen] = useState(false)
   const [isPasswordOpen, setPasswordOpen] = useState(false)
   const [isLanguageOpen, setLanguageOpen] = useState(false)
@@ -65,6 +67,7 @@ const UserDropdownMenu: FC<Props> = props => {
   const toggleProfile = () => setProfileOpen(!isProfileOpen)
   const toggleSubscription = () => setSubscriptionOpen(!isSubscriptionOpen)
   const toggleGemini = () => setGemini(!isGemini)
+  const toggleAdminControl = () => setAdminControl(!isAdminControl)
   const togglePassword = () => setPasswordOpen(!isPasswordOpen)
   const toggleLanguage = () => setLanguageOpen(!isLanguageOpen)
 
@@ -88,6 +91,8 @@ const UserDropdownMenu: FC<Props> = props => {
           <MenuItem id="btn-subscription" icon="user" text={'Subscription'} onClick={toggleSubscription} />
 
           {/* <MenuItem id="btn-gemini" icon="user" text={'Gemini Speech'} onClick={toggleGemini} /> */}
+
+          <MenuItem id="btn-admin-control" icon="user" text={'Admin Control'} onClick={toggleAdminControl} />
 
           {!isExpired && (<MenuItem id="btn-profile" icon="user" text={lang.tr('admin.updateProfile')} onClick={toggleProfile} />)}
 
@@ -120,6 +125,11 @@ const UserDropdownMenu: FC<Props> = props => {
         isOpen={isSubscriptionOpen}
         toggle={toggleSubscription}>
       </Subscription>
+
+      <AdminControl
+        isOpen={isAdminControl}
+        toggle={toggleAdminControl}>
+      </AdminControl>
 
       {/* <VoiceRecorder
         isOpen={isGemini}

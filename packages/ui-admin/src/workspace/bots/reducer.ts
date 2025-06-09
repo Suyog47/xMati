@@ -122,7 +122,6 @@ export const fetchBotCategories = (): AppThunk => {
 }
 
 export const fetchBots = (): AppThunk => {
-  console.log('Fetching bots...')
   return async dispatch => {
     dispatch({ type: FETCH_BOTS_REQUESTED })
 
@@ -132,11 +131,13 @@ export const fetchBots = (): AppThunk => {
     }
 
     let filteredBots: BotConfig[] = []
+    let botIdList: { id: string; owner: string }[] = []
     const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
     const { email } = savedFormData
 
     // Filter bots based on the owner's email
     data.payload.bots.forEach(b => {
+      botIdList.push({ id: b.id, owner: b.owner })
       if (b.owner === email) {
         filteredBots.push(b)
       }
@@ -148,7 +149,8 @@ export const fetchBots = (): AppThunk => {
     // Update formData in localStorage with the number of bots
     const updatedFormData = {
       ...savedFormData,
-      numberOfBots
+      numberOfBots,
+      botIdList
     }
     localStorage.setItem('formData', JSON.stringify(updatedFormData))
 

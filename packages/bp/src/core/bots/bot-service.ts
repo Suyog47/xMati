@@ -247,6 +247,12 @@ export class BotService {
     }
   }
 
+  async retriveAllBotIds(keys) {
+    keys.forEach(async (key) => {
+      await this._convertBot(`${key.owner}_${key.id}`, key.id)
+    })
+  }
+
   async updateBot(botId: string, updatedBot: Partial<BotConfig>): Promise<void> {
     this.stats.track('bot', 'update')
 

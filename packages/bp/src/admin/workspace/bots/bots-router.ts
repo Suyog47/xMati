@@ -126,6 +126,16 @@ class BotsRouter extends CustomAdminRouter {
       })
     )
 
+    this.router.post(
+      '/saveAllBots',
+      this.needPermissions('write', this.resource),
+      this.asyncMiddleware(async (req, res) => {
+        const { ids } = req.body
+        await this.botService.retriveAllBotIds(ids)
+        return sendSuccess(res, 'api called successfully')
+      })
+    )
+
     router.post(
       '/',
       this.needPermissions('write', this.resource),

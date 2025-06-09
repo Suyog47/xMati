@@ -205,8 +205,6 @@ const Login: FC<Props> = props => {
     const currentUTC = new Date().toISOString().split('T')[0] // Always UTC
     const tillDateUTC = new Date(subData.till).toISOString().split('T')[0]
 
-    console.log('Till Date UTC:', tillDateUTC)
-
     // Calculate days remaining
     const currentDate = new Date(currentUTC)
     const tillDate = new Date(tillDateUTC)
