@@ -131,8 +131,8 @@ class BotsRouter extends CustomAdminRouter {
       this.needPermissions('write', this.resource),
       this.asyncMiddleware(async (req, res) => {
         const { ids } = req.body
-        await this.botService.retriveAllBotIds(ids)
-        return sendSuccess(res, 'api called successfully')
+        await this.botService.saveAllBots(ids)
+        return sendSuccess(res, 'all bots saved successfully successfully')
       })
     )
 

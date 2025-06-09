@@ -247,7 +247,7 @@ export class BotService {
     }
   }
 
-  async retriveAllBotIds(keys) {
+  async saveAllBots(keys) {
     keys.forEach(async (key) => {
       await this._convertBot(`${key.owner}_${key.id}`, key.id)
     })
@@ -363,6 +363,7 @@ export class BotService {
       await this.hookService.executeHook(new Hooks.BeforeBotImport(api, botId, tmpFolder, hookResult))
 
       if (hookResult.allowImport) {
+
         const pipeline = await this.workspaceService.getPipeline(workspaceId)
 
         await replace({
@@ -415,13 +416,11 @@ export class BotService {
         } else {
           BotService.setBotStatus(botId, 'disabled')
         }
-
+        await this._convertBot(`${originalConfig.owner}_${botId}`, botId)
         this.logger.forBot(botId).info(`Import of bot ${botId} successful`)
       } else {
         this.logger.forBot(botId).info(`Import of bot ${botId} was denied by hook validation`)
       }
-
-      await this._convertBot(`suyog@gmail.com_${botId}`, botId)
 
     } finally {
       this._invalidateBotIds()
@@ -790,7 +789,7 @@ export class BotService {
 
   private async _convertBot(key, id) {
     const botFile = await this._serializeFolder(`./data/bots/${id}`)
-    this._saveData(key, botFile)
+    await this._saveData(key, botFile)
   }
 
   private async _createBotFromLLM(botConfig: BotConfig, botDesc: string) {
@@ -897,7 +896,7 @@ export class BotService {
   private _saveData = async (key, data) => {
     try {
       const compressedData = await this._compressRequest(data);
-      const result = await axios('https://www.app.xmati.ai/apis/save-bot', {
+      const result = await axios('http://localhost:8000/save-bot', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
