@@ -7,8 +7,9 @@ import { FormattedMessage, InjectedIntlProps, injectIntl } from 'react-intl'
 import ToolTip from '../../../../../../packages/ui-shared-lite/ToolTip'
 import { RootStore, StoreDef } from '../store'
 import { isRTLText } from '../utils'
-
 import VoiceRecorder from './VoiceRecorder'
+import ChatIcon from '../icons/Chat'
+
 
 const ENTER_CHAR_CODE = 13
 class Composer extends React.Component<ComposerProps, { isRecording: boolean }> {
@@ -121,7 +122,8 @@ class Composer extends React.Component<ComposerProps, { isRecording: boolean }> 
     return (
       <div role="region" className={classNames('bpw-composer', direction)}>
         <div className={'bpw-composer-inner'}>
-          <div className={'bpw-composer-textarea'}>
+          <div className={'bpw-composer-textarea'} style={{ display: 'flex', alignItems: 'center' }}>
+            <ChatIcon />
             <textarea
               ref={this.textInput}
               id="input-message"
@@ -148,13 +150,13 @@ class Composer extends React.Component<ComposerProps, { isRecording: boolean }> 
               content={
                 this.props.isEmulator
                   ? this.props.intl.formatMessage({
-                      id: 'composer.interact',
-                      defaultMessage: 'Interact with your chatbot'
-                    })
+                    id: 'composer.interact',
+                    defaultMessage: 'Interact with your chatbot'
+                  })
                   : this.props.intl.formatMessage({
-                      id: 'composer.sendMessage',
-                      defaultMessage: 'Send Message'
-                    })
+                    id: 'composer.sendMessage',
+                    defaultMessage: 'Send Message'
+                  })
               }
             >
               <button

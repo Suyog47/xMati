@@ -49,7 +49,7 @@ body {
 }
 
 .bpw-widget-btn {
-  background-color: #000000;
+  background-color: white;
 }
 
 .bpw-message-read-more {
@@ -67,7 +67,9 @@ body {
 
 .bpw-widget-btn:focus,
 .bpw-widget-btn:hover {
-  background-color: #333;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3); /* Enlarged shadow */
+  transform: scale(1.05); /* Slight size increase */
+  transition: all 0.2s ease-in-out; /* Smooth transition */
 }
 
 .bpw-chat-container {
@@ -76,21 +78,28 @@ body {
 }
 
 .bpw-layout {
+  float: right;
   position: fixed;
   bottom: 0;
-  right: 0;
-  height: 100%;
-  border-left: 1px solid #ccc;
+  right: 10px;
+  bottom: 0;
+  height: 80%;
+  box-shadow: 0px -4px 8px rgba(0, 0, 0, 0.2), 0px 8px 16px rgba(0, 0, 0, 0.2);
   -webkit-box-orient: vertical;
   -ms-flex-direction: column;
   flex-direction: column;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  border-radius: 8px; 
 }
 
 .bpw-layout-fullscreen {
+  float: right;
+  right: 10px;
   visibility: visible;
+  box-shadow: 0px -4px 8px rgba(0, 0, 0, 0.2), 0px 8px 16px rgba(0, 0, 0, 0.2);
+  border-radius: 8px; 
 }
 
 .bpw-bot-avatar {
@@ -725,10 +734,12 @@ body {
   flex-shrink: 0;
   height: 52px;
   font-weight: 500;
-  border-top: solid 1px #ccc;
+  /* border-top: solid 1px #ccc; */
   border-bottom: 1px solid #ccc;
   padding: 0 1rem;
   overflow: hidden;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
 }
 
 .bpw-header-title-flexbox {
@@ -849,12 +860,10 @@ body {
   cursor: pointer;
   border-radius: 0px;
   box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.4);
+  border: 2px solid #00AEEF;
   overflow: hidden;
-
   padding: 0;
-  border: none;
   background-clip: padding-box;
-
   transition: width 1s, height 1s;
 }
 
