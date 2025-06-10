@@ -8,6 +8,7 @@ import {
 } from '@stripe/react-stripe-js'
 import { loadStripe, PaymentRequest } from '@stripe/stripe-js'
 import { Dialog, Button, FormGroup } from '@blueprintjs/core'
+import BasicAuthentication from '~/auth/basicAuth'
 
 // For development use
 const stripePromise = loadStripe('pk_test_51RLimpPBSMPLjWxm3IUaX63iUb4TqhU5prbUsg7A5RwG2sZsukOa7doAAhPu2RpEkYXZ2dRLNrOA4Pby9IscZOse00unCEcNDG')
@@ -150,6 +151,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         setIsSuccessDialogOpen(true)
         await togglePaymentDialog(false)
         toggle()
+        await logout()
       } catch (err: any) {
         setError(err.message)
       } finally {
@@ -157,6 +159,10 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       }
     }
 
+    const logout = async () => {
+      const auth: BasicAuthentication = new BasicAuthentication()
+      await auth.logout()
+    }
 
     const paymentFailedEmail = async () => {
       try {
@@ -196,7 +202,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
           throw new Error('Invalid server response')
         }
       } catch (err: any) {
-
+        throw new Error('Something went wrong while saving subscription data: ' + err.message)
       }
     }
 
@@ -284,7 +290,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
           >
             {isProcessing ? 'Processing...' : `Pay $${amount / 100}`}
           </Button>
-
+          <p style={{ fontSize: '0.85em', color: '#666', textAlign: 'center' }}>You will be logged-out once the subscription plan has been purchased</p>
         </form>
         {/* Apple/Google Pay Section
         {paymentRequest && (
