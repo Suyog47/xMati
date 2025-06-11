@@ -150,7 +150,8 @@ export const fetchBots = (): AppThunk => {
     const updatedFormData = {
       ...savedFormData,
       numberOfBots,
-      botIdList
+      botIdList,
+      filteredBots
     }
     localStorage.setItem('formData', JSON.stringify(updatedFormData))
 

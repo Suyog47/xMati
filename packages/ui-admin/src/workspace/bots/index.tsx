@@ -9,7 +9,8 @@ import {
   Intent,
   Popover,
   PopoverInteractionKind,
-  Position
+  Position,
+  Spinner
 } from '@blueprintjs/core'
 import { BotConfig } from 'botpress/sdk'
 import { confirmDialog, lang, telemetry, toast } from 'botpress/shared'
@@ -64,6 +65,7 @@ class Bots extends Component<Props> {
     showExpiryPrompt: false,
     expiryMessage: '',
     numberOfBots: this.formData.numberOfBots || 0, // Initialize from localStorage
+    isLoading: false, // Add a state variable for the loader
   }
 
   componentDidMount() {
@@ -155,8 +157,20 @@ class Bots extends Component<Props> {
         acceptLabel: lang.tr('delete')
       })
     ) {
-      await api.getSecured().post(`/admin/workspace/bots/${savedFormData.email}/${botId}/delete`)
-      this.props.fetchBots()
+      this.setState({ isLoading: true }) // Show the loader
+      try {
+        await api.getSecured().post(`/admin/workspace/bots/${savedFormData.email}/${botId}/delete`)
+        this.props.fetchBots()
+        setTimeout(() => {
+          window.location.reload()    // reloading for the bot creation limit check
+        }, 1000)
+        toast.success(lang.tr('The bot has been deleted successfully'))
+      } catch (err) {
+        console.error(err)
+        toast.failure(lang.tr('The bot could not be deleted'))
+      } finally {
+        this.setState({ isLoading: false }) // Hide the loader
+      }
     }
   }
 
@@ -451,7 +465,7 @@ class Bots extends Component<Props> {
   }
 
   render() {
-    const { showExpiryPrompt, expiryMessage } = this.state
+    const { showExpiryPrompt, expiryMessage, isLoading } = this.state
 
     if (!this.props.bots) {
       return <LoadingSection />
@@ -459,6 +473,26 @@ class Bots extends Component<Props> {
 
     return (
       <PageContainer title={lang.tr('admin.workspace.bots.bots')}>
+        {/* Full-screen loader */}
+        {isLoading && (
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              backgroundColor: 'rgba(255, 255, 255, 0.37)',
+              zIndex: 9999,
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <Spinner intent="primary" size={50} />
+          </div>
+        )}
+
         {/* Expiry Prompt */}
         {showExpiryPrompt && (
           <div className={style.expiryPrompt}>
