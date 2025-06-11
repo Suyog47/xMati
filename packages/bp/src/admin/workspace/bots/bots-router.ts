@@ -292,15 +292,19 @@ class BotsRouter extends CustomAdminRouter {
     )
 
     router.post(
-      '/:botId/import',
+      '/:botId/:newBotId/:email/import',
       this.needPermissions('write', `${this.resource}.archive`),
       this.asyncMiddleware(async (req, res) => {
         if (!req.is('application/tar+gzip')) {
           return res.status(400).send('Bot should be imported from archive')
         }
 
+        const oldBotId = req.params.botId;
+        const newBotId = req.params.newBotId;
+        const email = req.params.email;
+
         const overwrite = yn(req.query.overwrite)
-        const botId = await this.botService.makeBotId(req.params.botId, req.workspace!)
+        const botId = await this.botService.makeBotId(oldBotId, req.workspace!)
 
         if (overwrite) {
           await assertBotInWorkspace(botId, req.workspace)
@@ -310,7 +314,12 @@ class BotsRouter extends CustomAdminRouter {
         req.on('data', chunk => buffers.push(chunk))
         await Promise.fromCallback(cb => req.on('end', cb))
 
-        await this.botService.importBot(botId, Buffer.concat(buffers), req.workspace!, overwrite)
+        const dataObj = {
+          oldBotId,
+          newBotId,
+          email,
+        }
+        await this.botService.importBot(dataObj, Buffer.concat(buffers), req.workspace!, overwrite)
         res.sendStatus(200)
       })
     )

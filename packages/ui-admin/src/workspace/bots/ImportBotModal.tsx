@@ -48,13 +48,18 @@ class ImportBotModal extends Component<Props, State> {
       return
     }
 
+    const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
     this.setState({ isProcessing: true, progress: 0 })
+
+    const oldBotId = this.state.botId
+    const newBotId = `${savedFormData.email.replace(/[^A-Za-z0-9]/g, '')}-${this.state.botId.split('-')[1]}`
+    const email = savedFormData.email
 
     try {
       await api
         .getSecured({ timeout: ms('20m') })
         .post(
-          `/admin/workspace/bots/${this.state.botId}/import?overwrite=${this.state.overwrite}`,
+          `/admin/workspace/bots/${oldBotId}/${newBotId}/${email}/import?overwrite=${this.state.overwrite}`,
           this.state.fileContent,
           {
             headers: { 'Content-Type': 'application/tar+gzip' },

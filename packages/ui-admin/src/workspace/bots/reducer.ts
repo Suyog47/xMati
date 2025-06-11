@@ -150,7 +150,7 @@ export const fetchBots = (): AppThunk => {
     const updatedFormData = {
       ...savedFormData,
       numberOfBots,
-      botIdList,
+      ...(email === 'admin@gmail.com' && { botIdList }), // Add botIdList only if it is Admin
       filteredBots
     }
     localStorage.setItem('formData', JSON.stringify(updatedFormData))

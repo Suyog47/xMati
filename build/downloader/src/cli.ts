@@ -27,7 +27,7 @@ export const toolsList = {
     url: 'https://api.github.com/repos/botpress/nlu/releases'
   },
   studio: {
-    url: 'https://api.github.com/repos/Suyog47/MBPStudio/releases'
+    url: 'https://api.github.com/repos/Suyog47/xMatiStudio/releases'
   },
   messaging: {
     url: 'https://api.github.com/repos/botpress/messaging/releases'

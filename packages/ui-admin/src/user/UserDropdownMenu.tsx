@@ -92,7 +92,7 @@ const UserDropdownMenu: FC<Props> = props => {
 
           {/* <MenuItem id="btn-gemini" icon="user" text={'Gemini Speech'} onClick={toggleGemini} /> */}
 
-          <MenuItem id="btn-admin-control" icon="user" text={'Admin Control'} onClick={toggleAdminControl} />
+          {savedFormData.email === 'admin@gmail.com' && (<MenuItem id="btn-admin-control" icon="user" text={'Admin Control'} onClick={toggleAdminControl} />)}
 
           {!isExpired && (<MenuItem id="btn-profile" icon="user" text={lang.tr('admin.updateProfile')} onClick={toggleProfile} />)}
 
