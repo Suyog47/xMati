@@ -65,7 +65,7 @@ const BotItemCompact: FC<Props> = props => {
           />
         </AccessControl>
 
-        {!props.bot.disabled && !props.hasError && (
+        {/* {!props.bot.disabled && !props.hasError && (
           <AnchorButton
             text={lang.tr('admin.workspace.bots.item.openChat')}
             icon="chat"
@@ -73,14 +73,14 @@ const BotItemCompact: FC<Props> = props => {
             target="_blank"
             minimal
           />
-        )}
+        )} */}
 
         <AccessControl resource="admin.bots.*" operation="read">
           <Popover minimal position={Position.BOTTOM} interactionKind={PopoverInteractionKind.HOVER}>
             <Button className="btn-menu-bot-item" icon={<Icon icon="menu" />} minimal />
 
             <Menu>
-              <WorkspaceAppItems loadedModules={props.loadedModules} botId={props.bot.id} />
+              {/* <WorkspaceAppItems loadedModules={props.loadedModules} botId={props.bot.id} /> */}
 
               {!props.bot.disabled && !props.hasError && hasStudioAccess && (
                 <MenuItem
