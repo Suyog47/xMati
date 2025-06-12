@@ -70,15 +70,44 @@ const CustomerWizard: React.FC = () => {
     'Channel Setup',
   ]
 
-  const industryData = {
-    industries: [
-      { industry: 'Agriculture', subIndustry: 'Precision Farming' },
-      { industry: 'Technology', subIndustry: 'Artificial Intelligence' },
-      { industry: 'Finance', subIndustry: 'Investment Banking' },
-      { industry: 'Healthcare', subIndustry: 'Telemedicine' },
-      { industry: 'Entertainment', subIndustry: 'Virtual Reality Gaming' }
-    ]
-  }
+  const industryData = [
+    {
+      industry: 'Agriculture',
+      subIndustries: ['Precision Farming', 'Organic Farming', 'Agri-Tech']
+    },
+    {
+      industry: 'Technology',
+      subIndustries: ['Artificial Intelligence', 'Cybersecurity', 'Cloud Computing']
+    },
+    {
+      industry: 'Finance',
+      subIndustries: ['Investment Banking', 'Personal Finance', 'Cryptocurrency']
+    },
+    {
+      industry: 'Healthcare',
+      subIndustries: ['Telemedicine', 'Pharmaceuticals', 'Medical Devices']
+    },
+    {
+      industry: 'Entertainment',
+      subIndustries: ['Virtual Reality Gaming', 'Film Production', 'Music Streaming']
+    },
+    {
+      industry: 'Education',
+      subIndustries: ['E-Learning', 'EdTech', 'Corporate Training']
+    },
+    {
+      industry: 'Retail',
+      subIndustries: ['E-Commerce', 'Brick-and-Mortar', 'Supply Chain Management']
+    },
+    {
+      industry: 'Energy',
+      subIndustries: ['Renewable Energy', 'Oil and Gas', 'Energy Storage']
+    },
+    {
+      industry: 'Transportation',
+      subIndustries: ['Logistics', 'Ride-Sharing', 'Autonomous Vehicles']
+    }
+  ]
 
   const botTemplates = [
     { id: 'insurance-bot', name: 'Insurance Bot' },
@@ -136,15 +165,24 @@ const CustomerWizard: React.FC = () => {
     >
   ) => {
     const { name, value } = e.target
-    setFormData({
-      ...formData,
-      [name]: value,
-    })
+
+    if (name === 'industryType') {
+      setFormData({
+        ...formData,
+        [name]: value,
+        subIndustryType: '' // Reset sub-industry when industry changes
+      })
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value
+      })
+    }
 
     if (errors[name as keyof Errors]) {
       setErrors({
         ...errors,
-        [name]: '',
+        [name]: ''
       })
     }
   }
@@ -156,6 +194,8 @@ const CustomerWizard: React.FC = () => {
 
       if (!formData.fullName.trim()) {
         newErrors.fullName = 'Full Name is required'
+      } else if (formData.fullName.trim().length > 20) {
+        newErrors.fullName = 'Full Name cannot exceed 20 characters'
       }
       if (!formData.email.trim()) {
         newErrors.email = 'Email is required'
@@ -187,6 +227,8 @@ const CustomerWizard: React.FC = () => {
       }
       if (!formData.organisationName.trim()) {
         newErrors.organisationName = 'Organisation Name is required'
+      } else if (formData.organisationName.trim().length > 20) {
+        newErrors.organisationName = 'Organization Name cannot exceed 20 characters'
       }
 
 
@@ -195,10 +237,13 @@ const CustomerWizard: React.FC = () => {
         newErrors.industryType = 'Industry Type is required'
       }
       if (!formData.subIndustryType.trim()) {
+        newErrors.subIndustryType = 'Sub-Industry Type is required'
       }
     } else if (step === 3) {
       if (!formData.botName.trim()) {
         newErrors.botName = 'Bot Name is required'
+      } else if (formData.botName.trim().length > 20) {
+        newErrors.botName = 'Bot Name cannot exceed 20 characters'
       } else if (!/^[A-Za-z0-9]+$/.test(formData.botName)) {
         newErrors.botName = 'Only letters and numbers are allowed (no spaces or special characters)'
       }
@@ -249,20 +294,22 @@ const CustomerWizard: React.FC = () => {
   }
 
   const handleSubmit = async () => {
-    if (formData && typeof formData === 'object') {
+    if (await validateStep()) {
+      if (formData && typeof formData === 'object') {
 
-      // setIsLoading(true)
-      let status = await register()
-      setIsLoading(false)
-      if (status) {
-        await setLocalData()
-        history.push({
-          pathname: '/login'
-        })
-        history.replace('/home')
+        // setIsLoading(true)
+        let status = await register()
+        setIsLoading(false)
+        if (status) {
+          await setLocalData()
+          history.push({
+            pathname: '/login'
+          })
+          history.replace('/home')
+        }
+      } else {
+        console.error('formData is not a valid object:', formData)
       }
-    } else {
-      console.error('formData is not a valid object:', formData)
     }
   }
 
@@ -784,13 +831,11 @@ const CustomerWizard: React.FC = () => {
                     onChange={handleChange}
                   >
                     <option value=''>Select Industry</option>
-                    {[...new Set(industryData.industries.map(item => item.industry))].map(
-                      (industry, index) => (
-                        <option key={index} value={industry}>
-                          {industry}
-                        </option>
-                      )
-                    )}
+                    {industryData.map((item, index) => (
+                      <option key={index} value={item.industry}>
+                        {item.industry}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 {errors.industryType && <span className='error'>{errors.industryType}</span>}
@@ -806,13 +851,13 @@ const CustomerWizard: React.FC = () => {
                         onChange={handleChange}
                       >
                         <option value=''>Select Sub Industry</option>
-                        {[...new Set(industryData.industries.map(item => item.subIndustry))].map(
-                          (industry, index) => (
-                            <option key={index} value={industry}>
-                              {industry}
+                        {industryData
+                          .find((item) => item.industry === formData.industryType)
+                          ?.subIndustries.map((subIndustry, index) => (
+                            <option key={index} value={subIndustry}>
+                              {subIndustry}
                             </option>
-                          )
-                        )}
+                          ))}
                       </select>
                     </div>
                     {errors.subIndustryType && <span className='error'>{errors.subIndustryType}</span>}
