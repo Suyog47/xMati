@@ -333,105 +333,110 @@ export class BotService {
   }
 
   async importBot(botData: any, archive: Buffer, workspaceId: string, allowOverwrite?: boolean): Promise<void> {
-    console.log(botData.oldBotId)
-    console.log(botData.newBotId)
-    console.log(botData.email)
+    const botId = botData.oldBotId;
+    const newBotId = botData.newBotId;
+    const email = botData.email;
 
-    // const startTime = Date.now()
-    // if (!isValidBotId(botId)) {         // newBotId
-    //   throw new InvalidOperationError('Cant import bot the bot ID contains invalid characters')
-    // }
+    console.log(newBotId)
+    console.log(email)
 
-    // if (await this.botExists(botId)) {      // newBotId
-    //   if (!allowOverwrite) {
-    //     throw new InvalidOperationError(
-    //       `Cannot import the bot ${botId}, it already exists, and overwriting is not allowed`
-    //     )
-    //   } else {
-    //     this.logger
-    //       .forBot(botId)
-    //       .warn(`The bot ${botId} already exists, files in the archive will overwrite existing ones`)
-    //   }
-    // }
-    // const tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    // const tmpFolder = tmpDir.name
+    const startTime = Date.now()
+    if (!isValidBotId(newBotId)) {         // newBotId
+      throw new InvalidOperationError('Cant import bot the bot ID contains invalid characters')
+    }
 
-    // try {
-    //   await extractArchive(archive, tmpFolder)
-    //   const api = await createForGlobalHooks()
+    if (await this.botExists(newBotId)) {      // newBotId
+      if (!allowOverwrite) {
+        throw new InvalidOperationError(
+          `Cannot import the bot ${newBotId}, it already exists, and overwriting is not allowed`
+        )
+      } else {
+        this.logger
+          .forBot(newBotId)
+          .warn(`The bot ${newBotId} already exists, files in the archive will overwrite existing ones`)
+      }
+    }
+    const tmpDir = tmp.dirSync({ unsafeCleanup: true })
+    const tmpFolder = tmpDir.name
 
-    //   const hookResult = {
-    //     allowImport: true
-    //   }
+    try {
+      await extractArchive(archive, tmpFolder)
+      const api = await createForGlobalHooks()
 
-    //   await this.hookService.executeHook(new Hooks.BeforeBotImport(api, botId, tmpFolder, hookResult))    //  // newBotId
+      const hookResult = {
+        allowImport: true
+      }
 
-    //   if (hookResult.allowImport) {
+      await this.hookService.executeHook(new Hooks.BeforeBotImport(api, newBotId, tmpFolder, hookResult))    //  // newBotId
 
-    //     const pipeline = await this.workspaceService.getPipeline(workspaceId)
+      if (hookResult.allowImport) {
 
-    //     await replace({
-    //       files: `${tmpDir.name}/**/*.json`,
-    //       from: new RegExp(BOT_ID_PLACEHOLDER, 'g'),
-    //       to: `/bots/${botId}/`                              // newBotId
-    //     })
+        const pipeline = await this.workspaceService.getPipeline(workspaceId)
 
-    //     const folder = await this._validateBotArchive(tmpDir.name)
+        await replace({
+          files: `${tmpDir.name}/**/*.json`,
+          from: new RegExp(BOT_ID_PLACEHOLDER, 'g'),
+          to: `/bots/${newBotId}/`                              // newBotId
+        })
 
-    //     // Check for deleted file upon overwriting
-    //     if (allowOverwrite) {
-    //       const files = await this.ghostService.forBot(botId).directoryListing('/')        // newBotId
-    //       const deletedFiles = await findDeletedFiles(files, folder)
+        const folder = await this._validateBotArchive(tmpDir.name)
 
-    //       for (const file of deletedFiles) {
-    //         await this.ghostService.forBot(botId).deleteFile('/', file)              // newBotId
-    //       }
-    //     }
+        // Check for deleted file upon overwriting
+        if (allowOverwrite) {
+          const files = await this.ghostService.forBot(newBotId).directoryListing('/')        // newBotId
+          const deletedFiles = await findDeletedFiles(files, folder)
 
-    //     if (await this.botExists(botId)) {           // newBotId
-    //       await this.unmountBot(botId)                // newBotId
-    //     }
+          for (const file of deletedFiles) {
+            await this.ghostService.forBot(newBotId).deleteFile('/', file)              // newBotId
+          }
+        }
 
-    //     await this.ghostService.forBot(botId).importFromDirectory(folder)
+        if (await this.botExists(newBotId)) {           // newBotId
+          await this.unmountBot(newBotId)                // newBotId
+        }
 
-    //     const originalConfig = await this.configProvider.getBotConfig(botId)      // oldBotId
-    //     const newConfigs = <Partial<BotConfig>>{
-    //       id: botId,                                                           // newBotId
-    //       name: `${originalConfig.name}`,
-    //       //owner: email,
-    //       pipeline_status: {
-    //         current_stage: {
-    //           id: pipeline && pipeline[0].id,
-    //           promoted_by: 'system',
-    //           promoted_on: new Date()
-    //         }
-    //       }
-    //     }
-    //     await this.configProvider.mergeBotConfig(botId, newConfigs, true)      // newBotId
+        await this.ghostService.forBot(newBotId).importFromDirectory(folder)
 
-    //     await this.workspaceService.addBotRef(botId, workspaceId)              // newBotId
+        const originalConfig = await this.configProvider.getBotConfig(botId)      // oldBotId
+        const newConfigs = <Partial<BotConfig>>{
+          id: newBotId,                                                           // newBotId
+          name: `${originalConfig.name}`,
+          owner: (email === '-') ? originalConfig.owner : email,
+          pipeline_status: {
+            current_stage: {
+              id: pipeline && pipeline[0].id,
+              promoted_by: 'system',
+              promoted_on: new Date()
+            }
+          }
+        }
+        await this.configProvider.mergeBotConfig(newBotId, newConfigs, true)      // newBotId
 
-    //     await studioActions.checkBotMigrations(botId)                          // newBotId
+        await this.workspaceService.addBotRef(newBotId, workspaceId)              // newBotId
 
-    //     if (!originalConfig.disabled) {
-    //       if (!(await this.mountBot(botId))) {                  // newBotId
-    //         this.logger.forBot(botId).warn(`Import of bot ${botId} completed, but it couldn't be mounted`)   // newBotId
-    //         return
-    //       }
-    //     } else {
-    //       BotService.setBotStatus(botId, 'disabled')        // newBotId
-    //     }
-    //     await this._convertBot(`${originalConfig.owner}_${botId}`, botId)
-    //     this.logger.forBot(botId).info(`Import of bot ${botId} successful`)       // newBotId
-    //   } else {
-    //     this.logger.forBot(botId).info(`Import of bot ${botId} was denied by hook validation`)    // newBotId
-    //   }
+        await studioActions.checkBotMigrations(newBotId)                          // newBotId
 
-    // } finally {
-    //   this._invalidateBotIds()
-    //   tmpDir.removeCallback()
-    //   debug.forBot(botId, `Bot import took ${Date.now() - startTime}ms`)     // newBotId
-    // }
+        if (!originalConfig.disabled) {
+          if (!(await this.mountBot(newBotId))) {                  // newBotId
+            this.logger.forBot(newBotId).warn(`Import of bot ${newBotId} completed, but it couldn't be mounted`)   // newBotId
+            return
+          }
+        } else {
+          BotService.setBotStatus(newBotId, 'disabled')        // newBotId
+        }
+
+
+        await this._convertBot(`${(email === '-') ? originalConfig.owner : email}_${newBotId}`, newBotId)
+        this.logger.forBot(botId).info(`Import of bot ${newBotId} successful`)       // newBotId
+      } else {
+        this.logger.forBot(newBotId).info(`Import of bot ${newBotId} was denied by hook validation`)    // newBotId
+      }
+
+    } finally {
+      this._invalidateBotIds()
+      tmpDir.removeCallback()
+      debug.forBot(newBotId, `Bot import took ${Date.now() - startTime}ms`)     // newBotId
+    }
   }
 
   private async _validateBotArchive(directory: string): Promise<string> {

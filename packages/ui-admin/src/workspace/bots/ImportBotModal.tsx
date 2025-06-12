@@ -22,6 +22,7 @@ interface State {
   isExistingBot: boolean
   isProcessing: boolean
   overwrite: boolean
+  yourself?: boolean
   progress: number
 }
 
@@ -34,6 +35,7 @@ const defaultState: State = {
   isExistingBot: false,
   isProcessing: false,
   overwrite: false,
+  yourself: true,
   progress: 0
 }
 
@@ -52,8 +54,16 @@ class ImportBotModal extends Component<Props, State> {
     this.setState({ isProcessing: true, progress: 0 })
 
     const oldBotId = this.state.botId
-    const newBotId = `${savedFormData.email.replace(/[^A-Za-z0-9]/g, '')}-${this.state.botId.split('-')[1]}`
-    const email = savedFormData.email
+    let newBotId
+    let email
+
+    if (this.state.yourself) {
+      newBotId = `${savedFormData.email.replace(/[^A-Za-z0-9]/g, '')}-${this.state.botId.split('-')[1]}`
+      email = savedFormData.email
+    } else {
+      newBotId = oldBotId
+      email = '-'            // keeping both empty so that the bot is imported for the original owner's email id
+    }
 
     try {
       await api
@@ -213,12 +223,17 @@ class ImportBotModal extends Component<Props, State> {
                 inputProps={{ accept: '.zip,.tgz' }}
               />
             </FormGroup>
+            <Checkbox
+              label={'Import for yourself?.. or else it will be imported and shown to the original owner'}
+              checked={this.state.yourself}
+              onChange={e => this.setState({ yourself: e.currentTarget.checked })}
+            ></Checkbox>
             {this.state.isIdTaken && (
-              <Checkbox
+              <><Checkbox
                 label={lang.tr('admin.workspace.bots.import.overwrite')}
                 checked={this.state.overwrite}
                 onChange={e => this.setState({ overwrite: e.currentTarget.checked })}
-              ></Checkbox>
+              ></Checkbox></>
             )}
           </div>
           <div className={Classes.DIALOG_FOOTER}>

@@ -304,7 +304,7 @@ class BotsRouter extends CustomAdminRouter {
         const email = req.params.email;
 
         const overwrite = yn(req.query.overwrite)
-        const botId = await this.botService.makeBotId(oldBotId, req.workspace!)
+        const botId = await this.botService.makeBotId(newBotId, req.workspace!)
 
         if (overwrite) {
           await assertBotInWorkspace(botId, req.workspace)
