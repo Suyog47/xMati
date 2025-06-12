@@ -31,6 +31,9 @@ interface FormData {
   messengerAppSecret: string
   botId: string
   botName: string
+  cardNumber: string
+  cardCVC: string
+  cardExpiry: string
 }
 
 interface Errors {
@@ -50,22 +53,26 @@ interface Errors {
   messengerAccessToken?: string
   messengerAppSecret?: string
   botName?: string
+  cardNumber?: string
+  cardCVC?: string
+  cardExpiry?: string
 }
 
-interface Industry {
-  industry: string
-  subIndustry: string
-}
-interface BotTemplate {
-  id: string
-  name: string
-}
+// interface Industry {
+//   industry: string
+//   subIndustry: string
+// }
+// interface BotTemplate {
+//   id: string
+//   name: string
+// }
 
 
 const CustomerWizard: React.FC = () => {
   const steps = [
     'Personal Info',
     'Industry Type',
+    'Payment',
     'Bot Creation',
     'Channel Setup',
   ]
@@ -138,13 +145,12 @@ const CustomerWizard: React.FC = () => {
     messengerAccessToken: '',
     messengerAppSecret: '',
     botId: '',
-    botName: ''
+    botName: '',
+    cardNumber: '',
+    cardCVC: '',
+    cardExpiry: ''
   })
   const [errors, setErrors] = useState<Errors>({})
-  // const [formDataOptions, setFormDataOptions] = useState({
-  //   industries: [],
-  //   botTemplates: [],
-  // })
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null) // Fix applied
@@ -240,6 +246,38 @@ const CustomerWizard: React.FC = () => {
         newErrors.subIndustryType = 'Sub-Industry Type is required'
       }
     } else if (step === 3) {
+      if (!formData.cardNumber.trim()) {
+        newErrors.cardNumber = 'Card Number is required'
+      } else if (!/^\d{16}$/.test(formData.cardNumber.trim())) {
+        newErrors.cardNumber = 'Card Number must be 16 digits'
+      }
+
+      if (!formData.cardCVC.trim()) {
+        newErrors.cardCVC = 'CVC/CVV is required'
+      } else if (!/^\d{3,4}$/.test(formData.cardCVC.trim())) {
+        newErrors.cardCVC = 'CVC/CVV must be 3 or 4 digits'
+      }
+
+      if (!formData.cardExpiry.trim()) {
+        newErrors.cardExpiry = 'Expiry Date is required'
+      } else {
+        const [month, year] = formData.cardExpiry.split('/').map(Number)
+        const currentDate = new Date()
+        const currentMonth = currentDate.getMonth() + 1
+        const currentYear = parseInt(currentDate.getFullYear().toString().slice(-2))
+
+        if (
+          !month ||
+          !year ||
+          month < 1 ||
+          month > 12 ||
+          year < currentYear ||
+          (year === currentYear && month < currentMonth)
+        ) {
+          newErrors.cardExpiry = 'Expiry Date must be valid and not in the past'
+        }
+      }
+    } else if (step === 4) {
       if (!formData.botName.trim()) {
         newErrors.botName = 'Bot Name is required'
       } else if (formData.botName.trim().length > 20) {
@@ -253,7 +291,7 @@ const CustomerWizard: React.FC = () => {
       if (!formData.channel.trim()) {
         newErrors.channel = 'Channel is required'
       }
-    } else if (step === 4) {
+    } else if (step === 5) {
       if (formData.channel === 'Telegram') {
         if (!formData.botToken.trim()) {
           newErrors.botToken = 'Bot Token is required'
@@ -361,6 +399,9 @@ const CustomerWizard: React.FC = () => {
         organisationName: formData.organisationName,
         industryType: formData.industryType,
         subIndustryType: formData.subIndustryType,
+        card: formData.cardNumber,
+        cardCVC: formData.cardCVC,
+        cardExpiry: formData.cardExpiry,
       }
 
       const result = await fetch('https://www.app.xmati.ai/apis/user-auth', {
@@ -700,12 +741,12 @@ const CustomerWizard: React.FC = () => {
                         }`}
                       ></div>
                     )} */}
-                      {index < steps.length - 1 && (
+                      {/* {index < steps.length - 1 && (
                         <div
                           className={`line ${isCompleted ? 'completed-line' : 'in-completed-line'
                             }`}
                         ></div>
-                      )}
+                      )} */}
                     </div>
                   </div>
                 </div>
@@ -877,6 +918,70 @@ const CustomerWizard: React.FC = () => {
           {step === 3 && (
             <>
               <div className='step'>
+                <p className='stepHeader'>Payment Information</p>
+                <p className='stepSubtitleSmall'>We are securely saving your credit card details to simplify future subscription plan purchases. No charges will be made at this time.</p>
+                <div className='input-container'>
+                  <label htmlFor='cardNumber'>Card Number</label>
+                  <input
+                    type='text'
+                    id='cardNumber'
+                    name='cardNumber'
+                    placeholder='Card Number'
+                    value={formData.cardNumber}
+                    onChange={handleChange}
+                    className='custom-input'
+                  />
+                </div>
+                {errors.cardNumber && <span className='error'>{errors.cardNumber}</span>}
+
+                <div className='horizontal-container'>
+                  <div className='input-container'>
+                    <label htmlFor='cardCVC'>CVC/CVV</label>
+                    <input
+                      type='text'
+                      id='cardCVC'
+                      name='cardCVC'
+                      placeholder='CVC/CVV'
+                      value={formData.cardCVC}
+                      onChange={handleChange}
+                      className='custom-input'
+                    />
+                  </div>
+                  {/* {errors.cardCVC && <span className='error'>{errors.cardCVC}</span>} */}
+                  <div className='input-container'>
+                    <label htmlFor='cardExpiry'>Expiry Date (MM/YY)</label>
+                    <input
+                      type='text'
+                      id='cardExpiry'
+                      name='cardExpiry'
+                      placeholder='MM/YY'
+                      value={formData.cardExpiry}
+                      onChange={handleChange}
+                      className='custom-input'
+                    />
+                  </div>
+                  {/* {errors.cardExpiry && <span className='error'>{errors.cardExpiry}</span>} */}
+                </div>
+                <div className='horizontal-container'>
+                  {errors.cardCVC && <span className='error'>{errors.cardCVC}</span>}
+                  {errors.cardExpiry && <span className='error'>{errors.cardExpiry}</span>}
+                </div>
+
+              </div>
+
+              <div className='button-container'>
+                <div className='buttons'>
+                  <button onClick={prevStep}>Back</button>
+                  <button onClick={nextStep}>Next</button>
+                </div>
+              </div>
+            </>
+          )}
+
+
+          {step === 4 && (
+            <>
+              <div className='step'>
                 <p className='stepHeader'>
                   Select from the ready-made templates or provide a prompt according to your need
                 </p>
@@ -958,7 +1063,7 @@ const CustomerWizard: React.FC = () => {
           )}
 
 
-          {step === 4 && (
+          {step === 5 && (
             <>
               <div className='step'>
                 <p className='stepHeader'>{formData.channel} Bot Setup Instructions</p>
@@ -994,7 +1099,7 @@ const CustomerWizard: React.FC = () => {
           )}
         </div>
       </div>
-    </div>
+    </div >
   )
 }
 

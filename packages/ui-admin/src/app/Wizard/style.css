@@ -293,14 +293,14 @@ button:hover {
 .completed-line {
   position: absolute;
   transform: translateX(98%);
-  width: 135px;
+  width: 75px;
   height: 2px;
 }
 
 .in-completed-line {
   position: absolute;
   transform: translateX(94%);
-  width: 135px;
+  width: 75px;
   height: 2px;
   background-color: #e6e6e6;
 }
@@ -317,6 +317,15 @@ button:hover {
   max-width: 150px;
   white-space: nowrap;
   overflow: hidden;
+}
+
+.horizontal-container {
+  display: flex;
+  gap: 20px;
+}
+
+.horizontal-container .input-container {
+  flex: 1;
 }
 
 .step-title p {
@@ -497,7 +506,7 @@ button:hover {
 @media (max-width: 1150px) {
   .in-completed-line {
     position: absolute;
-    width: 100px;
+    width: 40px;
     height: 2px;
     background-color: #e6e6e6;
     top: 50%;
@@ -527,7 +536,7 @@ button:hover {
   .in-completed-line {
     position: absolute;
     transform: translateX(105%);
-    width: 110px;
+    width: 40px;
     height: 2px;
     background-color: #e6e6e6;
   }
@@ -535,7 +544,7 @@ button:hover {
   .completed-line {
     position: absolute;
     transform: translateX(105%);
-    width: 110px;
+    width: 40px;
     height: 2px;
   }
 
@@ -551,7 +560,7 @@ button:hover {
   .completed-line {
     position: absolute;
     transform: translateX(155%);
-    width: 65px;
+    width: 40px;
     height: 2px;
     background-color: #05a8e1;
   }
@@ -567,7 +576,7 @@ button:hover {
 
   .completed-line {
     transform: translateX(143%);
-    width: 65px;
+    width: 40px;
     height: 2px;
   }
 
@@ -576,14 +585,14 @@ button:hover {
 @media (min-width: 907px) and (max-width: 950px) {
   .completed-line {
     transform: translateX(99%);
-    width: 40px;
+    width: 15px;
     height: 2px;
     background-color: #05a8e1;
   }
 
   .in-completed-line {
     transform: translateX(95%);
-    width: 40px;
+    width: 15px;
     height: 2px;
     background-color: #e6e6e6;
   }
@@ -593,14 +602,14 @@ button:hover {
 @media (min-width: 1400px) {
   .completed-line {
     transform: translateX(99%);
-    width: 135px;
+    width: 105px;
     height: 2px;
     background-color: #05a8e1;
   }
 
   .in-completed-line {
     transform: translateX(95%);
-    width: 135px;
+    width: 105px;
     height: 2px;
     background-color: #e6e6e6;
   }
@@ -608,13 +617,13 @@ button:hover {
 
 @media (min-width: 907px) and (max-width: 950px) {
   .completed-line {
-    width: 60px;
+    width: 35px;
     transform: translateX(147%);
     height: 2px;
   }
 
   .in-completed-line {
-    width: 60px;
+    width: 35px;
     transform: translateX(-24%);
     height: 2px;
   }
