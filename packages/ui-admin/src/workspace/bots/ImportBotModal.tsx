@@ -34,14 +34,14 @@ const defaultState: State = {
   isIdTaken: false,
   isExistingBot: false,
   isProcessing: false,
-  overwrite: false,
+  overwrite: true,
   yourself: true,
   progress: 0
 }
 
 class ImportBotModal extends Component<Props, State> {
   private _form: HTMLFormElement | null = null
-
+  savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
   state: State = { ...defaultState }
 
   importBot = async e => {
@@ -50,7 +50,6 @@ class ImportBotModal extends Component<Props, State> {
       return
     }
 
-    const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
     this.setState({ isProcessing: true, progress: 0 })
 
     const oldBotId = this.state.botId
@@ -58,8 +57,8 @@ class ImportBotModal extends Component<Props, State> {
     let email
 
     if (this.state.yourself) {
-      newBotId = `${savedFormData.email.replace(/[^A-Za-z0-9]/g, '')}-${this.state.botId.split('-')[1]}`
-      email = savedFormData.email
+      newBotId = `${this.savedFormData.email.replace(/[^A-Za-z0-9]/g, '')}-${this.state.botId.split('-')[1]}`
+      email = this.savedFormData.email
     } else {
       newBotId = oldBotId
       email = '-'            // keeping both empty so that the bot is imported for the original owner's email id
@@ -80,8 +79,10 @@ class ImportBotModal extends Component<Props, State> {
         )
 
       toast.success('admin.workspace.bots.import.successful', this.state.botId)
-
       this.props.onCreateBotSuccess()
+      setTimeout(() => {
+        window.location.reload()    // reloading for the bot creation limit check
+      }, 1000)
       this.toggleDialog()
     } catch (error) {
       this.setState({ error: error.message, isProcessing: false })
@@ -90,21 +91,21 @@ class ImportBotModal extends Component<Props, State> {
     }
   }
 
-  checkIdAvailability = _.debounce(async () => {
-    if (!this.state.botId) {
-      return this.setState({ isIdTaken: false })
-    }
+  // checkIdAvailability = _.debounce(async () => {
+  //   if (!this.state.botId) {
+  //     return this.setState({ isIdTaken: false })
+  //   }
 
-    try {
-      const { data: isIdTaken } = await api.getSecured().get(`/admin/workspace/bots/${this.state.botId}/exists`)
-      this.setState({ isIdTaken, isExistingBot: this.state.isExistingBot || isIdTaken })
-    } catch (error) {
-      this.setState({ error: error.message })
-    }
-  }, 500)
+  //   try {
+  //     const { data: isIdTaken } = await api.getSecured().get(`/admin/workspace/bots/${this.state.botId}/exists`)
+  //     this.setState({ isIdTaken, isExistingBot: this.state.isExistingBot || isIdTaken })
+  //   } catch (error) {
+  //     this.setState({ error: error.message })
+  //   }
+  // }, 500)
 
   handleBotIdChanged = (e: React.ChangeEvent<HTMLInputElement>) =>
-    this.setState({ botId: sanitizeBotId(e.currentTarget.value), overwrite: false }, this.checkIdAvailability)
+    this.setState({ botId: sanitizeBotId(e.currentTarget.value), overwrite: false })
 
   handleFileChanged = (files: FileList | null) => {
     if (!files) {
@@ -129,7 +130,7 @@ class ImportBotModal extends Component<Props, State> {
     const matches = noExt.match(/bot_(.*)_[0-9]+/)
     this.setState(
       { botId: sanitizeBotId((matches && matches[1]) || noExt), overwrite: false },
-      this.checkIdAvailability
+      // this.checkIdAvailability
     )
   }
 
@@ -223,18 +224,18 @@ class ImportBotModal extends Component<Props, State> {
                 inputProps={{ accept: '.zip,.tgz' }}
               />
             </FormGroup>
-            <Checkbox
+            {(this.savedFormData.email === 'admin@gmail.com') && < Checkbox
               label={'Import for yourself?.. or else it will be imported and shown to the original owner'}
               checked={this.state.yourself}
               onChange={e => this.setState({ yourself: e.currentTarget.checked })}
-            ></Checkbox>
-            {this.state.isIdTaken && (
+            ></Checkbox>}
+            {/* {this.state.isIdTaken && (
               <><Checkbox
                 label={lang.tr('admin.workspace.bots.import.overwrite')}
                 checked={this.state.overwrite}
                 onChange={e => this.setState({ overwrite: e.currentTarget.checked })}
               ></Checkbox></>
-            )}
+            )} */}
           </div>
           <div className={Classes.DIALOG_FOOTER}>
             {!!this.state.error && <Callout intent={Intent.DANGER}>{this.state.error}</Callout>}
@@ -251,7 +252,7 @@ class ImportBotModal extends Component<Props, State> {
             </div>
           </div>
         </form>
-      </Dialog>
+      </Dialog >
     )
   }
 }

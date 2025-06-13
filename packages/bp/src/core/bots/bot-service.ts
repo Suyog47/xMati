@@ -337,25 +337,22 @@ export class BotService {
     const newBotId = botData.newBotId;
     const email = botData.email;
 
-    console.log(newBotId)
-    console.log(email)
-
     const startTime = Date.now()
     if (!isValidBotId(newBotId)) {         // newBotId
       throw new InvalidOperationError('Cant import bot the bot ID contains invalid characters')
     }
 
-    if (await this.botExists(newBotId)) {      // newBotId
-      if (!allowOverwrite) {
-        throw new InvalidOperationError(
-          `Cannot import the bot ${newBotId}, it already exists, and overwriting is not allowed`
-        )
-      } else {
-        this.logger
-          .forBot(newBotId)
-          .warn(`The bot ${newBotId} already exists, files in the archive will overwrite existing ones`)
-      }
-    }
+    // if (await this.botExists(newBotId)) {      // newBotId
+    //   if (!allowOverwrite) {
+    //     throw new InvalidOperationError(
+    //       `Cannot import the bot ${newBotId}, it already exists, and overwriting is not allowed`
+    //     )
+    //   } else {
+    //     this.logger
+    //       .forBot(newBotId)
+    //       .warn(`The bot ${newBotId} already exists, files in the archive will overwrite existing ones`)
+    //   }
+    // }
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
     const tmpFolder = tmpDir.name
 
