@@ -46,7 +46,12 @@ export const BotCreationSchema = Joi.object().keys({
         accessToken: Joi.string().allow(''),
         appSecret: Joi.string().allow(''),
         verifyToken: Joi.string().allow(''),
-      }
+      },
+      twilio: {
+        enabled: Joi.bool(),
+        accountSID: Joi.string().allow(''),
+        authToken: Joi.string().allow(''),
+      },
     }),
   }),
 

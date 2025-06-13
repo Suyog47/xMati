@@ -149,7 +149,10 @@ class BotsRouter extends CustomAdminRouter {
         const messengerAccessToken = <BotConfig>_.pick(req.body, ['messengerAccessToken'])
         const messengerAppSecret = <BotConfig>_.pick(req.body, ['messengerAppSecret'])
         const messengerVerifyToken = <BotConfig>_.pick(req.body, ['messengerVerifyToken'])
+        const twilioAccountSid = <BotConfig>_.pick(req.body, ['twilioAccountSid'])
+        const twilioAuthToken = <BotConfig>_.pick(req.body, ['twilioAuthToken'])
 
+        console.log(twilioAccountSid, twilioAuthToken)
 
         await assertBotInWorkspace(bot.id, req.workspace, bot.name)
         const botExists = (await this.botService.getBotsIds()).includes(bot.id)
@@ -175,7 +178,7 @@ class BotsRouter extends CustomAdminRouter {
           }
 
 
-          if (telegram.telegramToken || slackBotToken.slackBotToken || messengerAccessToken.messengerAccessToken) {
+          if (telegram.telegramToken || slackBotToken.slackBotToken || messengerAccessToken.messengerAccessToken || twilioAccountSid.twilioAccountSid) {
             bot.messaging = {
               channels: {
                 ...(telegram.telegramToken && {
@@ -197,6 +200,13 @@ class BotsRouter extends CustomAdminRouter {
                     accessToken: messengerAccessToken.messengerAccessToken,
                     appSecret: messengerAppSecret.messengerAppSecret,
                     verifyToken: messengerVerifyToken.messengerVerifyToken
+                  }
+                }),
+                ...(twilioAccountSid.twilioAccountSid && {
+                  twilio: {
+                    enabled: true,
+                    accountSID: twilioAccountSid.twilioAccountSid,
+                    authToken: twilioAuthToken.twilioAuthToken
                   }
                 })
               }

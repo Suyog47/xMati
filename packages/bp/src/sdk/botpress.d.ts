@@ -950,6 +950,8 @@ declare module 'botpress/sdk' {
     messengerAccessToken?: string
     messengerAppSecret?: string
     messengerVerifyToken?: string
+    twilioAccountSid?: string
+    twilioAuthToken?: string
     oneflow?: boolean
     from?: string
     owner?: string

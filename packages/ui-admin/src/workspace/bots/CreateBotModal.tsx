@@ -44,6 +44,8 @@ interface State {
   messengerAccessToken: string
   messengerAppSecret: string
   verifyToken: string
+  twilioAccountSid: string
+  twilioAuthToken: string
   error: any
 
   templates: any
@@ -64,6 +66,8 @@ const defaultState = {
   messengerAccessToken: '',
   messengerAppSecret: '',
   verifyToken: '',
+  twilioAccountSid: '',
+  twilioAuthToken: '',
   selectedCategory: undefined,
   selectedTemplate: undefined,
   error: undefined,
@@ -92,6 +96,7 @@ class CreateBotModal extends Component<Props, State> {
       { id: 'telegram', name: 'Telegram' },
       { id: 'slack', name: 'Slack' },
       { id: 'messenger', name: 'Facebook Messenger' },
+      { id: 'whatsapp', name: 'Whatsapp' },
     ]
   }
 
@@ -139,11 +144,12 @@ class CreateBotModal extends Component<Props, State> {
       messengerAccessToken: this.state.messengerAccessToken,
       messengerAppSecret: this.state.messengerAppSecret,
       messengerVerifyToken: this.state.verifyToken,
+      twilioAccountSid: this.state.twilioAccountSid,
+      twilioAuthToken: this.state.twilioAuthToken,
     }
 
     try {
       let res = await api.getSecured({ timeout: ms('12m') }).post('/admin/workspace/bots', newBot)
-      console.log('create called')
       this.props.onCreateBotSuccess()
       this.closeChannelDialog()
       setTimeout(() => {
@@ -170,7 +176,7 @@ class CreateBotModal extends Component<Props, State> {
   }
 
   resetvalues = () => {
-    this.setState({ botToken: '', slackBotToken: '', slackSigningSecret: '', messengerAccessToken: '', messengerAppSecret: '' })
+    this.setState({ botToken: '', slackBotToken: '', slackSigningSecret: '', messengerAccessToken: '', messengerAppSecret: '', twilioAccountSid: '', twilioAuthToken: '' })
   }
 
   get isButtonDisabled() {
@@ -182,7 +188,7 @@ class CreateBotModal extends Component<Props, State> {
   }
 
   get isChannelButtonDisabled() {
-    const { isProcessing, selectedChannel, botToken, slackBotToken, slackSigningSecret, messengerAccessToken, messengerAppSecret } = this.state
+    const { isProcessing, selectedChannel, botToken, slackBotToken, slackSigningSecret, messengerAccessToken, messengerAppSecret, twilioAccountSid, twilioAuthToken } = this.state
 
     if (!selectedChannel) {
       return true
@@ -196,6 +202,9 @@ class CreateBotModal extends Component<Props, State> {
     }
     if (selectedChannel.id === 'messenger') {
       return !(messengerAccessToken && messengerAppSecret && !isProcessing)
+    }
+    if (selectedChannel.id === 'whatsapp') {
+      return !(twilioAccountSid && twilioAuthToken && !isProcessing)
     }
 
     return false
@@ -323,6 +332,25 @@ class CreateBotModal extends Component<Props, State> {
           <li>Search for your Facebook page name and now you can start chatting with your Chat bot.</li>
         </ol>
       `,
+      whatsapp: `
+           <ol>
+            <li>To enable the <b>Whatsapp</b> integration with xMati, you need to create an account in <b>Twilio</b> and purchase a phone number.</li>
+             <li>For that, first go to your <b>Twilio account dashboard</b> and click on <b>'Phone Numbers'</b> section and inside <b>'Manage'</b>, click on <b>'Active Numbers'</b>.</li>
+             <li>Buy a number of your choice and go to <b>'Configure'</b> tab, scroll down and go to <b>'Messaging Configuration'.</b></li>
+             <li>Set <b>'A Message Comes In'</b> url textfiels to <b>https://www.app.xmati.ai/api/v1/messaging/webhooks/${botId}/twilio</b></li>
+             <li>Save the Configuration and come back to the Account Dashboard</li>
+             <li>Once inside, Scroll down and copy your <b>Account SID</b> and <b>Auth Token</b>.</li>
+             <li>Enter both of them here in their respective textfields.</li>
+             <li>Again vist your twilio dashboard and go to <b>'Messaging'</b> section on the left.</li>
+             <li>Click on <b>'Try it out'</b> and select <b>'Send a Whatsapp message'</b>.</li>
+             <li>Once inside, Click on <b>'Sandbox settings'</b> tab and enter <b>'https://www.app.xmati.ai/api/v1/messaging/webhooks/${botId}/twilio'</b> inside <b>'A Message Comes In'</b> field.</li>
+             <li>Click on Save.</li>
+             <li>Now test the whatsapp flow according to the instructions given on it.</li>
+             <li>Once test is done, Try to send a dummy message in whatsapp to the number you purchased from Twilio and check for the bot response.</li>
+             <li>Your bot should work fine by now.</li>
+             <li><u>It is advisable to activate a paid plan for the twilio account for uninterrupted access.</u></li>
+           </ol>
+         `
     }
 
     return (
@@ -375,7 +403,7 @@ class CreateBotModal extends Component<Props, State> {
                   rows={3}
                   style={{
                     resize: 'none', // Disables resizing
-                    height: '100px', // Fixed height
+                    height: '120px', // Fixed height
                     width: '100%', // Full width
                     overflow: 'auto', // Adds scrollbars if content exceeds the box
                   }}
@@ -426,6 +454,7 @@ class CreateBotModal extends Component<Props, State> {
           title="Select a Channel"
           icon="select"
           canOutsideClickClose={false}
+          style={{ width: '600px' }}
         >
           <form ref={form => (this._form2 = form)}>
             <div className={Classes.DIALOG_BODY}>
@@ -511,6 +540,29 @@ class CreateBotModal extends Component<Props, State> {
                           placeholder="Enter Messenger App Secret"
                           onChange={(e) => {
                             this.setState({ messengerAppSecret: e.target.value })
+                          }}
+                        />
+                      </FormGroup>
+                    </div>
+                  )}
+
+                  {this.state.selectedChannel && this.state.selectedChannel.id === 'whatsapp' && (
+                    <div>
+                      <FormGroup label="Twilio account SID" labelFor="twilio-account-sid">
+                        <InputGroup
+                          id="twilio-account-sid"
+                          placeholder="Enter twilio account SID"
+                          onChange={(e) => {
+                            this.setState({ twilioAccountSid: e.target.value })
+                          }}
+                        />
+                      </FormGroup>
+                      <FormGroup label="Twilio auth token" labelFor="twilio-auth-token">
+                        <InputGroup
+                          id="twilio-auth-token"
+                          placeholder="Enter Twlio auth token"
+                          onChange={(e) => {
+                            this.setState({ twilioAuthToken: e.target.value })
                           }}
                         />
                       </FormGroup>
