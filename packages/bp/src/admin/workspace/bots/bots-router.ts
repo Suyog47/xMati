@@ -118,8 +118,10 @@ class BotsRouter extends CustomAdminRouter {
           return;
         }
 
+        // await new Promise(resolve => setTimeout(resolve, 1000));
         for (const id of botIds) {
-          await this.workspaceService.addBotRef(id, 'default');
+          //await assertBotInWorkspace(id, req.workspace)
+          await this.workspaceService.addBotRef(id, req.workspace!);
         }
 
         return sendSuccess(res, 'api called successfully')
@@ -151,8 +153,6 @@ class BotsRouter extends CustomAdminRouter {
         const messengerVerifyToken = <BotConfig>_.pick(req.body, ['messengerVerifyToken'])
         const twilioAccountSid = <BotConfig>_.pick(req.body, ['twilioAccountSid'])
         const twilioAuthToken = <BotConfig>_.pick(req.body, ['twilioAuthToken'])
-
-        console.log(twilioAccountSid, twilioAuthToken)
 
         await assertBotInWorkspace(bot.id, req.workspace, bot.name)
         const botExists = (await this.botService.getBotsIds()).includes(bot.id)

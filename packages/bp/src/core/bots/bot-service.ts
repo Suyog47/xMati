@@ -204,6 +204,7 @@ export class BotService {
         // parse and save the bot inside folder 
         const files = await this._parseBotFiles(JSON.parse(decompressedFile as string))
         await this._saveFiles(result.data[i]['key'].toString().split('_')[1], files)
+        await this.mountBot(result.data[i]['key'].toString().split('_')[1])
         botIds.push(result.data[i]['key'].toString().split('_')[1]);
       }
       return botIds;
@@ -215,7 +216,7 @@ export class BotService {
 
   async getAndLoadAllBots() {
     try {
-      let result = await axios('http://localhost:8000/get-all-bots', {
+      let result = await axios('https://www.app.xmati.ai/apis/get-all-bots', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -238,6 +239,7 @@ export class BotService {
         // parse and save the bot inside folder 
         const files = await this._parseBotFiles(JSON.parse(decompressedFile as string))
         await this._saveFiles(result.data[i]['key'].toString().split('_')[1], files)
+        await this.mountBot(result.data[i]['key'].toString().split('_')[1])
         botIds.push(result.data[i]['key'].toString().split('_')[1]);
       }
       return botIds;
@@ -885,7 +887,6 @@ export class BotService {
         await scopedGhost.ensureDirs('/', BOT_DIRECTORIES)
         await scopedGhost.upsertFile('/', BOT_CONFIG_FILENAME, stringify(mergedConfigs))
         await scopedGhost.upsertFiles('/', files, { ignoreLock: true })
-
         await this._convertBot(`${email}_${botConfig.id}`, botConfig.id);
 
         return mergedConfigs
@@ -903,7 +904,7 @@ export class BotService {
   private _saveData = async (key, data) => {
     try {
       const compressedData = await this._compressRequest(data);
-      const result = await axios('http://localhost:8000/save-bot', {
+      const result = await axios('https://www.app.xmati.ai/apis/save-bot', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
