@@ -339,6 +339,7 @@ export class BotService {
     const newBotId = botData.newBotId;
     const email = botData.email;
 
+
     const startTime = Date.now()
     if (!isValidBotId(newBotId)) {         // newBotId
       throw new InvalidOperationError('Cant import bot the bot ID contains invalid characters')
@@ -384,7 +385,6 @@ export class BotService {
         if (allowOverwrite) {
           const files = await this.ghostService.forBot(newBotId).directoryListing('/')        // newBotId
           const deletedFiles = await findDeletedFiles(files, folder)
-
           for (const file of deletedFiles) {
             await this.ghostService.forBot(newBotId).deleteFile('/', file)              // newBotId
           }
@@ -396,7 +396,13 @@ export class BotService {
 
         await this.ghostService.forBot(newBotId).importFromDirectory(folder)
 
-        const originalConfig = await this.configProvider.getBotConfig(botId)      // oldBotId
+        // Load the bot.config.json from the extracted archive
+        const configFilePath = path.join(folder, 'bot.config.json');
+        if (!(await fse.pathExists(configFilePath))) {
+          throw new Error(`Configuration file "bot.config.json" not found in the archive for botId: ${newBotId}`);
+        }
+
+        const originalConfig = JSON.parse(await fse.readFile(configFilePath, 'utf-8'));      // oldBotId
         const newConfigs = <Partial<BotConfig>>{
           id: newBotId,                                                           // newBotId
           name: `${originalConfig.name}`,

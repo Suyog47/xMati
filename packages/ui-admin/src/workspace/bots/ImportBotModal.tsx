@@ -44,6 +44,16 @@ class ImportBotModal extends Component<Props, State> {
   savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
   state: State = { ...defaultState }
 
+  generateRandomString = (length: number = 16): string => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    let result = ''
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * chars.length)
+      result += chars[randomIndex]
+    }
+    return result
+  }
+
   importBot = async e => {
     e.preventDefault()
     if (this.isButtonDisabled) {
@@ -51,13 +61,13 @@ class ImportBotModal extends Component<Props, State> {
     }
 
     this.setState({ isProcessing: true, progress: 0 })
-
+    let randomString = this.generateRandomString(20)
     const oldBotId = this.state.botId
     let newBotId
     let email
 
     if (this.state.yourself) {
-      newBotId = `${this.savedFormData.email.replace(/[^A-Za-z0-9]/g, '')}-${this.state.botId.split('-')[1]}`
+      newBotId = `${randomString}-${this.state.botId.split('-')[1]}`
       email = this.savedFormData.email
     } else {
       newBotId = oldBotId
@@ -129,7 +139,7 @@ class ImportBotModal extends Component<Props, State> {
     const noExt = filename.substr(0, filename.indexOf('.'))
     const matches = noExt.match(/bot_(.*)_[0-9]+/)
     this.setState(
-      { botId: sanitizeBotId((matches && matches[1]) || noExt), overwrite: false },
+      { botId: matches && matches[1] || noExt, overwrite: false },
       // this.checkIdAvailability
     )
   }
