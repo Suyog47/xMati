@@ -7,6 +7,7 @@ RUN yarn build
 EXPOSE 3000 
 CMD ["yarn", "start"] 
 
+
 # docker build -t xmati -f Dockerfile.txt .
 # docker run -p 8080:3000 xmati
 # http://localhost:8080/

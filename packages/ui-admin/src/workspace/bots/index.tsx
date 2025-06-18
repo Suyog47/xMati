@@ -522,7 +522,7 @@ class Bots extends Component<Props> {
                 }}
               >
                 <h3>Your {(this.subData.subscription === 'trial') ?
-                  '15-Day Trial' : this.subData.subscription} subscription {(this.subData.subscription !== 'trial') ? 'and a 3 day complimentary trail' : ''} has been Expired</h3>
+                  'Trial' : this.subData.subscription} subscription {(this.subData.subscription !== 'trial') ? 'and a 3 day complimentary trail' : ''} has been Expired</h3>
                 <p style={{ margin: '20px 0' }}>
                   To continue using the platform, please purchase a subscription.
                 </p>

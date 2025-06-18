@@ -11,9 +11,8 @@ interface Props {
 
 const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
   const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
-  const [isBackupLoading, setBackupLoading] = useState(false)
-  const [isRetrievalLoading, setRetrievalLoading] = useState(false)
   const [isDialogLoading, setDialogLoading] = useState(false) // Full dialog loader state
+  const [isMaintenanceActive, setMaintenanceActive] = useState(false) // State for maintenance status
 
   const handleBackup = async () => {
     setDialogLoading(true) // Show full dialog loader
@@ -38,6 +37,18 @@ const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
     } catch (error) {
       console.error('Error during retrieval:', error)
       alert('Failed to retrieve from S3.')
+    } finally {
+      setDialogLoading(false) // Hide full dialog loader
+    }
+  }
+
+  const handleMaintenance = async () => {
+    setDialogLoading(true) // Show full dialog loader
+    try {
+      alert('Maintenance in progress...')
+      // Simulate a delay for loading
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      setMaintenanceActive(!isMaintenanceActive) // Toggle maintenance status
     } finally {
       setDialogLoading(false) // Hide full dialog loader
     }
@@ -74,12 +85,12 @@ const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
         className="bp4-dialog-body"
         style={{
           display: 'flex',
-          flexDirection: 'row',
+          flexDirection: 'column', // Change to column for vertical alignment
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', marginRight: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
           <FormGroup label="Bot Backup to S3">
             <Button
               intent="primary"
@@ -91,8 +102,7 @@ const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
             </Button>
           </FormGroup>
         </div>
-        <div style={{ width: '1px', backgroundColor: '#ccc', margin: '0 16px' }} /> {/* Divider */}
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '3px' }}>
           <FormGroup label="Bot Retrieval from S3">
             <Button
               intent="success"
@@ -103,6 +113,24 @@ const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
               Retrieve
             </Button>
           </FormGroup>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
+          <FormGroup label="Maintenance">
+            <Button
+              intent="warning"
+              onClick={handleMaintenance}
+              disabled={isDialogLoading} // Disable button when dialog loader is active
+              style={{ width: '150px' }} // Increased button width
+            >
+              Toggle Maintenance
+            </Button>
+          </FormGroup>
+        </div>
+        <div style={{ marginTop: '16px', textAlign: 'center' }}>
+          <strong>Maintenance Status:</strong>{' '}
+          <span style={{ color: isMaintenanceActive ? 'green' : 'red' }}>
+            {isMaintenanceActive ? 'Active' : 'Inactive'}
+          </span>
         </div>
       </div>
     </Dialog>
