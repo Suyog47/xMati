@@ -17,7 +17,6 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
           },
         })
         const data = await response.json()
-        console.log('Maintenance Status:', data.data)
         setIsMaintenance(data.data) // Set the maintenance status
         localStorage.setItem('maintenance', JSON.stringify({ status: data.data })) // Store the status in localStorage
       } catch (error) {
@@ -41,9 +40,6 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
   if (isLoading) {
     return <div>Loading xMati...</div> // Show a loading indicator while the API call is in progress
   }
-
-  console.log('Is Excluded Route:', isExcludedRoute)
-  console.log('User:', formData.email)
 
   if (isMaintenance && !isExcludedRoute && !isAdminUser) {
     // Render the maintenance mode screen

@@ -31,6 +31,7 @@ interface AuthConfigResponse {
 }
 
 const Login: FC<Props> = props => {
+  const maintenanceStatus = JSON.parse(localStorage.getItem('maintenance') || '{}')
   const [isLoading, setLoading] = useState(true)
   const [isFirstUser, setFirstUser] = useState(false)
   const [strategies, setStrategies] = useState<AuthStrategyConfig[]>()
@@ -50,7 +51,6 @@ const Login: FC<Props> = props => {
     const routeWorkspaceId = props.match.params.workspace
     const { workspaceId, botId, sessionId, signature, error } = props.location.query
 
-    console.log('location', props.location.pathname)
     if (routeWorkspaceId || workspaceId) {
       setActiveWorkspace(routeWorkspaceId || workspaceId)
     }
@@ -79,7 +79,6 @@ const Login: FC<Props> = props => {
       const excludedRouteRegex = /admin123/ // Regex to match the route
       const isAdminRoute = excludedRouteRegex.test(props.location.pathname)
 
-      console.log('isAdminRoute:', isAdminRoute)
       if (isAdminRoute) {
         updateAdminUrlStrategy(strategies[0].strategyId)
       } else {
@@ -129,6 +128,11 @@ const Login: FC<Props> = props => {
 
   const loginUser = async (email: string, password: string) => {
     try {
+      if (maintenanceStatus.status && email !== 'admin@gmail.com') {
+        setError('Maintenance mode is active. Only Admins are allowed to Login.')
+        return
+      }
+
       // setLoading(true)
       setError(undefined)
 

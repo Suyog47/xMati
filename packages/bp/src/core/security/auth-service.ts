@@ -390,8 +390,6 @@ export class AuthService {
     if (!callback) {
       return res.sendStatus(200)
     }
-
-    localStorage.setItem('formData', JSON.stringify({}))
     return callback(strategy, req, res)
   }
 }

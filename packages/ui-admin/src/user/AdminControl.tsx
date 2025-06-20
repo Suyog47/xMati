@@ -47,7 +47,6 @@ const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
 
   const handleMaintenance = async () => {
     setDialogLoading(true) // Show full dialog loader
-    console.log(maintenanceStatus)
     try {
       let response = await fetch('http://localhost:8000/set-maintenance', {
         method: 'POST',
@@ -59,7 +58,6 @@ const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
         }),
       })
       const result = await response.json()
-      console.log('Maintenance toggle response:', result)
       if (result.status) {
         toggleMaintenance() // Toggle maintenance status
         alert(`${result.msg}, ${!result.data ? 'active' : 'inactive'}`)
