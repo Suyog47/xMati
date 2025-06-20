@@ -11,8 +11,11 @@ interface Props {
 
 const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
   const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
+  const maintenanceStatus = JSON.parse(localStorage.getItem('maintenance') || '{}')
   const [isDialogLoading, setDialogLoading] = useState(false) // Full dialog loader state
-  const [isMaintenanceActive, setMaintenanceActive] = useState(false) // State for maintenance status
+  const [isMaintenanceActive, setMaintenanceActive] = useState(maintenanceStatus.status) // State for maintenance status
+
+  const toggleMaintenance = () => setMaintenanceActive(prev => !prev)
 
   const handleBackup = async () => {
     setDialogLoading(true) // Show full dialog loader
@@ -44,11 +47,26 @@ const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
 
   const handleMaintenance = async () => {
     setDialogLoading(true) // Show full dialog loader
+    console.log(maintenanceStatus)
     try {
-      alert('Maintenance in progress...')
-      // Simulate a delay for loading
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      setMaintenanceActive(!isMaintenanceActive) // Toggle maintenance status
+      let response = await fetch('http://localhost:8000/set-maintenance', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          status: !isMaintenanceActive,
+        }),
+      })
+      const result = await response.json()
+      console.log('Maintenance toggle response:', result)
+      if (result.status) {
+        toggleMaintenance() // Toggle maintenance status
+        alert(`${result.msg}, ${!result.data ? 'active' : 'inactive'}`)
+        localStorage.setItem('maintenance', JSON.stringify({ status: !isMaintenanceActive }))
+      } else {
+        alert(`Failed to toggle maintenance mode: ${result.msg}`)
+      }
     } finally {
       setDialogLoading(false) // Hide full dialog loader
     }

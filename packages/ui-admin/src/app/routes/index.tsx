@@ -33,6 +33,7 @@ import { extractCookie } from './cookies'
 import PrivateRoute from './PrivateRoute'
 import SegmentHandler from './SegmentHandler'
 import CustomerWizard from '../Wizard'
+import MaintenanceWrapper from './MaintenanceWrapper'
 
 const setupBranding = () => {
   window.document.title = window.APP_NAME || 'xMati Panel'
@@ -53,6 +54,7 @@ const setupBranding = () => {
 
 export const makeMainRoutes = () => {
   const auth = new Auth()
+  const status = true
   setupBranding()
 
   const ExtractToken = () => {
@@ -85,35 +87,39 @@ export const makeMainRoutes = () => {
     <Provider store={store}>
       <SegmentHandler>
         <ConnectedRouter history={history}>
-          <Switch>
-            <Route path="/botCreation" component={CustomerWizard} />
-            <Route path="/login/:strategy?/:workspace?" render={props => <LoginPage auth={auth} {...props} />} />
-            <Route path="/register/:strategy?/:workspace?" render={props => <RegisterPage auth={auth} {...props} />} />
-            <Route path="/setToken" component={ExtractToken} />
-            <Route path="/changePassword" component={ChangePassword} />
-            <Route path="/noAccess" component={NoAccess} />
-            <Route path="/chatAuthResult" component={ChatAuthResult} />
-            <PrivateRoute path="/" auth={auth} component={App}>
-              <Switch>
-                <Route path="/checklist" component={Checklist} />
-                <Route path="/latestReleases" component={LatestReleases} />
-                <Route path="/server/monitoring" component={Monitoring} />
-                <Route path="/server/version" component={Versioning} />
-                <Route path="/server/languages" component={Languages} />
-                <Route path="/server/license" component={LicenseStatus} />
-                <Route path="/server/alerting" component={Alerting} />
-                <Route path="/channels" component={Channels} />
-                <Route path="/workspace/:workspaceId?/bots" component={Bots} />
-                <Route path="/workspace/:workspaceId?/users" component={Collaborators} />
-                <Route path="/workspace/:workspaceId?/roles" component={Roles} />
-                <Route path="/workspace/:workspaceId?/logs" component={Logs} />
-                <Route path="/workspaces" component={Workspaces} />
-                <Route path="/apps/:appName/:botId?" component={AppLoader} />
-                <Route path="/modules" component={Modules} />
-                <Route path="/" render={() => <Redirect from="/" to={`/workspace/${getActiveWorkspace()}/bots`} />} />
-              </Switch>
-            </PrivateRoute>
-          </Switch>
+          <MaintenanceWrapper>
+            <Switch>
+              <Route path="/botCreation" component={CustomerWizard} />
+              <Route path="/botCreation/admin123" component={CustomerWizard} />
+              <Route path="/login/:strategy?/:workspace?" render={props => <LoginPage auth={auth} {...props} />} />
+              <Route path="/login/admin123/:strategy?/:workspace?" render={props => <LoginPage auth={auth} {...props} />} />
+              <Route path="/register/:strategy?/:workspace?" render={props => <RegisterPage auth={auth} {...props} />} />
+              <Route path="/setToken" component={ExtractToken} />
+              <Route path="/changePassword" component={ChangePassword} />
+              <Route path="/noAccess" component={NoAccess} />
+              <Route path="/chatAuthResult" component={ChatAuthResult} />
+              <PrivateRoute path="/" auth={auth} component={App}>
+                <Switch>
+                  <Route path="/checklist" component={Checklist} />
+                  <Route path="/latestReleases" component={LatestReleases} />
+                  <Route path="/server/monitoring" component={Monitoring} />
+                  <Route path="/server/version" component={Versioning} />
+                  <Route path="/server/languages" component={Languages} />
+                  <Route path="/server/license" component={LicenseStatus} />
+                  <Route path="/server/alerting" component={Alerting} />
+                  <Route path="/channels" component={Channels} />
+                  <Route path="/workspace/:workspaceId?/bots" component={Bots} />
+                  <Route path="/workspace/:workspaceId?/users" component={Collaborators} />
+                  <Route path="/workspace/:workspaceId?/roles" component={Roles} />
+                  <Route path="/workspace/:workspaceId?/logs" component={Logs} />
+                  <Route path="/workspaces" component={Workspaces} />
+                  <Route path="/apps/:appName/:botId?" component={AppLoader} />
+                  <Route path="/modules" component={Modules} />
+                  <Route path="/" render={() => <Redirect from="/" to={`/workspace/${getActiveWorkspace()}/bots`} />} />
+                </Switch>
+              </PrivateRoute>
+            </Switch>
+          </MaintenanceWrapper>
         </ConnectedRouter>
       </SegmentHandler>
     </Provider>

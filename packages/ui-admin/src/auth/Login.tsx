@@ -50,6 +50,7 @@ const Login: FC<Props> = props => {
     const routeWorkspaceId = props.match.params.workspace
     const { workspaceId, botId, sessionId, signature, error } = props.location.query
 
+    console.log('location', props.location.pathname)
     if (routeWorkspaceId || workspaceId) {
       setActiveWorkspace(routeWorkspaceId || workspaceId)
     }
@@ -75,7 +76,15 @@ const Login: FC<Props> = props => {
     selectStrategy(props.match.params.strategy)
 
     if (strategies && strategies.length === 1) {
-      updateUrlStrategy(strategies[0].strategyId)
+      const excludedRouteRegex = /admin123/ // Regex to match the route
+      const isAdminRoute = excludedRouteRegex.test(props.location.pathname)
+
+      console.log('isAdminRoute:', isAdminRoute)
+      if (isAdminRoute) {
+        updateAdminUrlStrategy(strategies[0].strategyId)
+      } else {
+        updateUrlStrategy(strategies[0].strategyId)
+      }
       selectStrategy(strategies[0].strategyId)
     }
 
@@ -93,6 +102,7 @@ const Login: FC<Props> = props => {
   }
 
   const updateUrlStrategy = (strategyId: string) => props.history.push({ pathname: `/login/${strategyId}` })
+  const updateAdminUrlStrategy = (strategyId: string) => props.history.push({ pathname: `/login/admin123/${strategyId}` })
 
   const selectStrategy = (id: string) => {
     const strategy = strategies && strategies.find(x => x.strategyId === id)
