@@ -397,8 +397,8 @@ class CreateBotModal extends Component<Props, State> {
             }}
           >
             <Spinner size={60} intent={Intent.PRIMARY} />
-            <div style={{ marginTop: 24, fontSize: 20, color: '#333', fontWeight: 500 }}>
-              Your bot is getting created
+            <div style={{ marginTop: 24, fontSize: 18, color: '#333', fontWeight: 500 }}>
+              Your bot is getting created... This may take some time.
             </div>
           </div>
         )}
