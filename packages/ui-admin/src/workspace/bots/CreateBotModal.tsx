@@ -101,6 +101,9 @@ class CreateBotModal extends Component<Props, State> {
   }
 
   openChannelDialog = (e) => {
+    console.log('botName', this.state.botName)
+    console.log('botPrompt', this.state.botPrompt)
+    console.log('selectedTemplate', this.state.selectedTemplate)
     e.preventDefault() // Prevents form submission if needed
     this.state.selectedChannel = undefined
     this.setState({ isChannelDialogOpen: true, verifyToken: this.generateRandomString(16) })
@@ -119,7 +122,10 @@ class CreateBotModal extends Component<Props, State> {
 
   handlePromptChanged = e => {
     const botPrompt = e.target.value
-    this.setState({ botPrompt })
+    this.setState({
+      botPrompt,
+      selectedTemplate: botPrompt ? undefined : this.state.selectedTemplate // Clear dropdown if prompt is not empty
+    })
   }
 
   createBot = async e => {
@@ -180,12 +186,30 @@ class CreateBotModal extends Component<Props, State> {
     this.setState({ botToken: '', slackBotToken: '', slackSigningSecret: '', messengerAccessToken: '', messengerAppSecret: '', twilioAccountSid: '', twilioAuthToken: '' })
   }
 
+  get isPromptTooShort() {
+    return this.state.botPrompt && this.state.botPrompt.length < 10
+  }
+
   get isButtonDisabled() {
     const { isProcessing, botName, botPrompt, selectedTemplate } = this.state
 
-    const isPromptAndTemplateMissing = !botPrompt && !selectedTemplate
+    // Must have a name, not processing, and either a valid prompt or a template
+    if (!botName || isProcessing) {
+      return true
+    }
 
-    return !(botName && !isProcessing && !isPromptAndTemplateMissing)
+    // If both prompt and template are empty, disable
+    if (!botPrompt && !selectedTemplate) {
+      return true
+    }
+
+    // If prompt is present, it must be at least 10 characters
+    if (botPrompt && botPrompt.length < 10) {
+      return true
+    }
+
+    // Otherwise, enable
+    return false
   }
 
   get isChannelButtonDisabled() {
@@ -408,8 +432,14 @@ class CreateBotModal extends Component<Props, State> {
                     width: '100%', // Full width
                     overflow: 'auto', // Adds scrollbars if content exceeds the box
                   }}
+                  disabled={!!this.state.selectedTemplate}
                 />
               </FormGroup>
+              {this.isPromptTooShort && (
+                <p style={{ color: 'red' }}>
+                  Bot prompt must be at least 10 characters.
+                </p>
+              )}
 
               <p style={{ textAlign: 'center' }}>
                 <b>Or</b>
@@ -423,11 +453,27 @@ class CreateBotModal extends Component<Props, State> {
                   <Select
                     id="select-bot-templates"
                     tabIndex="4"
-                    options={this.state.templates}
-                    value={this.state.selectedTemplate}
+                    options={[
+                      { id: '', name: 'Select template' }, // Add this option at the top
+                      ...this.state.templates
+                    ]}
+                    value={
+                      this.state.selectedTemplate && this.state.selectedTemplate.id
+                        ? this.state.selectedTemplate
+                        : { id: '', name: 'Select template' }
+                    }
                     onChange={selectedTemplate => {
-                      this.setState({ selectedTemplate: selectedTemplate as any })
+                      // If "Select template" is chosen, reset selectedTemplate
+                      if (!selectedTemplate || (selectedTemplate as any).id === '') {
+                        this.setState({ selectedTemplate: undefined })
+                      } else {
+                        this.setState({
+                          selectedTemplate: selectedTemplate as any,
+                          botPrompt: ''
+                        })
+                      }
                     }}
+                    isDisabled={!!this.state.botPrompt}
                     getOptionLabel={o => o.name}
                     getOptionValue={o => o.id}
                   />
