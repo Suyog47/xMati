@@ -92,7 +92,7 @@ class ImportBotModal extends Component<Props, State> {
       this.props.onCreateBotSuccess()
       setTimeout(() => {
         window.location.reload()    // reloading for the bot creation limit check
-      }, 1000)
+      }, 500)
       this.toggleDialog()
     } catch (error) {
       this.setState({ error: error.message, isProcessing: false })

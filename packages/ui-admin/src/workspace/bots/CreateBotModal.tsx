@@ -1,4 +1,4 @@
-import { Button, Classes, Dialog, FormGroup, InputGroup, Intent, Callout, Divider } from '@blueprintjs/core'
+import { Button, Classes, Dialog, FormGroup, InputGroup, Intent, Callout, Divider, Spinner } from '@blueprintjs/core'
 import { BotChannel, BotConfig, BotTemplate } from 'botpress/sdk'
 import { lang } from 'botpress/shared'
 import _ from 'lodash'
@@ -54,6 +54,7 @@ interface State {
   selectedTemplate?: BotTemplate
   selectedChannel?: BotChannel
   selectedCategory?: SelectOption<string>
+  showFullScreenLoader?: boolean
 }
 
 const defaultState = {
@@ -84,10 +85,7 @@ class CreateBotModal extends Component<Props, State> {
   state: State = {
     templates: [
       { id: 'insurance-bot', name: 'Insurance Bot' },
-      // { id: 'welcome-bot', name: 'Welcome Bot' },
-      // { id: 'small-talk', name: 'Small Talk' },
       { id: 'empty-bot', name: 'Empty Bot' },
-      //{ id: 'learn-botpress', name: 'Learn Botpress' },
     ],
     ...defaultState,
     isChannelDialogOpen: false,
@@ -97,7 +95,8 @@ class CreateBotModal extends Component<Props, State> {
       { id: 'slack', name: 'Slack' },
       { id: 'messenger', name: 'Facebook Messenger' },
       { id: 'whatsapp', name: 'Whatsapp' },
-    ]
+    ],
+    showFullScreenLoader: false
   }
 
   openChannelDialog = (e) => {
@@ -136,7 +135,7 @@ class CreateBotModal extends Component<Props, State> {
     if (this.isChannelButtonDisabled || this.isButtonDisabled) {
       return
     }
-    this.setState({ isProcessing: true })
+    this.setState({ isProcessing: true, showFullScreenLoader: true })
 
     const newBot = {
       id: this.state.botId,
@@ -156,14 +155,14 @@ class CreateBotModal extends Component<Props, State> {
     }
 
     try {
-      let res = await api.getSecured({ timeout: ms('12m') }).post('/admin/workspace/bots', newBot)
+      let res = await api.getSecured({ timeout: 0 }).post('/admin/workspace/bots', newBot)
       this.props.onCreateBotSuccess()
       this.closeChannelDialog()
       setTimeout(() => {
         window.location.reload()    // reloading for the bot creation limit check
-      }, 1000)
+      }, 500)
     } catch (error) {
-      this.setState({ error: error.message, isProcessing: false })
+      this.setState({ error: error.message, isProcessing: false, showFullScreenLoader: false })
     }
   }
 
@@ -380,6 +379,30 @@ class CreateBotModal extends Component<Props, State> {
 
     return (
       <>
+        {/* Fullscreen Loader */}
+        {this.state.showFullScreenLoader && (
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100vw',
+              height: '100vh',
+              background: 'rgba(255,255,255,0.85)',
+              zIndex: 9999,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <Spinner size={60} intent={Intent.PRIMARY} />
+            <div style={{ marginTop: 24, fontSize: 20, color: '#333', fontWeight: 500 }}>
+              Your bot is getting created
+            </div>
+          </div>
+        )}
+
         <Dialog
           title={lang.tr('admin.workspace.bots.create.newBot')}
           icon="add"

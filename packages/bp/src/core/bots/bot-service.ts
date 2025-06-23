@@ -752,7 +752,6 @@ export class BotService {
 
       // 3. Extract files from response
       const files = this._parseBotFiles(botContent)
-      console.log(files)
 
       // 4. Save to folders
       await this._saveFilesWithConfig(id, files, mergedConfigs, owner)

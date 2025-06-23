@@ -163,7 +163,7 @@ class Bots extends Component<Props> {
         this.props.fetchBots()
         setTimeout(() => {
           window.location.reload()    // reloading for the bot creation limit check
-        }, 1000)
+        }, 500)
         toast.success(lang.tr('The bot has been deleted successfully'))
       } catch (err) {
         console.error(err)
