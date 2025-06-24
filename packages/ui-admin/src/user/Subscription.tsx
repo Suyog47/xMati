@@ -11,10 +11,10 @@ import { Dialog, Button, FormGroup } from '@blueprintjs/core'
 import BasicAuthentication from '~/auth/basicAuth'
 
 // For development use
-// const stripePromise = loadStripe('pk_test_51RLimpPBSMPLjWxm3IUaX63iUb4TqhU5prbUsg7A5RwG2sZsukOa7doAAhPu2RpEkYXZ2dRLNrOA4Pby9IscZOse00unCEcNDG')
+const stripePromise = loadStripe('pk_test_51RLimpPBSMPLjWxm3IUaX63iUb4TqhU5prbUsg7A5RwG2sZsukOa7doAAhPu2RpEkYXZ2dRLNrOA4Pby9IscZOse00unCEcNDG')
 
 //For production use
-const stripePromise = loadStripe('pk_live_51RPPI0EncrURrNgDF2LNkLrh5Wf53SIe3WjqPqjtzqbJWDGfDFeG4VvzUXuC4nCmrPTNOTeFENuAqRBw1mvbNJg600URDxPnuc')
+//const stripePromise = loadStripe('pk_live_51RPPI0EncrURrNgDF2LNkLrh5Wf53SIe3WjqPqjtzqbJWDGfDFeG4VvzUXuC4nCmrPTNOTeFENuAqRBw1mvbNJg600URDxPnuc')
 
 interface Props {
   isOpen: boolean
@@ -47,7 +47,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     setPaymentError('')
 
     try {
-      const result = await fetch('https://www.app.xmati.ai/apis/create-payment-intent', {
+      const result = await fetch('http://localhost:8000/create-payment-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount, currency: 'usd' }),
@@ -151,17 +151,11 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         setIsSuccessDialogOpen(true)
         await togglePaymentDialog(false)
         toggle()
-        await logout()
       } catch (err: any) {
         setError(err.message)
       } finally {
         setIsProcessing(false)
       }
-    }
-
-    const logout = async () => {
-      const auth: BasicAuthentication = new BasicAuthentication()
-      await auth.logout()
     }
 
     const paymentFailedEmail = async () => {
@@ -187,20 +181,18 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
         const { fullName, email } = savedFormData
 
-        const result = await fetch('https://www.app.xmati.ai/apis/save-subscription', {
+        const result = await fetch('http://localhost:8000/save-subscription', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ key: email, name: fullName, subscription: selectedTab, duration: selectedDuration, amount: `$${amount / 100}` }),
         })
 
-        if (!result.ok) {
-          throw new Error('Subscriber saving failed')
+        const data = await result.json()
+
+        if (data.status !== true) {
+          throw new Error('Subscriber activation failed')
         }
 
-        const data = await result.json()
-        if (!data.client_secret) {
-          throw new Error('Invalid server response')
-        }
       } catch (err: any) {
         throw new Error('Something went wrong while saving subscription data: ' + err.message)
       }
@@ -307,6 +299,11 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     setIsPaymentDialogOpen(val)
 
     await new Promise(resolve => setTimeout(resolve, 500))   // A delay of 500 milliseconds to ensure the dialog opens/closes after the state update
+  }
+
+  const logout = async () => {
+    const auth: BasicAuthentication = new BasicAuthentication()
+    await auth.logout()
   }
 
   return (
@@ -478,22 +475,32 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
 
       <Dialog
         isOpen={isSuccessDialogOpen}
-        onClose={() => setIsSuccessDialogOpen(false)}
+        onClose={async () => {
+          setIsSuccessDialogOpen(false)
+          await logout()
+        }}
         title="Payment Successful"
         icon="tick-circle"
-        canOutsideClickClose={true}
+        canOutsideClickClose={false}
       >
         <div style={{ padding: '20px', textAlign: 'center' }}>
           <h2 style={{ color: '#4caf50', marginBottom: '10px' }}>Thank You!</h2>
-          <p style={{ fontSize: '1em', color: '#666' }}>
+          <p style={{ fontSize: '1.1em', color: '#666' }}>
             Your payment was successful. Your subscription has been activated.
+          </p>
+          <p style={{ fontSize: '1.0em', color: 'grey' }}>
+            You will now be logged out and will need to log in again..
           </p>
           <Button
             intent="primary"
-            onClick={() => setIsSuccessDialogOpen(false)}
+            onClick={async () => {
+              setIsSuccessDialogOpen(false)
+              await logout()
+            }
+            }
             style={{ marginTop: '20px' }}
           >
-            Close
+            Logout
           </Button>
         </div>
       </Dialog>

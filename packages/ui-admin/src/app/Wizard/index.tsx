@@ -111,6 +111,29 @@ const CustomerWizard: React.FC = () => {
     setShowPassword(prevState => !prevState)
   }
 
+  const countryOptions = [
+    { code: '+1', name: 'United States' },
+    { code: '+91', name: 'India' },
+    { code: '+44', name: 'United Kingdom' },
+    { code: '+61', name: 'Australia' },
+    { code: '+81', name: 'Japan' },
+    { code: '+49', name: 'Germany' },
+    { code: '+33', name: 'France' },
+    { code: '+86', name: 'China' },
+    { code: '+7', name: 'Russia' },
+    { code: '+39', name: 'Italy' },
+    { code: '+34', name: 'Spain' },
+    { code: '+55', name: 'Brazil' },
+    { code: '+27', name: 'South Africa' },
+    { code: '+82', name: 'South Korea' },
+    { code: '+62', name: 'Indonesia' },
+    { code: '+234', name: 'Nigeria' },
+    { code: '+20', name: 'Egypt' },
+    { code: '+63', name: 'Philippines' },
+    { code: '+90', name: 'Turkey' },
+    { code: '+966', name: 'Saudi Arabia' }
+  ]
+
   useEffect(() => {
     setFormData((prevData) => ({
       ...prevData,
@@ -173,7 +196,7 @@ const CustomerWizard: React.FC = () => {
       } else {
         const phoneRegex = /^(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?$/
         if (!phoneRegex.test(formData.phoneNumber.trim())) {
-          newErrors.phoneNumber = newErrors.phoneNumber = 'Please enter valid phone number'
+          newErrors.phoneNumber = newErrors.phoneNumber = 'Please enter valid phone number with no special characters or spaces'
         }
       }
       if (!formData.password || !formData.password.trim()) {
@@ -231,45 +254,6 @@ const CustomerWizard: React.FC = () => {
         }
       }
     }
-    // else if (step === 4) {
-    //   if (!formData.botName.trim()) {
-    //     newErrors.botName = 'Bot Name is required'
-    //   } else if (formData.botName.trim().length > 20) {
-    //     newErrors.botName = 'Bot Name cannot exceed 20 characters'
-    //   } else if (!/^[A-Za-z0-9]+$/.test(formData.botName)) {
-    //     newErrors.botName = 'Only letters and numbers are allowed (no spaces or special characters)'
-    //   }
-    //   if (!formData.botAIPrompt.trim() && !formData.template.trim()) {
-    //     newErrors.botAIPrompt = 'Bot Prompt or Template is required'
-    //   }
-    //   if (!formData.channel.trim()) {
-    //     newErrors.channel = 'Channel is required'
-    //   }
-    // } else if (step === 5) {
-    //   if (formData.channel === 'Telegram') {
-    //     if (!formData.botToken.trim()) {
-    //       newErrors.botToken = 'Bot Token is required'
-    //     }
-    //   }
-    //   if (formData.channel === 'Slack') {
-    //     if (!formData.slackBotToken.trim()) {
-    //       newErrors.slackBotToken = 'Bot Token is required'
-    //     }
-
-    //     if (!formData.slackSigningSecret.trim()) {
-    //       newErrors.slackSigningSecret = 'Signing Secret is required'
-    //     }
-    //   }
-    //   if (formData.channel === 'Facebook Messenger') {
-    //     if (!formData.messengerAccessToken.trim()) {
-    //       newErrors.messengerAccessToken = 'Access Token is required'
-    //     }
-
-    //     if (!formData.messengerAppSecret.trim()) {
-    //       newErrors.messengerAppSecret = 'App Secret is required'
-    //     }
-    //   }
-    // }
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -288,8 +272,6 @@ const CustomerWizard: React.FC = () => {
   const handleSubmit = async () => {
     if (await validateStep()) {
       if (formData && typeof formData === 'object') {
-
-        console.log('Form Data:', formData)
         // setIsLoading(true)
         let status = await register()
         setIsLoading(false)
@@ -330,7 +312,6 @@ const CustomerWizard: React.FC = () => {
 
       // create subscription for the user
       await setSubscriber()
-
       return true
     } catch (error) {
       const errorMsg =
@@ -357,7 +338,7 @@ const CustomerWizard: React.FC = () => {
         cardExpiry: formData.cardExpiry,
       }
 
-      const result = await fetch('https://www.app.xmati.ai/apis/user-auth', {
+      const result = await fetch('http://localhost:8000/user-auth', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -377,7 +358,7 @@ const CustomerWizard: React.FC = () => {
 
   const setSubscriber = async () => {
     try {
-      const result = await fetch('https://www.app.xmati.ai/apis/save-subscription', {
+      const result = await fetch('http://localhost:8000/save-subscription', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key: formData.email, name: formData.fullName, subscription: 'trial', duration: '15d', amount: '0' }),
@@ -421,7 +402,8 @@ const CustomerWizard: React.FC = () => {
     const updatedFormData = {
       fullName: formData.fullName,
       email: formData.email,
-      phoneNumber: formData.phoneNumber,
+      phoneNumber: formData.countryCode + formData.phoneNumber, // Save full number
+      countryCode: formData.countryCode, // Save separately as well if needed
       password: formData.password,
       organisationName: formData.organisationName,
       industryType: formData.industryType,
@@ -444,7 +426,6 @@ const CustomerWizard: React.FC = () => {
       promptRun: false  // set the prompt run to false
     }
 
-    console.log(updatedSubData)
     localStorage.setItem('formData', JSON.stringify(updatedFormData))
     localStorage.setItem('subData', JSON.stringify(updatedSubData))
   }
@@ -543,12 +524,11 @@ const CustomerWizard: React.FC = () => {
                       textAlign: 'center'
                     }}
                   >
-                    <option value='+1'>+1</option>
-                    <option value='+91'>+91</option>
-                    <option value='+44'>+44</option>
-                    <option value='+61'>+61</option>
-                    <option value='+81'>+81</option>
-                    {/* Add more as needed */}
+                    {countryOptions.map(opt => (
+                      <option key={opt.code} value={opt.code} label={`${opt.code}    (${opt.name})`}>
+                        {opt.code}
+                      </option>
+                    ))}
                   </select>
                   <div style={{
                     width: 1,
