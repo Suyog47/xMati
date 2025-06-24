@@ -10,7 +10,7 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
     const checkMaintenanceStatus = async () => {
       try {
         // Call the get-maintenance API
-        const response = await fetch('http://localhost:8000/get-maintenance', {
+        const response = await fetch('https://www.app.xmati.ai/apis/get-maintenance', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

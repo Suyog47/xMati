@@ -47,7 +47,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     setPaymentError('')
 
     try {
-      const result = await fetch('http://localhost:8000/create-payment-intent', {
+      const result = await fetch('https://www.app.xmati.ai/apis/create-payment-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount, currency: 'usd' }),
@@ -181,7 +181,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
         const { fullName, email } = savedFormData
 
-        const result = await fetch('http://localhost:8000/save-subscription', {
+        const result = await fetch('https://www.app.xmati.ai/apis/save-subscription', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ key: email, name: fullName, subscription: selectedTab, duration: selectedDuration, amount: `$${amount / 100}` }),

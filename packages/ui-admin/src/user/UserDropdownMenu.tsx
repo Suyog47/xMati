@@ -49,7 +49,7 @@ const UserDropdownMenu: FC<Props> = props => {
     if (subscription === 'trial') {
       expiry = expired || false
     } else {
-      expiry = expired && daysRemaining === -4
+      expiry = expired && daysRemaining <= -4
     }
     setExpiry(expiry)
 

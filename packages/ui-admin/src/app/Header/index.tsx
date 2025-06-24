@@ -11,6 +11,7 @@ import { AppState } from '../rootReducer'
 import { toggleBottomPanel } from '../uiReducer'
 import { HelpMenu } from './Help'
 import style from './style.scss'
+import { Subs } from './Subs'
 
 type Props = ConnectedProps<typeof connector>
 const Header: FC<Props> = props => {
@@ -38,7 +39,7 @@ const Header: FC<Props> = props => {
           {/* <WorkspaceSelect /> */}
           <div className={cx(style['menu-container'])}>
             <div>
-              <HelpMenu />
+              <Subs />
             </div>
 
             {/* <div>

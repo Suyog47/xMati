@@ -48,7 +48,7 @@ const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
   const handleMaintenance = async () => {
     setDialogLoading(true) // Show full dialog loader
     try {
-      let response = await fetch('http://localhost:8000/set-maintenance', {
+      let response = await fetch('https://www.app.xmati.ai/apis/set-maintenance', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

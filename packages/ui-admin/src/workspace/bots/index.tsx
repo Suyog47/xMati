@@ -90,7 +90,7 @@ class Bots extends Component<Props> {
     if (subscription === 'trial') {
       expiry = this.subData.expired || false
     } else {
-      expiry = this.subData.expired && daysRemaining === -4
+      expiry = this.subData.expired && daysRemaining <= -4
     }
 
     this.setState({ isExpired: expiry })

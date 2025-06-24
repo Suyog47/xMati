@@ -14,6 +14,7 @@ import LoginContainer from './LoginContainer'
 import { LoginForm } from './LoginForm'
 import ms from 'ms'
 import { Spinner, SpinnerSize } from '@blueprintjs/core/lib/esm/components/spinner/spinner'
+import { duration } from 'moment'
 
 type RouterProps = RouteComponentProps<
   { strategy: string; workspace: string },
@@ -233,7 +234,9 @@ const Login: FC<Props> = props => {
       till: subData.till,
       expired: currentUTC > tillDateUTC,
       daysRemaining,
-      promptRun: false  // set the prompt run to false
+      promptRun: false,  // set the prompt run to false
+      amount: subData.amount,
+      duration: subData.duration,
     }
 
     localStorage.setItem('formData', JSON.stringify(updatedFormData))
