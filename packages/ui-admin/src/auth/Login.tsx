@@ -211,10 +211,14 @@ const Login: FC<Props> = props => {
       fullName: formData.fullName,
       email: formData.email,
       phoneNumber: formData.phoneNumber,
+      countryCode: formData.countryCode,
       password: formData.password,
       organisationName: formData.organisationName,
       industryType: formData.industryType,
       subIndustryType: formData.subIndustryType,
+      card: formData.cardNumber,
+      cardCVC: formData.cardCVC,
+      cardExpiry: formData.cardExpiry,
     }
 
     const currentUTC = new Date().toISOString().split('T')[0] // Always UTC

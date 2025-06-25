@@ -209,8 +209,8 @@ const CustomerWizard: React.FC = () => {
       }
       if (!formData.organisationName.trim()) {
         newErrors.organisationName = 'Organisation Name is required'
-      } else if (formData.organisationName.trim().length > 20) {
-        newErrors.organisationName = 'Organization Name cannot exceed 20 characters'
+      } else if (formData.organisationName.trim().length > 50) {
+        newErrors.organisationName = 'Organization Name cannot exceed 50 characters'
       }
 
 
@@ -327,7 +327,7 @@ const CustomerWizard: React.FC = () => {
       const updatedFormData = {
         fullName: formData.fullName,
         email: formData.email,
-        phoneNumber: formData.countryCode + formData.phoneNumber, // Save full number
+        phoneNumber: formData.phoneNumber, // Save full number
         countryCode: formData.countryCode, // Save separately as well if needed
         password: formData.password,
         organisationName: formData.organisationName,
