@@ -338,7 +338,7 @@ const CustomerWizard: React.FC = () => {
         cardExpiry: formData.cardExpiry,
       }
 
-      const result = await fetch('https://www.app.xmati.ai/apis/user-auth', {
+      const result = await fetch('http://localhost:8000/user-auth', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -358,10 +358,10 @@ const CustomerWizard: React.FC = () => {
 
   const setSubscriber = async () => {
     try {
-      const result = await fetch('https://www.app.xmati.ai/apis/save-subscription', {
+      const result = await fetch('http://localhost:8000/save-subscription', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key: formData.email, name: formData.fullName, subscription: 'trial', duration: '15d', amount: '0' }),
+        body: JSON.stringify({ key: formData.email, name: formData.fullName, subscription: 'Trial', duration: '15d', amount: '0' }),
       })
 
       return result.json()
@@ -408,6 +408,9 @@ const CustomerWizard: React.FC = () => {
       organisationName: formData.organisationName,
       industryType: formData.industryType,
       subIndustryType: formData.subIndustryType,
+      card: formData.cardNumber,
+      cardCVC: formData.cardCVC,
+      cardExpiry: formData.cardExpiry,
     }
 
     const currentUTC = new Date().toISOString().split('T')[0] // Always UTC
@@ -418,7 +421,7 @@ const CustomerWizard: React.FC = () => {
     const tillDate = new Date(tillDateUTC.toISOString().split('T')[0]) // Ensure it's in the same format
 
     const updatedSubData = {
-      subscription: 'trial',
+      subscription: 'Trial',
       createdAt: currentDate,
       till: tillDate,
       expired: false,

@@ -309,142 +309,213 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   return (
     <><Dialog
       title="Subscribe & Pay"
+      icon="dollar"
       isOpen={isOpen}
       onOpening={getClientSecret}
       onClose={toggle}
-      style={{ width: '600px' }}
+      canOutsideClickClose={false}
+      style={{
+        width: '99vw',
+        maxWidth: '100vw',
+        height: '97vh', // Increased height
+        maxHeight: '95vh',
+        margin: 0,
+        borderRadius: 0,
+        padding: 0,
+      }}
     >
-      <div style={{ padding: 15 }}> {/* Reduced padding */}
-
-        <div style={{ marginBottom: '5px', textAlign: 'center', fontSize: '1em', color: '#666' }}>
-          {subscription && expiryTill && (
-            <p>
-              Your current subscription plan is <strong><u>{subscription}</u></strong> and it {savedSubData.expired === true ? 'was' : 'is'} valid till <strong><u>{expiryTill}</u></strong>.
-            </p>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          height: '100%',
+          padding: 32,
+          paddingTop: 20,
+          paddingLeft: 32,
+          paddingRight: 32,
+          paddingBottom: 32,
+          gap: 20,
+        }}
+      >
+        {/* Left: Subscription Plan Section */}
+        <div style={{ flex: 1.4, overflowY: 'auto' }}>
+          <div style={{ marginBottom: '5px', textAlign: 'center', fontSize: '1em', color: '#666' }}>
+            {subscription && expiryTill && (
+              <p>
+                Your current subscription plan is <strong><u>{subscription}</u></strong> and it {savedSubData.expired === true ? 'was' : 'is'} valid till <strong><u>{expiryTill}</u></strong>.
+              </p>
+            )}
+          </div>
+          <h1 style={{ marginBottom: '5px', fontSize: '1.2em' }}>
+            {(subscription && subscription.toLowerCase() === 'Trial')
+              ? 'Choose Your Subscription Plan'
+              : 'Change Your Subscription Plan'}
+          </h1>
+          <div style={{
+            display: 'flex',
+            gap: '20px',
+            marginBottom: '10px',
+            justifyContent: 'space-between'
+          }}>
+            {['Starter', 'Professional'].map((plan) => (
+              <div
+                key={plan}
+                onClick={() => setSelectedTab(plan)}
+                style={{
+                  flex: 1,
+                  border: `2px solid ${selectedTab === plan ? '#2196f3' : '#e0e0e0'}`,
+                  borderRadius: '6px',
+                  padding: '15px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  backgroundColor: selectedTab === plan ? '#f8fbff' : 'white'
+                }}
+              >
+                <h3 style={{
+                  margin: '0',
+                  padding: '0',
+                  textAlign: 'center',
+                  fontSize: '1.1em',
+                  marginBottom: '10px'
+                }}>
+                  {plan}
+                </h3>
+                <h3 style={{
+                  marginTop: 0,
+                  marginBottom: '12px',
+                  fontSize: '1.2em'
+                }}>
+                  {plan === 'Starter' ? '$18/month' : '$100/month'}
+                </h3>
+                <div style={{
+                  marginBottom: '12px',
+                  padding: '10px',
+                  background: '#f8f9fa',
+                  borderRadius: '3px'
+                }}>
+                  <strong style={{ fontSize: '0.95em' }}>
+                    {plan === 'Starter' ? '3 bots included' : '5 bots included'}
+                  </strong>
+                </div>
+                <div style={{ marginBottom: '15px' }}>
+                  <div style={{
+                    color: '#666',
+                    marginBottom: '10px',
+                    paddingBottom: '10px',
+                    borderBottom: '1px solid #eee',
+                    fontSize: '0.95em'
+                  }}>
+                    Includes:
+                  </div>
+                  {['LLM Support', 'HITL (Human in the Loop) Enabled', 'Bot Analytics'].map((feature) => (
+                    <div
+                      key={feature}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        marginBottom: '6px',
+                        fontSize: '0.9em'
+                      }}
+                    >
+                      <span style={{ color: '#4caf50', marginRight: '6px' }}>✓</span>
+                      {feature}
+                    </div>
+                  ))}
+                  <div style={{
+                    color: '#666',
+                    marginBottom: '10px',
+                    paddingBottom: '10px',
+                    borderBottom: '1px solid #eee',
+                    fontSize: '0.95em'
+                  }}>
+                    Supported Channels:
+                  </div>
+                  {['Web Channel', 'Telegram', 'Slack', 'Facebook Messenger'].map((feature) => (
+                    <div
+                      key={feature}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        marginBottom: '6px',
+                        fontSize: '0.9em'
+                      }}
+                    >
+                      <span style={{ color: '#4caf50', marginRight: '6px' }}>✓</span>
+                      {feature}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+          {subscription === 'Trial' && (<br></br>)}
+          <Button
+            type="submit"
+            intent="primary"
+            fill
+            style={{
+              marginTop: '10px',
+              height: 40,
+              width: '100%',
+              fontSize: '1.1em',
+              fontWeight: 600,
+              borderRadius: 6,
+            }}
+            onClick={() => togglePaymentDialog(true)}
+          >
+            Subscribe Now
+          </Button>
+          {subscription !== 'Trial' && (
+            <Button
+              intent="danger"
+              fill
+              style={{
+                marginTop: '12px',
+                height: 40,
+                width: '100%',
+                fontSize: '1.1em',
+                fontWeight: 600,
+                borderRadius: 6,
+              }}
+              onClick={() => {
+                // Add your cancel subscription logic here
+                alert('Cancel Subscription clicked')
+              }}
+            >
+              Cancel Your Current Subscription
+            </Button>
           )}
         </div>
 
-        <h1 style={{ marginBottom: '5px', fontSize: '1.2em' }}>Choose Your Subscription Plan</h1>
+        {/* Vertical Divider */}
+        <div
+          style={{
+            width: 1.5,
+            background: '#e0e0e0',
+            margin: '0 10px',
+            height: '100%',
+            alignSelf: 'stretch',
+          }}
+        />
 
-        {/* Subscription Plans Container */}
+        {/* Right: Transaction History Section */}
         <div style={{
-          display: 'flex',
-          gap: '15px', // Reduced gap
-          marginBottom: '10px', // Smaller margin
-          justifyContent: 'space-between'
+          flex: 1.6,
+          background: '#f5f7fa',
+          borderRadius: 8,
+          padding: 20,
+          minWidth: 300,
+          overflowY: 'auto',
+          boxShadow: '0 0 8px #e0e0e0'
         }}>
-          {['Starter', 'Professional'].map((plan) => (
-            <div
-              key={plan}
-              onClick={() => setSelectedTab(plan)}
-              style={{
-                flex: 1,
-                border: `2px solid ${selectedTab === plan ? '#2196f3' : '#e0e0e0'}`,
-                borderRadius: '6px', // Slightly smaller radius
-                padding: '15px', // Reduced padding
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                backgroundColor: selectedTab === plan ? '#f8fbff' : 'white'
-              }}
-            >
-              <h3 style={{
-                margin: '0',
-                padding: '0',
-                textAlign: 'center', // Center-align the header
-                fontSize: '1.1em', // Larger font size for the header
-                marginBottom: '10px'
-              }}>
-                {plan}
-              </h3>
-
-              <h3 style={{
-                marginTop: 0,
-                marginBottom: '12px', // Tighter spacing
-                fontSize: '1.2em' // Slightly smaller font
-              }}>
-                {plan === 'Starter' ? '$18/month' : '$100/month'}
-              </h3>
-
-              <div style={{
-                marginBottom: '12px',
-                padding: '10px', // Smaller padding
-                background: '#f8f9fa',
-                borderRadius: '3px'
-              }}>
-                <strong style={{ fontSize: '0.95em' }}>
-                  {plan === 'Starter' ? '3 bots included' : '5 bots included'}
-                </strong>
-              </div>
-
-              <div style={{ marginBottom: '15px' }}>
-                <div style={{
-                  color: '#666',
-                  marginBottom: '10px',
-                  paddingBottom: '10px',
-                  borderBottom: '1px solid #eee',
-                  fontSize: '0.95em'
-                }}>
-                  Includes:
-                </div>
-
-                {/* Features list */}
-                {['LLM Support', 'HITL (Human in the Loop) Enabled', 'Bot Analytics'].map((feature) => (
-                  <div
-                    key={feature}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      marginBottom: '6px',
-                      fontSize: '0.9em'
-                    }}
-                  >
-                    <span style={{ color: '#4caf50', marginRight: '6px' }}>✓</span>
-                    {feature}
-                  </div>
-                ))}
-
-                <div style={{
-                  color: '#666',
-                  marginBottom: '10px',
-                  paddingBottom: '10px',
-                  borderBottom: '1px solid #eee',
-                  fontSize: '0.95em'
-                }}>
-                  Supported Channels:
-                </div>
-
-                {/* Features list */}
-                {['Web Channel', 'Telegram', 'Slack', 'Facebook Messenger'].map((feature) => (
-                  <div
-                    key={feature}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      marginBottom: '6px',
-                      fontSize: '0.9em'
-                    }}
-                  >
-                    <span style={{ color: '#4caf50', marginRight: '6px' }}>✓</span>
-                    {feature}
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
+          <h2 style={{ marginTop: 0, marginBottom: 16, fontSize: '1.2em' }}>Transaction History</h2>
+          {/* Placeholder for transaction history */}
+          <div style={{ color: '#888', fontSize: '1em', textAlign: 'center' }}>
+            No transactions yet.
+          </div>
         </div>
-        <Button
-          type="submit"
-          intent="primary"
-          // disabled={!stripe || isProcessing}
-          // loading={isProcessing}
-          fill
-          style={{ marginTop: '10px' }}
-          onClick={() => togglePaymentDialog(true)}
-        >
-          Subscribe Now
-        </Button>
       </div>
-    </Dialog>
+    </Dialog >
 
       <Dialog
         isOpen={isPaymentDialogOpen}

@@ -84,10 +84,10 @@ class Bots extends Component<Props> {
     // Check subscription expiry from localStorage
     let expiry
     const daysRemaining = this.subData.daysRemaining || 0
-    const subscription = this.subData.subscription || 'trial'
+    const subscription = this.subData.subscription || 'Trial'
     const promptRun = this.subData.promptRun || false
 
-    if (subscription === 'trial') {
+    if (subscription === 'Trial') {
       expiry = this.subData.expired || false
     } else {
       expiry = this.subData.expired && daysRemaining <= -4
@@ -97,7 +97,7 @@ class Bots extends Component<Props> {
 
     if (!promptRun) {
       let msg
-      if ((daysRemaining === 15 && subscription === 'trial') || (daysRemaining < 0 && subscription === 'trial')) {
+      if ((daysRemaining === 15 && subscription === 'Trial') || (daysRemaining < 0 && subscription === 'Trial')) {
         return
       }
 
@@ -521,8 +521,8 @@ class Bots extends Component<Props> {
                   backgroundColor: 'white',
                 }}
               >
-                <h3>Your {(this.subData.subscription === 'trial') ?
-                  'Trial' : this.subData.subscription} subscription {(this.subData.subscription !== 'trial') ? 'and a 3 day complimentary trail' : ''} has been Expired</h3>
+                <h3>Your {(this.subData.subscription === 'Trial') ?
+                  'Trial' : this.subData.subscription} subscription {(this.subData.subscription !== 'Trial') ? 'and a 3 day complimentary trail' : ''} has been Expired</h3>
                 <p style={{ margin: '20px 0' }}>
                   To continue using the platform, please purchase a subscription.
                 </p>

@@ -44,11 +44,11 @@ const UserDropdownMenu: FC<Props> = props => {
     !props.profile && props.fetchProfile()
     let expiry
     const subData = JSON.parse(localStorage.getItem('subData') || '{}')
-    const subscription = subData?.subscription || 'trial'
+    const subscription = subData?.subscription || 'Trial'
     const daysRemaining = subData.daysRemaining || 0
     const expired = subData.expired || 0
 
-    if (subscription === 'trial') {
+    if (subscription === 'Trial') {
       expiry = expired || false
     } else {
       expiry = expired && daysRemaining <= -4
@@ -91,7 +91,7 @@ const UserDropdownMenu: FC<Props> = props => {
         <Menu>
           <MenuDivider title={lang.tr('admin.signedInAs', { name: savedFormData.email })} />
 
-          <MenuItem id="btn-subscription" icon="user" text={'Subscription'} onClick={toggleSubscription} />
+          <MenuItem id="btn-subscription" icon="dollar" text={'Subscription'} onClick={toggleSubscription} />
 
           {/* <MenuItem id="btn-gemini" icon="user" text={'Gemini Speech'} onClick={toggleGemini} /> */}
 
