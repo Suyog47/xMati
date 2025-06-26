@@ -24,6 +24,7 @@ import Subscription from './Subscription'
 import VoiceRecorder from './VoicetoText'
 import UserProfile from './UpdateUserProfile'
 import AdminControl from './AdminControl'
+import UpdateCardDetails from './UpdateCardDetails'
 
 
 type Props = ConnectedProps<typeof connector>
@@ -33,6 +34,7 @@ const UserDropdownMenu: FC<Props> = props => {
   const [isGemini, setGemini] = useState(false)
   const [isAdminControl, setAdminControl] = useState(false)
   const [isProfileOpen, setProfileOpen] = useState(false)
+  const [isCardOpen, setCardOpen] = useState(false)
   const [isPasswordOpen, setPasswordOpen] = useState(false)
   const [isLanguageOpen, setLanguageOpen] = useState(false)
   const [isExpired, setExpiry] = useState(false)
@@ -65,6 +67,7 @@ const UserDropdownMenu: FC<Props> = props => {
   }
 
   const toggleProfile = () => setProfileOpen(!isProfileOpen)
+  const toggleCard = () => setCardOpen(!isCardOpen)
   const toggleSubscription = () => setSubscriptionOpen(!isSubscriptionOpen)
   const toggleGemini = () => setGemini(!isGemini)
   const toggleAdminControl = () => setAdminControl(!isAdminControl)
@@ -96,6 +99,8 @@ const UserDropdownMenu: FC<Props> = props => {
 
           {!isExpired && (<MenuItem id="btn-profile" icon="user" text={lang.tr('admin.updateProfile')} onClick={toggleProfile} />)}
 
+          {!isExpired && (<MenuItem id="btn-card" icon="credit-card" text={'Update Payment Card'} onClick={toggleCard} />)}
+
           {canChangePassword && !isExpired && (
             <MenuItem id="btn-changepass" icon="key" text={lang.tr('admin.changePassword')} onClick={togglePassword} />
           )}
@@ -119,6 +124,11 @@ const UserDropdownMenu: FC<Props> = props => {
         toggle={toggleProfile}
         profile={props.profile}
         fetchProfile={props.fetchProfile}
+      />
+
+      <UpdateCardDetails
+        isOpen={isCardOpen}
+        toggle={toggleCard}
       />
 
       <Subscription

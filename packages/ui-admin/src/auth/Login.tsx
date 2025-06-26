@@ -216,7 +216,7 @@ const Login: FC<Props> = props => {
       organisationName: formData.organisationName,
       industryType: formData.industryType,
       subIndustryType: formData.subIndustryType,
-      card: formData.cardNumber,
+      card: formData.card,
       cardCVC: formData.cardCVC,
       cardExpiry: formData.cardExpiry,
     }
