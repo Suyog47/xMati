@@ -37,6 +37,9 @@ const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
     try {
       await api.getSecured({ timeout: ms('8m') }).post('/admin/workspace/bots/getAllBots')
       alert('Retrieval from S3 completed successfully!')
+      setTimeout(() => {
+        window.location.reload()    // reloading for the bot creation limit check
+      }, 500)
     } catch (error) {
       console.error('Error during retrieval:', error)
       alert('Failed to retrieve from S3.')

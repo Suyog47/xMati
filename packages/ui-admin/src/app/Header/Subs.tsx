@@ -110,20 +110,22 @@ export const Subs = () => {
           <hr style={dialogStyles.divider} />
           <div style={dialogStyles.contentRow}>
             <span style={dialogStyles.label}>Amount Paid:</span>
-            <span style={dialogStyles.value}>{amount}</span>
+            <span style={dialogStyles.value}>{amount === 0 || amount === '0' ? '-' : amount}</span>
           </div>
           <hr style={dialogStyles.divider} />
           <div style={dialogStyles.contentRow}>
             <span style={dialogStyles.label}>Duration:</span>
-            <span style={dialogStyles.value}>{duration}</span>
+            <span style={dialogStyles.value}>
+              {duration === '15d' ? '15 Days' : duration}
+            </span>
           </div>
           <br />
           <div style={dialogStyles.centerText}>
             {days === 0
-              ? 'Your plan has expired.'
+              ? 'You plan will be expired today.'
               : days !== '-' && days > 0
                 ? `Your plan expires in ${days} day${days > 1 ? 's' : ''}`
-                : 'No active subscription'}
+                : 'Your plan has been expired.'}
           </div>
         </div>
 

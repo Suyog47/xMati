@@ -181,7 +181,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
         const { fullName, email } = savedFormData
 
-        const result = await fetch('https://www.app.xmati.ai/apis/save-subscription', {
+        const result = await fetch('http://localhost:8000/save-subscription', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ key: email, name: fullName, subscription: selectedTab, duration: selectedDuration, amount: `$${amount / 100}` }),
@@ -199,98 +199,142 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     }
 
     return (
-      <div style={{ padding: 10 }}>
-        {/* Dedicated Card Section */}
-        <form onSubmit={handleSubmit}>
-
-          <FormGroup label="Credit/Debit Card Details">
-            <CardElement
-              options={{
-                style: {
-                  base: { fontSize: '16px', color: '#424770' },
-                  invalid: { color: '#9e2146' },
-                },
-                hidePostalCode: true,
+      <>
+        {/* Fullscreen loader while payment is processing */}
+        {isProcessing && (
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100vw',
+              height: '100vh',
+              background: 'rgba(255,255,255,0.85)',
+              zIndex: 99999,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            {/* Simple CSS spinner */}
+            <div
+              style={{
+                border: '8px solid #f3f3f3',
+                borderTop: '8px solid #106ba3',
+                borderRadius: '50%',
+                width: 60,
+                height: 60,
+                animation: 'spin 1s linear infinite',
+                marginBottom: 24,
               }}
             />
-          </FormGroup>
-
-          {error && <div style={{ color: 'red', margin: '15px 0' }}>{error}</div>}
-
-          {/* Divider */}
-          <div style={{
-            borderTop: '1px solid #e0e0e0',
-            margin: '20px 0',
-          }}></div>
-
-          {/* Radio Buttons for Half-yearly and Yearly Options */}
-          <div style={{ marginTop: '20px', textAlign: 'center' }}>
-            <h4>Select Subscription Duration</h4>
-            <p style={{ fontSize: '0.85em', color: '#666' }}>
-              If you purchase a Half-Yearly plan, you will get a <strong>3% discount</strong>, and with a Yearly plan, you will get a <strong>5% discount</strong> and no discount for Monthly plan.
-            </p>
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '30px' }}>
-              <label>
-                <input
-                  type="radio"
-                  name="subscriptionDuration"
-                  value="monthly"
-                  checked={selectedDuration === 'monthly'}
-                  disabled={isProcessing} // Disable radio buttons when processing
-                  onChange={() =>
-                    setSelectedDuration(selectedDuration === 'monthly' ? '' : 'monthly')
-                  }
-                />
-                Monthly
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="subscriptionDuration"
-                  value="half-yearly"
-                  checked={selectedDuration === 'half-yearly'}
-                  disabled={isProcessing} // Disable radio buttons when processing
-                  onChange={() =>
-                    setSelectedDuration(selectedDuration === 'half-yearly' ? '' : 'half-yearly')
-                  }
-                />
-                Half-yearly
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="subscriptionDuration"
-                  value="yearly"
-                  checked={selectedDuration === 'yearly'}
-                  disabled={isProcessing} // Disable radio buttons when processing
-                  onChange={() =>
-                    setSelectedDuration(selectedDuration === 'yearly' ? '' : 'yearly')
-                  }
-                />
-                Yearly
-              </label>
+            <style>
+              {`
+                @keyframes spin {
+                  0% { transform: rotate(0deg); }
+                  100% { transform: rotate(360deg); }
+                }
+              `}
+            </style>
+            <div style={{ fontSize: 20, color: '#106ba3', fontWeight: 600 }}>
+              Your payment is being processed...
             </div>
           </div>
+        )}
+        <div style={{ padding: 10 }}>
+          {/* Dedicated Card Section */}
+          <form onSubmit={handleSubmit}>
 
-          <Button
-            type="submit"
-            intent="primary"
-            disabled={!stripe || isProcessing}
-            loading={isProcessing}
-            fill
-            style={{ marginTop: '20px' }}
-          >
-            {isProcessing ? 'Processing...' : `Pay $${amount / 100}`}
-          </Button>
-          <p style={{ fontSize: '0.85em', color: '#666', textAlign: 'center' }}>You will be logged-out once the subscription plan has been purchased</p>
-        </form>
-        {/* Apple/Google Pay Section
-        {paymentRequest && (
-          <div style={{ marginTop: 30 }}>
-            <PaymentRequestButtonElement options={{ paymentRequest }} />
-          </div>
-        )} */}
-      </div>
+            <FormGroup label="Credit/Debit Card Details">
+              <CardElement
+                options={{
+                  style: {
+                    base: { fontSize: '16px', color: '#424770' },
+                    invalid: { color: '#9e2146' },
+                  },
+                  hidePostalCode: true,
+                }}
+              />
+            </FormGroup>
+
+            {error && <div style={{ color: 'red', margin: '15px 0' }}>{error}</div>}
+
+            {/* Divider */}
+            <div style={{
+              borderTop: '1px solid #e0e0e0',
+              margin: '20px 0',
+            }}></div>
+
+            {/* Radio Buttons for Half-yearly and Yearly Options */}
+            <div style={{ marginTop: '20px', textAlign: 'center' }}>
+              <h4>Select Subscription Duration</h4>
+              <p style={{ fontSize: '0.85em', color: '#666' }}>
+                If you purchase a Half-Yearly plan, you will get a <strong>3% discount</strong>, and with a Yearly plan, you will get a <strong>5% discount</strong> and no discount for Monthly plan.
+              </p>
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '30px' }}>
+                <label>
+                  <input
+                    type="radio"
+                    name="subscriptionDuration"
+                    value="monthly"
+                    checked={selectedDuration === 'monthly'}
+                    disabled={isProcessing} // Disable radio buttons when processing
+                    onChange={() =>
+                      setSelectedDuration(selectedDuration === 'monthly' ? '' : 'monthly')
+                    }
+                  />
+                  Monthly
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    name="subscriptionDuration"
+                    value="half-yearly"
+                    checked={selectedDuration === 'half-yearly'}
+                    disabled={isProcessing} // Disable radio buttons when processing
+                    onChange={() =>
+                      setSelectedDuration(selectedDuration === 'half-yearly' ? '' : 'half-yearly')
+                    }
+                  />
+                  Half-yearly
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    name="subscriptionDuration"
+                    value="yearly"
+                    checked={selectedDuration === 'yearly'}
+                    disabled={isProcessing} // Disable radio buttons when processing
+                    onChange={() =>
+                      setSelectedDuration(selectedDuration === 'yearly' ? '' : 'yearly')
+                    }
+                  />
+                  Yearly
+                </label>
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              intent="primary"
+              disabled={!stripe || isProcessing}
+              loading={isProcessing}
+              fill
+              style={{ marginTop: '20px' }}
+            >
+              {isProcessing ? 'Processing...' : `Pay $${amount / 100}`}
+            </Button>
+            <p style={{ fontSize: '0.85em', color: '#666', textAlign: 'center' }}>You will be logged-out once the subscription plan has been purchased</p>
+          </form>
+          {/* Apple/Google Pay Section
+          {paymentRequest && (
+            <div style={{ marginTop: 30 }}>
+              <PaymentRequestButtonElement options={{ paymentRequest }} />
+            </div>
+          )} */}
+        </div>
+      </>
     )
   }, [clientSecret, amount, toggle]) // Add required dependencies
 
@@ -557,11 +601,12 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         <div style={{ padding: '20px', textAlign: 'center' }}>
           <h2 style={{ color: '#4caf50', marginBottom: '10px' }}>Thank You!</h2>
           <p style={{ fontSize: '1.1em', color: '#666' }}>
-            Your payment was successful. Your subscription has been activated.
+            Your payment was successful...
           </p>
-          <p style={{ fontSize: '1.0em', color: 'grey' }}>
-            You will now be logged out and will need to log in again..
-          </p>
+          <div style={{ marginTop: 24, color: '#106ba3', fontWeight: 500, fontSize: 16 }}>
+            You now need to log out and will need to log in again.<br />
+            After re-login, your new subscription plan will be activated and available for use.
+          </div>
           <Button
             intent="primary"
             onClick={async () => {
