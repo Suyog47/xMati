@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
+import logo from './xmati.png' // Make sure this path is correct
 
 const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true)
@@ -9,12 +10,9 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     const checkMaintenanceStatus = async () => {
       try {
-        // Call the get-maintenance API
         const response = await fetch('http://localhost:8000/get-maintenance', {
           method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
         })
         const data = await response.json()
         setIsMaintenance(data.data) // Set the maintenance status
@@ -22,46 +20,78 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
       } catch (error) {
         console.error('Error fetching maintenance status:', error)
       } finally {
-        setIsLoading(false) // Stop loading
+        setIsLoading(false)
       }
     }
 
     void checkMaintenanceStatus()
   }, [])
 
-  // Exclude the '/login/admin123/:strategy?/:workspace?' route from maintenance
-  const excludedRouteRegex = /admin123/ // Regex to match the route
+  const excludedRouteRegex = /admin123/
   const isExcludedRoute = excludedRouteRegex.test(location.pathname)
 
-  // Check if formData.email is 'admin@123'
   const formData = JSON.parse(localStorage.getItem('formData') || '{}')
   const isAdminUser = formData.email === 'admin@gmail.com'
 
   if (isLoading) {
-    return <div>Loading xMati...</div> // Show a loading indicator while the API call is in progress
-  }
-
-  if (isMaintenance && !isExcludedRoute && !isAdminUser) {
-    // Render the maintenance mode screen
     return (
       <div
         style={{
-          backgroundColor: 'white',
-          color: 'black',
           height: '100vh',
           display: 'flex',
-          alignItems: 'center',
           justifyContent: 'center',
-          fontSize: '24px',
-          fontWeight: 'bold',
+          alignItems: 'center',
+          fontSize: 20,
+          color: '#444',
+          fontWeight: 500,
         }}
       >
-        The xMati is in Maintenance mode
+        Loading xMati...
       </div>
     )
   }
 
-  // Render the rest of the app if not in maintenance mode
+  if (isMaintenance && !isExcludedRoute) {
+    return (
+      <div
+        style={{
+          height: '100vh',
+          width: '100vw',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          background: 'linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%)', // subtle background gradient
+          textAlign: 'center',
+          padding: 24,
+          boxSizing: 'border-box',
+        }}
+      >
+        <img
+          src={logo}
+          alt='xMati Logo'
+          style={{ width: 120, height: 'auto', marginBottom: 24, userSelect: 'none' }}
+          draggable={false}
+        />
+        <div
+          style={{
+            fontSize: 23,
+            fontWeight: 600,
+            color: '#102a43',
+            width: '80%',
+            maxWidth: 500, // keeps it from stretching too far on large screens
+            lineHeight: 1.6,         // Line spacing
+            wordSpacing: '2px',      // Word spacing
+          }}
+        >
+          The xMati platform is currently in Maintenance mode.
+          <br />
+          Please check back later.
+        </div>
+      </div>
+    )
+  }
+
   return <>{children}</>
 }
 
