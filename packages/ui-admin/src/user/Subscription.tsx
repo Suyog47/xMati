@@ -24,6 +24,7 @@ interface Props {
 const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   const savedSubData = JSON.parse(localStorage.getItem('subData') || '{}')
   const [clientSecret, setClientSecret] = useState<string>('')
+  const [transactions, setTransactions] = useState<any[]>([])
   const [selectedTab, setSelectedTab] = useState<string>('Starter')
   const [isLoadingSecret, setIsLoadingSecret] = useState(false)
   const [paymentError, setPaymentError] = useState<string>('')
@@ -32,6 +33,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false)
   const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false)
   const [selectedDuration, setSelectedDuration] = useState<string>('monthly')
+  const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
 
   const amount = useMemo(() => {
     if (selectedDuration === 'half-yearly') {
@@ -47,20 +49,21 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     setPaymentError('')
 
     try {
-      const result = await fetch('https://www.app.xmati.ai/apis/create-payment-intent', {
+      const result = await fetch('http://localhost:8000/create-payment-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount, currency: 'usd' }),
+        body: JSON.stringify({ amount, currency: 'usd', email: savedFormData.email }),
       })
 
       if (!result.ok) {
         throw new Error('Payment setup failed')
       }
       const data = await result.json()
+
       if (!data.client_secret) {
         throw new Error('Invalid server response')
       }
-      setClientSecret(data.client_secret)
+      setClientSecret(data.client_secret.client_secret)
     } catch (err: any) {
       setPaymentError(err.message)
       setClientSecret('')
@@ -69,9 +72,27 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     }
   }, [amount])
 
+  const fetchTransactions = async () => {
+    try {
+      const formData = JSON.parse(localStorage.getItem('formData') || '{}')
+      const res = await fetch('http://localhost:8000/get-stripe-transactions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.email })
+      })
+      const data = await res.json()
+      if (data.charges) {
+        setTransactions(data.charges)
+      }
+    } catch (error) {
+      console.error('Failed to fetch transactions:', error)
+    }
+  }
+
   useEffect(() => {
     if (isOpen) {
       void getClientSecret()
+      void fetchTransactions()
     }
 
     setSubscription(savedSubData.subscription || '')
@@ -160,7 +181,6 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
 
     const paymentFailedEmail = async () => {
       try {
-        const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
         const { fullName, email } = savedFormData
 
         const result = await fetch('https://www.app.xmati.ai/apis/failed-payment', {
@@ -528,7 +548,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                 alert('Cancel Subscription clicked')
               }}
             >
-              Cancel Your Current Subscription
+              Cancel Your Subscription
             </Button>
           )}
         </div>
@@ -555,11 +575,61 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
           boxShadow: '0 0 8px #e0e0e0'
         }}>
           <h2 style={{ marginTop: 0, marginBottom: 16, fontSize: '1.2em' }}>Transaction History</h2>
-          {/* Placeholder for transaction history */}
-          <div style={{ color: '#888', fontSize: '1em', textAlign: 'center' }}>
-            No transactions yet.
+
+          <div style={{ color: '#888', fontSize: '1em' }}>
+            {transactions.length === 0 ? (
+              <div style={{ textAlign: 'center' }}>No transactions yet.</div>
+            ) : (
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                {transactions.map((txn, idx) => (
+                  <li
+                    key={idx}
+                    style={{
+                      background: 'white',
+                      marginBottom: '12px',
+                      padding: '16px',
+                      borderRadius: '6px',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'flex-start',
+                      borderLeft: '4px solid #106ba3',
+                    }}
+                  >
+                    {/* Left: Transaction Details */}
+                    <div>
+                      <div style={{ fontWeight: 600, fontSize: '1em', color: '#102a43', marginBottom: 4 }}>
+                        Transaction ID: <span style={{ fontFamily: 'monospace', color: '#5c7080' }}>{txn.id}</span>
+                      </div>
+                      <div style={{ fontSize: '0.9em', color: '#5c7080', marginBottom: 4 }}>
+                        {new Date(txn.created * 1000).toLocaleString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          hour12: true,
+                        })}
+                      </div>
+                      <div style={{
+                        fontSize: '0.85em',
+                        color: txn.status === 'succeeded' ? 'green' : 'red'
+                      }}>
+                        Status: {txn.status}
+                      </div>
+                    </div>
+
+                    {/* Right: Amount */}
+                    <div style={{ fontSize: 22, fontWeight: 700, color: '#28a745', textAlign: 'right' }}>
+                      ${txn.amount / 100}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
+
       </div>
     </Dialog >
 

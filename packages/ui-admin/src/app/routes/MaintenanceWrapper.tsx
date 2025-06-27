@@ -51,7 +51,7 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
     )
   }
 
-  if (isMaintenance && !isExcludedRoute) {
+  if (isMaintenance && !isExcludedRoute && !isAdminUser) {
     return (
       <div
         style={{
