@@ -492,7 +492,9 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
               </div>
             ))}
           </div>
-          {subscription === 'Trial' && (<br></br>)}
+
+          {(subscription === 'Trial' || savedSubData.expired === true) && (<br />)}
+
           <Button
             type="submit"
             intent="primary"
@@ -509,7 +511,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
           >
             Subscribe Now
           </Button>
-          {subscription !== 'Trial' && (
+          {subscription !== 'Trial' && savedSubData.expired !== true && (
             <Button
               intent="danger"
               fill

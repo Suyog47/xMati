@@ -127,12 +127,18 @@
 
 .menu-container {
   display: flex;
+  flex-wrap: nowrap;               /* Prevents wrapping */
   align-items: center;
-  justify-content: space-between;
-  background-color: #292929; /* Dark background */
-  padding: 3px 16px;
-  border-radius: 16px; /* Rounded corners */
-  gap: 16px; /* Space between items */
-  width: fit-content; /* Only as wide as content */
+  justify-content: center;         /* Center all items horizontally */
+  gap: 12px;                       /* Consistent space between items */
+  background-color: #292929;
+  padding: 5px 8px;
+  border-radius: 16px;
+  width: fit-content;
+  max-width: 100%;
   margin: auto;
+  overflow-x: auto;                /* Allows scroll if content overflows */
+  box-sizing: border-box;
 }
+
+

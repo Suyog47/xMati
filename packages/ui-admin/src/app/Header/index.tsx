@@ -38,9 +38,8 @@ const Header: FC<Props> = props => {
         <Navbar.Group align={Alignment.RIGHT}>
           {/* <WorkspaceSelect /> */}
           <div className={cx(style['menu-container'])}>
-            <div>
-              <Subs />
-            </div>
+            <Subs />
+            <HelpMenu />
 
             {/* <div>
               <AccessControl resource='admin.logs' operation='read'>
@@ -52,9 +51,7 @@ const Header: FC<Props> = props => {
               </AccessControl>
             </div> */}
 
-            <div>
-              <UserDropdownMenu />
-            </div>
+            <UserDropdownMenu />
           </div>
         </Navbar.Group>
       </Navbar>
