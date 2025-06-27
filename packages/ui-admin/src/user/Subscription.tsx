@@ -11,10 +11,10 @@ import { Dialog, Button, FormGroup, Icon, Spinner } from '@blueprintjs/core'
 import BasicAuthentication from '~/auth/basicAuth'
 
 // For development use
-const stripePromise = loadStripe('pk_test_51RLimpPBSMPLjWxm3IUaX63iUb4TqhU5prbUsg7A5RwG2sZsukOa7doAAhPu2RpEkYXZ2dRLNrOA4Pby9IscZOse00unCEcNDG')
+// const stripePromise = loadStripe('pk_test_51RLimpPBSMPLjWxm3IUaX63iUb4TqhU5prbUsg7A5RwG2sZsukOa7doAAhPu2RpEkYXZ2dRLNrOA4Pby9IscZOse00unCEcNDG')
 
 //For production use
-//const stripePromise = loadStripe('pk_live_51RPPI0EncrURrNgDF2LNkLrh5Wf53SIe3WjqPqjtzqbJWDGfDFeG4VvzUXuC4nCmrPTNOTeFENuAqRBw1mvbNJg600URDxPnuc')
+const stripePromise = loadStripe('pk_live_51RPPI0EncrURrNgDF2LNkLrh5Wf53SIe3WjqPqjtzqbJWDGfDFeG4VvzUXuC4nCmrPTNOTeFENuAqRBw1mvbNJg600URDxPnuc')
 
 interface Props {
   isOpen: boolean
@@ -53,7 +53,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     setPaymentError('')
 
     try {
-      const result = await fetch('http://localhost:8000/create-payment-intent', {
+      const result = await fetch('https://www.app.xmati.ai/apis/create-payment-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount, currency: 'usd', email: savedFormData.email }),
@@ -81,7 +81,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     setIsLoadingTransactions(true)
     try {
       const formData = JSON.parse(localStorage.getItem('formData') || '{}')
-      const res = await fetch('http://localhost:8000/get-stripe-transactions', {
+      const res = await fetch('https://www.app.xmati.ai/apis/get-stripe-transactions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: formData.email })
@@ -210,7 +210,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
         const { fullName, email } = savedFormData
 
-        const result = await fetch('http://localhost:8000/save-subscription', {
+        const result = await fetch('https://www.app.xmati.ai/apis/save-subscription', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ key: email, name: fullName, subscription: selectedTab, duration: selectedDuration, amount: `$${amount / 100}` }),
