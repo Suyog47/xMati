@@ -258,7 +258,7 @@ export const Subs = () => {
                   fontWeight: 600,
                   borderRadius: 8,
                 }}
-                onClick={() => alert('Cancel Subscription clicked')}
+                onClick={() => alert('Work in progress')}
               >
                 Cancel Your Subscription
               </Button>

@@ -421,7 +421,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
             )}
           </div>
           <h1 style={{ marginBottom: '5px', fontSize: '1.2em' }}>
-            {(subscription && subscription.toLowerCase() === 'Trial')
+            {(subscription === 'Trial')
               ? 'Choose Your Subscription Plan'
               : 'Change Your Subscription Plan'}
           </h1>
@@ -555,7 +555,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
               }}
               onClick={() => {
                 // Add your cancel subscription logic here
-                alert('Cancel Subscription clicked')
+                alert('Work in progress')
               }}
             >
               Cancel Your Subscription
@@ -592,7 +592,8 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
             marginBottom: 16,
           }}>
             <h2 style={{ margin: 0, fontSize: '1.2em' }}>Transaction History</h2>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+              {/* Reload icon button */}
               <Icon
                 icon="refresh"
                 iconSize={18}
@@ -608,6 +609,27 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                 }}
                 title="Reload"
               />
+
+              {/* Download PDF button */}
+              <button
+                onClick={() => {
+                  if (!isLoadingTransactions) {
+                    alert('Work in progress')
+                  }
+                }}
+                style={{
+                  backgroundColor: '#106ba3',
+                  color: 'white',
+                  border: 'none',
+                  padding: '6px 12px',
+                  borderRadius: '4px',
+                  fontSize: '0.9em',
+                  cursor: isLoadingTransactions ? 'not-allowed' : 'pointer',
+                  opacity: isLoadingTransactions ? 0.4 : 1,
+                }}
+              >
+                Download PDF
+              </button>
             </div>
           </div>
 
