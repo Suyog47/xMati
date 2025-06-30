@@ -574,25 +574,30 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         />
 
         {/* Right: Transaction History Section */}
-        <div style={{
-          flex: 1.6,
-          background: '#f5f7fa',
-          borderRadius: 8,
-          padding: 20,
-          minWidth: 300,
-          overflowY: 'auto',
-          boxShadow: '0 0 8px #e0e0e0'
-        }}>
-          {/* Header with title + reload button */}
-          <div style={{
+        <div
+          style={{
+            flex: 1.6,
+            background: '#f5f7fa',
+            borderRadius: 8,
+            padding: 20,
+            minWidth: 300,
+            height: 570, // Fixed height
             display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: 16,
-          }}>
+            flexDirection: 'column',
+            boxShadow: '0 0 8px #e0e0e0',
+          }}
+        >
+          {/* Header with title + reload button */}
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: 16,
+            }}
+          >
             <h2 style={{ margin: 0, fontSize: '1.2em' }}>Transaction History</h2>
             <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-              {/* Reload icon button */}
               <Icon
                 icon="refresh"
                 iconSize={18}
@@ -609,7 +614,6 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                 title="Reload"
               />
 
-              {/* Download PDF button */}
               <button
                 onClick={() => {
                   if (!isLoadingTransactions) {
@@ -632,74 +636,79 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
             </div>
           </div>
 
-          {/* Loader */}
-          {isLoadingTransactions ? (
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: '200px',  // adjust height as needed for spacing
-                width: '100%',
-              }}
-            >
-              <Spinner size={38} />
-            </div>
-          ) : (
-            <div style={{ color: '#888', fontSize: '1em' }}>
-              {transactions.length === 0 ? (
-                <div style={{ textAlign: 'center' }}>No transactions yet.</div>
-              ) : (
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                  {transactions.map((txn, idx) => (
-                    <li
-                      key={idx}
-                      style={{
-                        background: 'white',
-                        marginBottom: '12px',
-                        padding: '16px',
-                        borderRadius: '6px',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'flex-start',
-                        borderLeft: '4px solid #106ba3',
-                      }}
-                    >
-                      {/* Left: Transaction Details */}
-                      <div>
-                        <div style={{ fontWeight: 600, fontSize: '1em', color: '#102a43', marginBottom: 4 }}>
-                          Transaction ID: <span style={{ fontFamily: 'monospace', color: '#5c7080' }}>{txn.id}</span>
+          {/* Scrollable Content */}
+          <div style={{ flex: 1, overflowY: 'auto' }}>
+            {isLoadingTransactions ? (
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: '100%',
+                  width: '100%',
+                }}
+              >
+                <Spinner size={38} />
+              </div>
+            ) : (
+              <div style={{ color: '#888', fontSize: '1em' }}>
+                {transactions.length === 0 ? (
+                  <div style={{ textAlign: 'center' }}>No transactions yet.</div>
+                ) : (
+                  <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                    {transactions.map((txn, idx) => (
+                      <li
+                        key={idx}
+                        style={{
+                          background: 'white',
+                          marginBottom: '12px',
+                          padding: '16px',
+                          borderRadius: '6px',
+                          boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'flex-start',
+                          borderLeft: '4px solid #106ba3',
+                        }}
+                      >
+                        <div>
+                          <div style={{ fontWeight: 600, fontSize: '1em', color: '#102a43', marginBottom: 4 }}>
+                            Transaction ID:{' '}
+                            <span style={{ fontFamily: 'monospace', color: '#5c7080' }}>{txn.id}</span>
+                          </div>
+                          <div style={{ fontSize: '0.9em', color: '#5c7080', marginBottom: 4 }}>
+                            {new Date(txn.created * 1000).toLocaleString('en-US', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                              hour12: true,
+                            })}
+                          </div>
+                          <div
+                            style={{
+                              fontSize: '0.85em',
+                              color: txn.status === 'succeeded' ? 'green' : 'red',
+                            }}
+                          >
+                            Status: {txn.status}
+                          </div>
                         </div>
-                        <div style={{ fontSize: '0.9em', color: '#5c7080', marginBottom: 4 }}>
-                          {new Date(txn.created * 1000).toLocaleString('en-US', {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            hour12: true,
-                          })}
-                        </div>
-                        <div style={{
-                          fontSize: '0.85em',
-                          color: txn.status === 'succeeded' ? 'green' : 'red'
-                        }}>
-                          Status: {txn.status}
-                        </div>
-                      </div>
 
-                      {/* Right: Amount */}
-                      <div style={{ fontSize: 22, fontWeight: 700, color: '#28a745', textAlign: 'right' }}>
-                        ${txn.amount / 100}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          )}
+                        <div style={{ fontSize: 22, fontWeight: 700, color: '#28a745', textAlign: 'right' }}>
+                          ${txn.amount / 100}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
+          </div>
         </div>
+
+
 
       </div>
     </Dialog >
