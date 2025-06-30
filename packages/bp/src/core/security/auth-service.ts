@@ -390,6 +390,7 @@ export class AuthService {
     if (!callback) {
       return res.sendStatus(200)
     }
+
     return callback(strategy, req, res)
   }
 }

@@ -105,6 +105,8 @@ export default class BasicAuthentication {
 
   logout = async () => {
     auth.logout(() => api.getSecured())
+    localStorage.setItem('formData', JSON.stringify({}))
+    localStorage.setItem('subData', JSON.stringify({}))
   }
 
   isAuthenticated() {

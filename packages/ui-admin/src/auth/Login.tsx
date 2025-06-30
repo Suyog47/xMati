@@ -12,9 +12,6 @@ import BasicAuthentication, { setActiveWorkspace, setChatUserAuth } from '~/auth
 import { AuthMethodPicker } from './AuthMethodPicker'
 import LoginContainer from './LoginContainer'
 import { LoginForm } from './LoginForm'
-import ms from 'ms'
-import { Spinner, SpinnerSize } from '@blueprintjs/core/lib/esm/components/spinner/spinner'
-import { duration } from 'moment'
 
 type RouterProps = RouteComponentProps<
   { strategy: string; workspace: string },
@@ -230,8 +227,6 @@ const Login: FC<Props> = props => {
     const tillDate = new Date(tillDateUTC)
     const timeDifference = tillDate.getTime() - currentDate.getTime()
     const daysRemaining = Math.ceil(timeDifference / (1000 * 60 * 60 * 24))
-
-    console.log('day remaining:', daysRemaining)
 
     const updatedSubData = {
       subscription: subData.subscription,

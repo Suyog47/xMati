@@ -451,7 +451,9 @@ const CustomerWizard: React.FC = () => {
       till: tillDate,
       expired: false,
       daysRemaining: 15,
-      promptRun: false  // set the prompt run to false
+      promptRun: false,  // set the prompt run to false
+      amount: 0,
+      duration: '15d',
     }
 
     localStorage.setItem('formData', JSON.stringify(updatedFormData))
