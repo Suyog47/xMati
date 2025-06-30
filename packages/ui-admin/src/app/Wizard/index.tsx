@@ -90,6 +90,7 @@ const CustomerWizard: React.FC = () => {
 
   const history = useHistory()
   const [step, setStep] = useState<number>(1)
+  const [customerId, setCustomerId] = useState<string>('')
   const [formData, setFormData] = useState<FormData>({
     fullName: '',
     email: '',
@@ -312,6 +313,7 @@ const CustomerWizard: React.FC = () => {
 
       // create subscription for the user
       await setSubscriber()
+      await setStripeCustomer()
       return true
     } catch (error) {
       const errorMsg =
@@ -323,6 +325,8 @@ const CustomerWizard: React.FC = () => {
   }
 
   const s3Upload = async () => {
+    const custId = await setStripeCustomer()
+
     try {
       const updatedFormData = {
         fullName: formData.fullName,
@@ -336,9 +340,10 @@ const CustomerWizard: React.FC = () => {
         card: formData.cardNumber,
         cardCVC: formData.cardCVC,
         cardExpiry: formData.cardExpiry,
+        stripeCustomerId: custId.data
       }
 
-      const result = await fetch('https://www.app.xmati.ai/apis/user-auth', {
+      const result = await fetch('http://localhost:8000/user-auth', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -358,13 +363,30 @@ const CustomerWizard: React.FC = () => {
 
   const setSubscriber = async () => {
     try {
-      const result = await fetch('https://www.app.xmati.ai/apis/save-subscription', {
+      const result = await fetch('http://localhost:8000/save-subscription', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key: formData.email, name: formData.fullName, subscription: 'Trial', duration: '15d', amount: '0' }),
       })
 
       return result.json()
+    } catch (err: any) {
+      setIsLoading(false)
+      return { success: false, msg: 'Error uploading subscription to S3' }
+    }
+  }
+
+  const setStripeCustomer = async () => {
+    try {
+      const result = await fetch('http://localhost:8000/create-stripe-customer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.email }),
+      })
+
+      let data = await result.json()
+      setCustomerId(data.data)
+      return data
     } catch (err: any) {
       setIsLoading(false)
       return { success: false, msg: 'Error uploading subscription to S3' }
@@ -399,6 +421,8 @@ const CustomerWizard: React.FC = () => {
   }
 
   const setLocalData = async () => {
+    const custId = await setStripeCustomer()
+
     const updatedFormData = {
       fullName: formData.fullName,
       email: formData.email,
@@ -411,6 +435,7 @@ const CustomerWizard: React.FC = () => {
       card: formData.cardNumber,
       cardCVC: formData.cardCVC,
       cardExpiry: formData.cardExpiry,
+      stripeCustomerId: custId.data
     }
 
     const currentUTC = new Date().toISOString().split('T')[0] // Always UTC

@@ -697,7 +697,6 @@ export class BotService {
 
 
   private async _generateBot(id, owner, botDesc, mergedConfigs) {
-    console.log('called')
     // DeepSeek API configuration (replace with actual API details)
     const DEEPSEEK_API_KEY = 'sk-d8088cbc82a046ccbf22716dd1c74af1'
     const API_ENDPOINT = 'https://api.deepseek.com/v1/chat/completions'
