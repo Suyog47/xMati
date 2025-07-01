@@ -21,7 +21,6 @@ export const Subs = () => {
   const [isDialogOpen, setDialogOpen] = useState(false)
   const savedSubData = JSON.parse(localStorage.getItem('subData') || '{}')
 
-  console.log(savedSubData)
   const {
     subscription = '',
     createdAt = '-',

@@ -34,6 +34,8 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   const [expiryTill, setExpiryTill] = useState<string>('')
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false)
   const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false)
+  const [isConfirmCancelDialogOpen, setIsConfirmCancelDialogOpen] = useState(false)
+  const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false)
   const [selectedDuration, setSelectedDuration] = useState<string>('monthly')
   const [isLoadingTransactions, setIsLoadingTransactions] = useState(true)
 
@@ -79,13 +81,18 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   const fetchTransactions = async () => {
     setIsLoadingTransactions(true)
     try {
-      const formData = JSON.parse(localStorage.getItem('formData') || '{}')
       const res = await fetch('http://localhost:8000/get-stripe-transactions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: formData.email })
+        body: JSON.stringify({ email: savedFormData.email })
       })
       const data = await res.json()
+
+      const latestCharge = data?.charges?.[0]
+      if (latestCharge?.id) {
+        localStorage.setItem('subData', JSON.stringify({ ...savedSubData, transactionId: latestCharge.id }))
+      }
+
       if (data.charges) {
         setTransactions(data.charges)
       }
@@ -96,6 +103,29 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     }
   }
 
+  const cancelSubscription = async () => {
+    try {
+      const res = await fetch('http://localhost:8000/refund', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ chargeId: savedSubData.transactionId, reason: '' }),
+      })
+
+      const data = await res.json()
+
+      if (data.success) {
+        setIsCancelDialogOpen(true)
+      } else {
+        alert('Refund failed: ' + data.error)
+      }
+    } catch (err: any) {
+      alert('Refund error: ' + err.message)
+    } finally {
+
+    }
+  }
 
   useEffect(() => {
     if (isOpen) {
@@ -553,8 +583,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                 borderRadius: 6,
               }}
               onClick={() => {
-                // Add your cancel subscription logic here
-                alert('Work in progress')
+                setIsConfirmCancelDialogOpen(true)
               }}
             >
               Cancel Your Subscription
@@ -689,11 +718,24 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                           <div
                             style={{
                               fontSize: '0.85em',
-                              color: txn.status === 'succeeded' ? 'green' : 'red',
+                              color: txn.refunded ? 'red' : txn.status === 'succeeded' ? 'green' : 'red'
                             }}
                           >
-                            Status: {txn.status}
+                            Status: {txn.refunded ? 'Refunded' : txn.status}
                           </div>
+                          {txn.refunded && txn.refunds?.data?.length > 0 && (
+                            <div style={{ fontSize: '0.8em', color: '#b58900' }}>
+                              Refunded: on{' '}
+                              {new Date(txn.refunds.data[0].created * 1000).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: true,
+                              })}
+                            </div>
+                          )}
                         </div>
 
                         <div style={{ fontSize: 22, fontWeight: 700, color: '#28a745', textAlign: 'right' }}>
@@ -707,12 +749,10 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
             )}
           </div>
         </div>
-
-
-
       </div>
     </Dialog >
 
+      {/* Payemnt dialog  */}
       <Dialog
         isOpen={isPaymentDialogOpen}
         onClose={() => togglePaymentDialog(false)}
@@ -740,6 +780,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         </div>
       </Dialog>
 
+      {/* Payment success dialog */}
       <Dialog
         isOpen={isSuccessDialogOpen}
         onClose={async () => {
@@ -763,6 +804,79 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
             intent="primary"
             onClick={async () => {
               setIsSuccessDialogOpen(false)
+              await logout()
+            }
+            }
+            style={{ marginTop: '20px' }}
+          >
+            Logout
+          </Button>
+        </div>
+      </Dialog>
+
+      {/* Subscription cancel confirm dialog */}
+      <Dialog
+        isOpen={isConfirmCancelDialogOpen}
+        onClose={() => setIsConfirmCancelDialogOpen(false)}
+        title="Confirm Subscription Cancellation"
+        icon="warning-sign"
+        canOutsideClickClose={false}
+      >
+        <div style={{ padding: '20px', textAlign: 'center' }}>
+          <h2 style={{ color: '#d9822b', marginBottom: '10px' }}>Are you sure?</h2>
+          <p style={{ fontSize: '1.1em', color: '#666' }}>
+            Cancelling your subscription will <strong>revoke your account</strong> and convert it to a <strong>3-day trial</strong> You will get the refund on your Bank Account.
+          </p>
+          <div style={{ marginTop: 24, color: '#c23030', fontWeight: 500, fontSize: 16 }}>
+            This action is irreversible. You will need to <strong>log in again</strong> to continue using the new trial plan.
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginTop: 30 }}>
+
+            <Button
+              intent="danger"
+              onClick={async () => {
+                void cancelSubscription()
+              }}
+              style={{
+                marginTop: '36px',
+                padding: '14px 32px',
+                fontSize: '1.05em',
+                fontWeight: 'bold',
+                minWidth: '220px',
+                borderRadius: 6,
+              }}
+            >
+              Confirm Cancellation
+            </Button>
+          </div>
+        </div>
+      </Dialog>
+
+      {/* Subscription cancelled dialog */}
+      <Dialog
+        isOpen={isCancelDialogOpen}
+        onClose={async () => {
+          setIsCancelDialogOpen(false)
+          await logout()
+        }}
+        title="Subscription Cancelled"
+        icon="tick-circle"
+        canOutsideClickClose={false}
+      >
+        <div style={{ padding: '20px', textAlign: 'center' }}>
+          <h2 style={{ color: '#4caf50', marginBottom: '10px' }}>Thank You!</h2>
+          <p style={{ fontSize: '1.1em', color: '#666' }}>
+            Your Subscription was been cancelled and revoked back to 3-day trial...
+          </p>
+          <div style={{ marginTop: 24, color: '#106ba3', fontWeight: 500, fontSize: 16 }}>
+            You now need to log out and will need to log in again.<br />
+            After re-login, your new subscription plan will be activated and available for use.
+          </div>
+          <Button
+            intent="primary"
+            onClick={async () => {
+              setIsCancelDialogOpen(false)
               await logout()
             }
             }
