@@ -36,6 +36,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false)
   const [isConfirmCancelDialogOpen, setIsConfirmCancelDialogOpen] = useState(false)
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false)
+  const [isCancelProcessing, setIsCancelProcessing] = useState(false)
   const [selectedDuration, setSelectedDuration] = useState<string>('monthly')
   const [isLoadingTransactions, setIsLoadingTransactions] = useState(true)
 
@@ -104,6 +105,11 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   }
 
   const cancelSubscription = async () => {
+    setIsCancelProcessing(true)
+
+    // // 🔧 Force React to flush state & show loader
+    // await new Promise(resolve => setTimeout(resolve, 50))
+
     try {
       const res = await fetch('http://localhost:8000/refund', {
         method: 'POST',
@@ -116,14 +122,38 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       const data = await res.json()
 
       if (data.success) {
+        await revokeSubscription()
+        setIsConfirmCancelDialogOpen(false)
         setIsCancelDialogOpen(true)
+        toggle()
       } else {
         alert('Refund failed: ' + data.error)
       }
     } catch (err: any) {
       alert('Refund error: ' + err.message)
     } finally {
+      setIsCancelProcessing(false)
+    }
+  }
 
+  const revokeSubscription = async () => {
+    try {
+      const { fullName, email } = savedFormData
+
+      const result = await fetch('http://localhost:8000/save-subscription', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: email, name: fullName, subscription: 'Trial', duration: '3d', amount: 0 }),
+      })
+
+      const data = await result.json()
+
+      if (data.status !== true) {
+        throw new Error('Subscriber revoking failed')
+      }
+
+    } catch (err: any) {
+      throw new Error('Something went wrong while revoking subscription data: ' + err.message)
     }
   }
 
@@ -403,330 +433,315 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     await new Promise(resolve => setTimeout(resolve, 500))   // A delay of 500 milliseconds to ensure the dialog opens/closes after the state update
   }
 
-
   const logout = async () => {
     const auth: BasicAuthentication = new BasicAuthentication()
     await auth.logout()
   }
 
   return (
-    <><Dialog
-      title="Subscribe & Pay"
-      icon="dollar"
-      isOpen={isOpen}
-      // onOpening={getClientSecret}
-      onClose={toggle}
-      canOutsideClickClose={false}
-      style={{
-        width: '99vw',
-        maxWidth: '100vw',
-        height: '97vh', // Increased height
-        maxHeight: '95vh',
-        margin: 0,
-        borderRadius: 0,
-        padding: 0,
-      }}
-    >
-      <div
+    <>
+      <Dialog
+        title="Subscribe & Pay"
+        icon="dollar"
+        isOpen={isOpen}
+        // onOpening={getClientSecret}
+        onClose={toggle}
+        canOutsideClickClose={false}
         style={{
-          display: 'flex',
-          flexDirection: 'row',
-          height: '100%',
-          padding: 32,
-          paddingTop: 20,
-          paddingLeft: 32,
-          paddingRight: 32,
-          paddingBottom: 32,
-          gap: 20,
+          width: '99vw',
+          maxWidth: '100vw',
+          height: '97vh', // Increased height
+          maxHeight: '95vh',
+          margin: 0,
+          borderRadius: 0,
+          padding: 0,
         }}
       >
-        {/* Left: Subscription Plan Section */}
-        <div style={{ flex: 1.4, overflowY: 'auto' }}>
-          <div style={{ marginBottom: '5px', textAlign: 'center', fontSize: '1em', color: '#666' }}>
-            {subscription && expiryTill && (
-              <p>
-                Your current subscription plan is <strong><u>{subscription}</u></strong> and it {savedSubData.expired === true ? 'was' : 'is'} valid till <strong><u>{expiryTill}</u></strong>.
-              </p>
-            )}
-          </div>
-          <h1 style={{ marginBottom: '5px', fontSize: '1.2em' }}>
-            {(subscription === 'Trial')
-              ? 'Choose Your Subscription Plan'
-              : 'Change Your Subscription Plan'}
-          </h1>
-          <div style={{
+        <div
+          style={{
             display: 'flex',
-            gap: '20px',
-            marginBottom: '10px',
-            justifyContent: 'space-between'
-          }}>
-            {['Starter', 'Professional'].map((plan) => (
-              <div
-                key={plan}
-                onClick={() => setSelectedTab(plan)}
-                style={{
-                  flex: 1,
-                  border: `2px solid ${selectedTab === plan ? '#2196f3' : '#e0e0e0'}`,
-                  borderRadius: '6px',
-                  padding: '15px',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  backgroundColor: selectedTab === plan ? '#f8fbff' : 'white'
-                }}
-              >
-                <h3 style={{
-                  margin: '0',
-                  padding: '0',
-                  textAlign: 'center',
-                  fontSize: '1.1em',
-                  marginBottom: '10px'
-                }}>
-                  {plan}
-                </h3>
-                <h3 style={{
-                  marginTop: 0,
-                  marginBottom: '12px',
-                  fontSize: '1.2em'
-                }}>
-                  {plan === 'Starter' ? '$18/month' : '$100/month'}
-                </h3>
-                <div style={{
-                  marginBottom: '12px',
-                  padding: '10px',
-                  background: '#f8f9fa',
-                  borderRadius: '3px'
-                }}>
-                  <strong style={{ fontSize: '0.95em' }}>
-                    {plan === 'Starter' ? '3 bots included' : '5 bots included'}
-                  </strong>
-                </div>
-                <div style={{ marginBottom: '15px' }}>
-                  <div style={{
-                    color: '#666',
-                    marginBottom: '10px',
-                    paddingBottom: '10px',
-                    borderBottom: '1px solid #eee',
-                    fontSize: '0.95em'
+            flexDirection: 'row',
+            height: '100%',
+            padding: 32,
+            paddingTop: 20,
+            paddingLeft: 32,
+            paddingRight: 32,
+            paddingBottom: 32,
+            gap: 20,
+          }}
+        >
+          {/* Left: Subscription Plan Section */}
+          <div style={{ flex: 1.4, overflowY: 'auto' }}>
+            <div style={{ marginBottom: '5px', textAlign: 'center', fontSize: '1em', color: '#666' }}>
+              {subscription && expiryTill && (
+                <p>
+                  Your current subscription plan is <strong><u>{subscription}</u></strong> and it {savedSubData.expired === true ? 'was' : 'is'} valid till <strong><u>{expiryTill}</u></strong>.
+                </p>
+              )}
+            </div>
+            <h1 style={{ marginBottom: '5px', fontSize: '1.2em' }}>
+              {(subscription === 'Trial')
+                ? 'Choose Your Subscription Plan'
+                : 'Change Your Subscription Plan'}
+            </h1>
+            <div style={{
+              display: 'flex',
+              gap: '20px',
+              marginBottom: '10px',
+              justifyContent: 'space-between'
+            }}>
+              {['Starter', 'Professional'].map((plan) => (
+                <div
+                  key={plan}
+                  onClick={() => setSelectedTab(plan)}
+                  style={{
+                    flex: 1,
+                    border: `2px solid ${selectedTab === plan ? '#2196f3' : '#e0e0e0'}`,
+                    borderRadius: '6px',
+                    padding: '15px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    backgroundColor: selectedTab === plan ? '#f8fbff' : 'white'
+                  }}
+                >
+                  <h3 style={{
+                    margin: '0',
+                    padding: '0',
+                    textAlign: 'center',
+                    fontSize: '1.1em',
+                    marginBottom: '10px'
                   }}>
-                    Includes:
-                  </div>
-                  {['LLM Support', 'HITL (Human in the Loop) Enabled', 'Bot Analytics'].map((feature) => (
-                    <div
-                      key={feature}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        marginBottom: '6px',
-                        fontSize: '0.9em'
-                      }}
-                    >
-                      <span style={{ color: '#4caf50', marginRight: '6px' }}>✓</span>
-                      {feature}
-                    </div>
-                  ))}
-                  <div style={{
-                    color: '#666',
-                    marginBottom: '10px',
-                    paddingBottom: '10px',
-                    borderBottom: '1px solid #eee',
-                    fontSize: '0.95em'
+                    {plan}
+                  </h3>
+                  <h3 style={{
+                    marginTop: 0,
+                    marginBottom: '12px',
+                    fontSize: '1.2em'
                   }}>
-                    Supported Channels:
+                    {plan === 'Starter' ? '$18/month' : '$100/month'}
+                  </h3>
+                  <div style={{
+                    marginBottom: '12px',
+                    padding: '10px',
+                    background: '#f8f9fa',
+                    borderRadius: '3px'
+                  }}>
+                    <strong style={{ fontSize: '0.95em' }}>
+                      {plan === 'Starter' ? '3 bots included' : '5 bots included'}
+                    </strong>
                   </div>
-                  {['Web Channel', 'Telegram', 'Slack', 'Facebook Messenger'].map((feature) => (
-                    <div
-                      key={feature}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        marginBottom: '6px',
-                        fontSize: '0.9em'
-                      }}
-                    >
-                      <span style={{ color: '#4caf50', marginRight: '6px' }}>✓</span>
-                      {feature}
+                  <div style={{ marginBottom: '15px' }}>
+                    <div style={{
+                      color: '#666',
+                      marginBottom: '10px',
+                      paddingBottom: '10px',
+                      borderBottom: '1px solid #eee',
+                      fontSize: '0.95em'
+                    }}>
+                      Includes:
                     </div>
-                  ))}
+                    {['LLM Support', 'HITL (Human in the Loop) Enabled', 'Bot Analytics'].map((feature) => (
+                      <div
+                        key={feature}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          marginBottom: '6px',
+                          fontSize: '0.9em'
+                        }}
+                      >
+                        <span style={{ color: '#4caf50', marginRight: '6px' }}>✓</span>
+                        {feature}
+                      </div>
+                    ))}
+                    <div style={{
+                      color: '#666',
+                      marginBottom: '10px',
+                      paddingBottom: '10px',
+                      borderBottom: '1px solid #eee',
+                      fontSize: '0.95em'
+                    }}>
+                      Supported Channels:
+                    </div>
+                    {['Web Channel', 'Telegram', 'Slack', 'Facebook Messenger'].map((feature) => (
+                      <div
+                        key={feature}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          marginBottom: '6px',
+                          fontSize: '0.9em'
+                        }}
+                      >
+                        <span style={{ color: '#4caf50', marginRight: '6px' }}>✓</span>
+                        {feature}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
 
-          {(subscription === 'Trial' || savedSubData.expired === true) && (<br />)}
+            {(subscription === 'Trial' || savedSubData.expired === true) && (<br />)}
 
-          <Button
-            type="submit"
-            intent="primary"
-            fill
-            style={{
-              marginTop: '10px',
-              height: 40,
-              width: '100%',
-              fontSize: '1.1em',
-              fontWeight: 600,
-              borderRadius: 6,
-            }}
-            onClick={() => togglePaymentDialog(true)}
-          >
-            Subscribe Now
-          </Button>
-          {subscription !== 'Trial' && savedSubData.expired !== true && (
             <Button
-              intent="danger"
+              type="submit"
+              intent="primary"
               fill
               style={{
-                marginTop: '12px',
+                marginTop: '10px',
                 height: 40,
                 width: '100%',
                 fontSize: '1.1em',
                 fontWeight: 600,
                 borderRadius: 6,
               }}
-              onClick={() => {
-                setIsConfirmCancelDialogOpen(true)
-              }}
+              onClick={() => togglePaymentDialog(true)}
             >
-              Cancel Your Subscription
+              Subscribe Now
             </Button>
-          )}
-        </div>
-
-        {/* Vertical Divider */}
-        <div
-          style={{
-            width: 1.5,
-            background: '#e0e0e0',
-            margin: '0 10px',
-            height: '100%',
-            alignSelf: 'stretch',
-          }}
-        />
-
-        {/* Right: Transaction History Section */}
-        <div
-          style={{
-            flex: 1.6,
-            background: '#f5f7fa',
-            borderRadius: 8,
-            padding: 20,
-            minWidth: 300,
-            height: 570, // Fixed height
-            display: 'flex',
-            flexDirection: 'column',
-            boxShadow: '0 0 8px #e0e0e0',
-          }}
-        >
-          {/* Header with title + reload button */}
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: 16,
-            }}
-          >
-            <h2 style={{ margin: 0, fontSize: '1.2em' }}>Transaction History</h2>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-              <Icon
-                icon="refresh"
-                iconSize={18}
-                intent="primary"
+            {subscription !== 'Trial' && savedSubData.canCancel === true && savedSubData.expired !== true && (
+              <Button
+                intent="danger"
+                fill
                 style={{
-                  cursor: isLoadingTransactions ? 'not-allowed' : 'pointer',
-                  opacity: isLoadingTransactions ? 0.4 : 1,
+                  marginTop: '12px',
+                  height: 40,
+                  width: '100%',
+                  fontSize: '1.1em',
+                  fontWeight: 600,
+                  borderRadius: 6,
                 }}
                 onClick={() => {
-                  if (!isLoadingTransactions) {
-                    void fetchTransactions()
-                  }
-                }}
-                title="Reload"
-              />
-
-              <button
-                onClick={() => {
-                  if (!isLoadingTransactions) {
-                    alert('Work in progress')
-                  }
-                }}
-                style={{
-                  backgroundColor: '#106ba3',
-                  color: 'white',
-                  border: 'none',
-                  padding: '6px 12px',
-                  borderRadius: '4px',
-                  fontSize: '0.9em',
-                  cursor: isLoadingTransactions ? 'not-allowed' : 'pointer',
-                  opacity: isLoadingTransactions ? 0.4 : 1,
+                  setIsConfirmCancelDialogOpen(true)
                 }}
               >
-                Download PDF
-              </button>
-            </div>
+                Cancel Your Subscription
+              </Button>
+            )}
           </div>
 
-          {/* Scrollable Content */}
-          <div style={{ flex: 1, overflowY: 'auto' }}>
-            {isLoadingTransactions ? (
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  height: '100%',
-                  width: '100%',
-                }}
-              >
-                <Spinner size={38} />
+          {/* Vertical Divider */}
+          <div
+            style={{
+              width: 1.5,
+              background: '#e0e0e0',
+              margin: '0 10px',
+              height: '100%',
+              alignSelf: 'stretch',
+            }}
+          />
+
+          {/* Right: Transaction History Section */}
+          <div
+            style={{
+              flex: 1.6,
+              background: '#f5f7fa',
+              borderRadius: 8,
+              padding: 20,
+              minWidth: 300,
+              height: 570, // Fixed height
+              display: 'flex',
+              flexDirection: 'column',
+              boxShadow: '0 0 8px #e0e0e0',
+            }}
+          >
+            {/* Header with title + reload button */}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: 16,
+              }}
+            >
+              <h2 style={{ margin: 0, fontSize: '1.2em' }}>Transaction History</h2>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+                <Icon
+                  icon="refresh"
+                  iconSize={18}
+                  intent="primary"
+                  style={{
+                    cursor: isLoadingTransactions ? 'not-allowed' : 'pointer',
+                    opacity: isLoadingTransactions ? 0.4 : 1,
+                  }}
+                  onClick={() => {
+                    if (!isLoadingTransactions) {
+                      void fetchTransactions()
+                    }
+                  }}
+                  title="Reload"
+                />
+
+                <button
+                  onClick={() => {
+                    if (!isLoadingTransactions) {
+                      alert('Work in progress')
+                    }
+                  }}
+                  style={{
+                    backgroundColor: '#106ba3',
+                    color: 'white',
+                    border: 'none',
+                    padding: '8px 16px',
+                    borderRadius: '6px',
+                    fontSize: '1em',
+                    fontWeight: 500,
+                    cursor: isLoadingTransactions ? 'not-allowed' : 'pointer',
+                    opacity: isLoadingTransactions ? 0.4 : 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                  }}
+                >
+                  <span role="img" aria-label="download">📥</span> Download PDF
+                </button>
+
               </div>
-            ) : (
-              <div style={{ color: '#888', fontSize: '1em' }}>
-                {transactions.length === 0 ? (
-                  <div style={{ textAlign: 'center' }}>No transactions yet.</div>
-                ) : (
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                    {transactions.map((txn, idx) => (
-                      <li
-                        key={idx}
-                        style={{
-                          background: 'white',
-                          marginBottom: '12px',
-                          padding: '16px',
-                          borderRadius: '6px',
-                          boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'flex-start',
-                          borderLeft: '4px solid #106ba3',
-                        }}
-                      >
-                        <div>
-                          <div style={{ fontWeight: 600, fontSize: '1em', color: '#102a43', marginBottom: 4 }}>
-                            Transaction ID:{' '}
-                            <span style={{ fontFamily: 'monospace', color: '#5c7080' }}>{txn.id}</span>
-                          </div>
-                          <div style={{ fontSize: '0.9em', color: '#5c7080', marginBottom: 4 }}>
-                            {new Date(txn.created * 1000).toLocaleString('en-US', {
-                              year: 'numeric',
-                              month: 'short',
-                              day: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit',
-                              hour12: true,
-                            })}
-                          </div>
-                          <div
-                            style={{
-                              fontSize: '0.85em',
-                              color: txn.refunded ? 'red' : txn.status === 'succeeded' ? 'green' : 'red'
-                            }}
-                          >
-                            Status: {txn.refunded ? 'Refunded' : txn.status}
-                          </div>
-                          {txn.refunded && txn.refunds?.data?.length > 0 && (
-                            <div style={{ fontSize: '0.8em', color: '#b58900' }}>
-                              Refunded: on{' '}
-                              {new Date(txn.refunds.data[0].created * 1000).toLocaleDateString('en-US', {
+            </div>
+
+            {/* Scrollable Content */}
+            <div style={{ flex: 1, overflowY: 'auto' }}>
+              {isLoadingTransactions ? (
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '100%',
+                    width: '100%',
+                  }}
+                >
+                  <Spinner size={38} />
+                </div>
+              ) : (
+                <div style={{ color: '#888', fontSize: '1em' }}>
+                  {transactions.length === 0 ? (
+                    <div style={{ textAlign: 'center' }}>No transactions yet.</div>
+                  ) : (
+                    <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                      {transactions.map((txn, idx) => (
+                        <li
+                          key={idx}
+                          style={{
+                            background: 'white',
+                            marginBottom: '12px',
+                            padding: '16px',
+                            borderRadius: '6px',
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'flex-start',
+                            borderLeft: '4px solid #106ba3',
+                          }}
+                        >
+                          <div>
+                            <div style={{ fontWeight: 600, fontSize: '1em', color: '#102a43', marginBottom: 4 }}>
+                              Transaction ID:{' '}
+                              <span style={{ fontFamily: 'monospace', color: '#5c7080' }}>{txn.id}</span>
+                            </div>
+                            <div style={{ fontSize: '0.9em', color: '#5c7080', marginBottom: 4 }}>
+                              {new Date(txn.created * 1000).toLocaleString('en-US', {
                                 year: 'numeric',
                                 month: 'short',
                                 day: 'numeric',
@@ -735,22 +750,42 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                                 hour12: true,
                               })}
                             </div>
-                          )}
-                        </div>
+                            <div
+                              style={{
+                                fontSize: '0.85em',
+                                color: txn.refunded ? 'red' : txn.status === 'succeeded' ? 'green' : 'red'
+                              }}
+                            >
+                              Status: {txn.refunded ? 'Refunded' : txn.status}
+                            </div>
+                            {txn.refunded && txn.refunds?.data?.length > 0 && (
+                              <div style={{ fontSize: '0.8em', color: '#b58900' }}>
+                                Refunded: on{' '}
+                                {new Date(txn.refunds.data[0].created * 1000).toLocaleDateString('en-US', {
+                                  year: 'numeric',
+                                  month: 'short',
+                                  day: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                  hour12: true,
+                                })}
+                              </div>
+                            )}
+                          </div>
 
-                        <div style={{ fontSize: 22, fontWeight: 700, color: '#28a745', textAlign: 'right' }}>
-                          ${txn.amount / 100}
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            )}
+                          <div style={{ fontSize: 22, fontWeight: 700, color: txn.refunded ? 'red' : '#28a745', textAlign: 'right' }}>
+                            ${txn.amount / 100}
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    </Dialog >
+      </Dialog >
 
       {/* Payemnt dialog  */}
       <Dialog
@@ -794,20 +829,30 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         <div style={{ padding: '20px', textAlign: 'center' }}>
           <h2 style={{ color: '#4caf50', marginBottom: '10px' }}>Thank You!</h2>
           <p style={{ fontSize: '1.1em', color: '#666' }}>
-            Your payment was successful...
+            Your payment is successful...
           </p>
-          <div style={{ marginTop: 24, color: '#106ba3', fontWeight: 500, fontSize: 16 }}>
+          <div style={{ marginTop: 10, color: '#106ba3', fontWeight: 500, fontSize: 15 }}>
             You now need to log out and will need to log in again.<br />
-            After re-login, your new subscription plan will be activated and available for use.
+          </div>
+
+          {/* 🔴 Important Warning Message */}
+          <div style={{ marginTop: 24, color: 'red', fontWeight: 600, fontSize: 17 }}>
+            *DO NOT Refresh this page and logout is mandatory for full subscription activation*.
           </div>
           <Button
             intent="primary"
             onClick={async () => {
               setIsSuccessDialogOpen(false)
               await logout()
-            }
-            }
-            style={{ marginTop: '20px' }}
+            }}
+            style={{
+              marginTop: '20px',
+              padding: '14px 32px',
+              fontSize: '1.05em',
+              fontWeight: 'bold',
+              minWidth: '250px',
+              borderRadius: 6,
+            }}
           >
             Logout
           </Button>
@@ -822,13 +867,56 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         icon="warning-sign"
         canOutsideClickClose={false}
       >
+        {/* Fullscreen loader while refund is processing */}
+        {isCancelProcessing && (
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100vw',
+              height: '100vh',
+              background: 'rgba(255,255,255,0.85)',
+              zIndex: 99999,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            {/* Simple CSS spinner */}
+            <div
+              style={{
+                border: '8px solid #f3f3f3',
+                borderTop: '8px solid #106ba3',
+                borderRadius: '50%',
+                width: 60,
+                height: 60,
+                animation: 'spin 1s linear infinite',
+                marginBottom: 24,
+              }}
+            />
+            <style>
+              {`
+                @keyframes spin {
+                  0% { transform: rotate(0deg); }
+                  100% { transform: rotate(360deg); }
+                }
+              `}
+            </style>
+            <div style={{ fontSize: 20, color: '#106ba3', fontWeight: 600 }}>
+              Your refund is being initiated...
+            </div>
+          </div>
+        )
+        }
         <div style={{ padding: '20px', textAlign: 'center' }}>
           <h2 style={{ color: '#d9822b', marginBottom: '10px' }}>Are you sure?</h2>
           <p style={{ fontSize: '1.1em', color: '#666' }}>
             Cancelling your subscription will <strong>revoke your account</strong> and convert it to a <strong>3-day trial</strong> You will get the refund on your Bank Account.
           </p>
           <div style={{ marginTop: 24, color: '#c23030', fontWeight: 500, fontSize: 16 }}>
-            This action is irreversible. You will need to <strong>log in again</strong> to continue using the new trial plan.
+            This action is irreversible. You will need to <strong>log-in again</strong> to continue using the trial plan.
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginTop: 30 }}>
@@ -839,11 +927,11 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                 void cancelSubscription()
               }}
               style={{
-                marginTop: '36px',
+                marginTop: '16px',
                 padding: '14px 32px',
                 fontSize: '1.05em',
                 fontWeight: 'bold',
-                minWidth: '220px',
+                minWidth: '250px',
                 borderRadius: 6,
               }}
             >
@@ -867,25 +955,37 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         <div style={{ padding: '20px', textAlign: 'center' }}>
           <h2 style={{ color: '#4caf50', marginBottom: '10px' }}>Thank You!</h2>
           <p style={{ fontSize: '1.1em', color: '#666' }}>
-            Your Subscription was been cancelled and revoked back to 3-day trial...
+            Your Subscription has been cancelled and revoked back to 3-day trial...
           </p>
-          <div style={{ marginTop: 24, color: '#106ba3', fontWeight: 500, fontSize: 16 }}>
-            You now need to log out and will need to log in again.<br />
-            After re-login, your new subscription plan will be activated and available for use.
+          <div style={{ marginTop: 24, color: '#106ba3', fontWeight: 500, fontSize: 14 }}>
+            You now need to log out and will need to log-in again.<br />
           </div>
+
+          {/* 🔴 Important Warning Message */}
+          <div style={{ marginTop: 24, color: 'red', fontWeight: 600, fontSize: 13 }}>
+            DO NOT Refresh this page and logout is mandatory for full subscription activation.
+          </div>
+
           <Button
             intent="primary"
             onClick={async () => {
               setIsCancelDialogOpen(false)
               await logout()
-            }
-            }
-            style={{ marginTop: '20px' }}
+            }}
+            style={{
+              marginTop: '16px',
+              padding: '14px 32px',
+              fontSize: '1.05em',
+              fontWeight: 'bold',
+              minWidth: '250px',
+              borderRadius: 6,
+            }}
           >
             Logout
           </Button>
         </div>
       </Dialog>
+
     </>
   )
 }

@@ -169,7 +169,7 @@ export const Subs = () => {
                 ['Start Date', formatDate(createdAt)],
                 ['End Date', formatDate(till)],
                 ['Amount Paid', amount === '0' ? '-' : amount],
-                ['Duration', duration === '15d' ? '15 Days' : duration],
+                ['Duration', duration === '15d' ? '15 Days' : duration === '3d' ? '3 Days' : duration],
               ].map(([label, value], idx, arr) => (
                 <React.Fragment key={idx}>
                   <div
@@ -247,7 +247,7 @@ export const Subs = () => {
               marginTop: 16,
             }}
           >
-            {subscription !== 'Trial' && !expired && (
+            {/* {subscription !== 'Trial' && !expired && (
               <Button
                 intent="danger"
                 large
@@ -262,7 +262,7 @@ export const Subs = () => {
               >
                 Cancel Your Subscription
               </Button>
-            )}
+            )} */}
             <Button
               intent="primary"
               large

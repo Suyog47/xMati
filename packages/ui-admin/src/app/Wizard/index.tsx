@@ -454,6 +454,7 @@ const CustomerWizard: React.FC = () => {
       promptRun: false,  // set the prompt run to false
       amount: 0,
       duration: '15d',
+      canCancel: false
     }
 
     localStorage.setItem('formData', JSON.stringify(updatedFormData))

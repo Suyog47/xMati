@@ -220,13 +220,30 @@ const Login: FC<Props> = props => {
     }
 
     const currentUTC = new Date().toISOString().split('T')[0] // Always UTC
+    const createdDateUTC = new Date(subData.createdAt).toISOString().split('T')[0]
     const tillDateUTC = new Date(subData.till).toISOString().split('T')[0]
 
     // Calculate days remaining
     const currentDate = new Date(currentUTC)
+    const createdDate = new Date(createdDateUTC)
     const tillDate = new Date(tillDateUTC)
+
+    // Check the days remaining
     const timeDifference = tillDate.getTime() - currentDate.getTime()
     const daysRemaining = Math.ceil(timeDifference / (1000 * 60 * 60 * 24))
+
+    let canCancel = false
+    if (subData.subscription === 'Trial') {
+      canCancel = false
+    } else {
+      // Check if current date is within 7 days from createdDate
+      const msInOneDay = 24 * 60 * 60 * 1000
+      const daysSinceCreation = (currentDate.getTime() - createdDate.getTime()) / msInOneDay
+      const isWithinOneWeek = daysSinceCreation >= 0 && daysSinceCreation <= 7
+
+      canCancel = isWithinOneWeek
+    }
+
 
     const updatedSubData = {
       subscription: subData.subscription,
@@ -237,6 +254,7 @@ const Login: FC<Props> = props => {
       promptRun: false,  // set the prompt run to false
       amount: subData.amount,
       duration: subData.duration,
+      canCancel
     }
 
     localStorage.setItem('formData', JSON.stringify(updatedFormData))
