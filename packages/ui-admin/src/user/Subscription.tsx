@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect, useMemo, useCallback } from 'react'
+import React, { FC, useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import {
   Elements,
   CardElement,
@@ -132,9 +132,6 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   const cancelSubscription = async () => {
     setIsCancelProcessing(true)
 
-    // // 🔧 Force React to flush state & show loader
-    // await new Promise(resolve => setTimeout(resolve, 50))
-
     try {
       const res = await fetch('http://localhost:8000/refund', {
         method: 'POST',
@@ -177,15 +174,22 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         throw new Error('Subscriber revoking failed')
       }
 
+      localStorage.setItem('subData', JSON.stringify({ ...savedSubData, subscription: 'Trial', duration: '3d', amount: 0, canCancel: false }))
     } catch (err: any) {
       throw new Error('Something went wrong while revoking subscription data: ' + err.message)
     }
   }
 
+  const fetchedOnceRef = useRef(false)
   useEffect(() => {
     if (isOpen) {
       void getClientSecret()
-      void fetchTransactions()
+
+      // Only fetch transactions once
+      if (!fetchedOnceRef.current) {
+        void fetchTransactions()
+        fetchedOnceRef.current = true
+      }
     }
 
     setSubscription(savedSubData.subscription || '')
@@ -311,6 +315,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
           throw new Error('Subscriber activation failed')
         }
 
+        localStorage.setItem('subData', JSON.stringify({ ...savedSubData, subscription: selectedTab, duration: selectedDuration, amount: `$${amount / 100}`, expired: false, canCancel: true }))
       } catch (err: any) {
         throw new Error('Something went wrong while saving subscription data: ' + err.message)
       }
@@ -478,7 +483,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         onClose={toggle}
         canOutsideClickClose={false}
         style={{
-          width: '99vw',
+          width: '98vw',
           maxWidth: '100vw',
           height: '97vh', // Increased height
           maxHeight: '95vh',
@@ -501,7 +506,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
           }}
         >
           {/* Left: Subscription Plan Section */}
-          <div style={{ flex: 1.4, overflowY: 'auto' }}>
+          <div style={{ flex: 1.5, overflowY: 'auto' }}>
             <div style={{ marginBottom: '5px', textAlign: 'center', fontSize: '1em', color: '#666' }}>
               {subscription && expiryTill && (
                 <p>
@@ -593,7 +598,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                     }}>
                       Supported Channels:
                     </div>
-                    {['Web Channel', 'Telegram', 'Slack', 'Facebook Messenger'].map((feature) => (
+                    {['Whatsapp', 'Web Channel', 'Telegram', 'Slack', 'Facebook Messenger'].map((feature) => (
                       <div
                         key={feature}
                         style={{
@@ -612,44 +617,55 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
               ))}
             </div>
 
-            {(subscription === 'Trial' || savedSubData.expired === true) && (<br />)}
+            {/* {(subscription === 'Trial' || savedSubData.expired === true) && (<br />)} */}
 
-            <Button
-              type="submit"
-              intent="primary"
-              fill
+            <div
               style={{
-                marginTop: '10px',
-                height: 40,
+                display: 'flex',
+                gap: '12px', // spacing between buttons
+                marginTop: '15px',
                 width: '100%',
-                fontSize: '1.1em',
-                fontWeight: 600,
-                borderRadius: 6,
               }}
-              onClick={() => togglePaymentDialog(true)}
             >
-              Subscribe Now
-            </Button>
-            {subscription !== 'Trial' && savedSubData.canCancel === true && savedSubData.expired !== true && (
               <Button
-                intent="danger"
+                type="submit"
+                intent="primary"
                 fill
                 style={{
-                  marginTop: '12px',
-                  height: 40,
-                  width: '100%',
+                  height: 50,
                   fontSize: '1.1em',
                   fontWeight: 600,
                   borderRadius: 6,
+                  flex: subscription === 'Trial' ? 1 : 0.5, // Full width if trial, half otherwise
                 }}
-                onClick={() => {
-                  setIsConfirmCancelDialogOpen(true)
-                }}
-                disabled={isLoadingTransactions}
+                onClick={() => togglePaymentDialog(true)}
               >
-                Cancel Your Subscription
+                Subscribe Now
               </Button>
-            )}
+
+              {subscription !== 'Trial' &&
+                savedSubData.canCancel === true &&
+                savedSubData.expired !== true && (
+                  <Button
+                    intent="danger"
+                    fill
+                    style={{
+                      height: 50,
+                      fontSize: '1.1em',
+                      fontWeight: 600,
+                      borderRadius: 6,
+                      flex: 0.5,
+                    }}
+                    onClick={() => {
+                      setIsConfirmCancelDialogOpen(true)
+                    }}
+                    disabled={isLoadingTransactions}
+                  >
+                    Cancel Your Subscription
+                  </Button>
+                )}
+            </div>
+
           </div>
 
           {/* Vertical Divider */}
@@ -666,7 +682,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
           {/* Right: Transaction History Section */}
           <div
             style={{
-              flex: 1.6,
+              flex: 1.5,
               background: '#f5f7fa',
               borderRadius: 8,
               padding: 20,
@@ -774,7 +790,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                               color: '#102a43',
                               marginBottom: '6px'
                             }}>
-                              {`Subscription Taken: ${txn.metadata?.subscription || '---'}`}
+                              {`Subscription: ${txn.metadata?.subscription || '---'}`}
                             </div>
 
                             <div style={{ fontWeight: 600, fontSize: '1em', color: '#102a43', marginBottom: 4 }}>
@@ -965,7 +981,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         <div style={{ padding: '20px', textAlign: 'center' }}>
           <h2 style={{ color: '#d9822b', marginBottom: '10px' }}>Are you sure?</h2>
           <p style={{ fontSize: '1.1em', color: '#666' }}>
-            Cancelling your subscription will <strong>revoke your account</strong> and convert it to a <strong>3-day trial</strong> You will get the refund on your Bank Account.
+            Cancelling your subscription will <strong>revoke your account</strong> and convert it to a <strong>3-day trial</strong>. You will get the refund on your Bank Account.
           </p>
           <div style={{ marginTop: 24, color: '#c23030', fontWeight: 500, fontSize: 16 }}>
             This action is irreversible. You will need to <strong>log-in again</strong> to continue using the trial plan.
@@ -1012,13 +1028,13 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
           <p style={{ fontSize: '1.1em', color: '#666' }}>
             Your Subscription has been cancelled and revoked back to 3-day trial...
           </p>
-          <div style={{ marginTop: 24, color: '#106ba3', fontWeight: 500, fontSize: 14 }}>
-            You now need to log out and will need to log-in again.<br />
+          <div style={{ marginTop: 10, color: '#106ba3', fontWeight: 500, fontSize: 15 }}>
+            You now need to log out and will need to log in again.<br />
           </div>
 
           {/* 🔴 Important Warning Message */}
-          <div style={{ marginTop: 24, color: 'red', fontWeight: 600, fontSize: 13 }}>
-            DO NOT Refresh this page and logout is mandatory for full subscription activation.
+          <div style={{ marginTop: 24, color: 'red', fontWeight: 600, fontSize: 17 }}>
+            *DO NOT Refresh this page and logout is mandatory for full subscription activation*.
           </div>
 
           <Button
@@ -1028,7 +1044,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
               await logout()
             }}
             style={{
-              marginTop: '16px',
+              marginTop: '20px',
               padding: '14px 32px',
               fontSize: '1.05em',
               fontWeight: 'bold',
