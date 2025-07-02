@@ -104,6 +104,25 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     }
   }
 
+  const downloadCSV = async () => {
+    const email = savedFormData.email
+
+    const res = await fetch('http://localhost:8000/download-csv', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ data: transactions, email }),
+    })
+
+    const blob = await res.blob()
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${email}-data.csv`
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+  }
+
   const cancelSubscription = async () => {
     setIsCancelProcessing(true)
 
@@ -615,6 +634,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                 onClick={() => {
                   setIsConfirmCancelDialogOpen(true)
                 }}
+                disabled={isLoadingTransactions}
               >
                 Cancel Your Subscription
               </Button>
@@ -676,7 +696,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                 <button
                   onClick={() => {
                     if (!isLoadingTransactions) {
-                      alert('Work in progress')
+                      void downloadCSV()
                     }
                   }}
                   style={{
@@ -933,7 +953,10 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                 fontWeight: 'bold',
                 minWidth: '250px',
                 borderRadius: 6,
+                cursor: isLoadingTransactions ? 'not-allowed' : 'pointer',
+                opacity: isLoadingTransactions ? 0.4 : 1,
               }}
+              disabled={isLoadingTransactions}
             >
               Confirm Cancellation
             </Button>
