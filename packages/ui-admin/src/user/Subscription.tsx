@@ -58,7 +58,13 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       const result = await fetch('http://localhost:8000/create-payment-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount, currency: 'usd', customerId: { id: savedFormData.stripeCustomerId }, email: savedFormData.email }),
+        body: JSON.stringify({
+          amount, currency: 'usd',
+          customerId: { id: savedFormData.stripeCustomerId },
+          email: savedFormData.email,
+          subscription: selectedTab,
+          duration: selectedDuration
+        }),
       })
 
       if (!result.ok) {
@@ -242,7 +248,12 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
           throw new Error('Card details missing')
         }
         const { error: paymentError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-          payment_method: { card: cardElement }
+          payment_method: {
+            card: cardElement, metadata: { // Attaches to PaymentMethod
+              subscription: selectedTab,
+              duration: selectedDuration
+            }
+          },
         })
 
         if (paymentError) {
@@ -755,7 +766,17 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                             borderLeft: '4px solid #106ba3',
                           }}
                         >
-                          <div>
+                          <div style={{ flex: 1 }}>
+                            {/* Subscription Header - New Section */}
+                            <div style={{
+                              fontWeight: 700,
+                              fontSize: '1.1em',
+                              color: '#102a43',
+                              marginBottom: '6px'
+                            }}>
+                              {`Subscription Taken: ${txn.metadata?.subscription || '---'}`}
+                            </div>
+
                             <div style={{ fontWeight: 600, fontSize: '1em', color: '#102a43', marginBottom: 4 }}>
                               Transaction ID:{' '}
                               <span style={{ fontFamily: 'monospace', color: '#5c7080' }}>{txn.id}</span>
@@ -770,6 +791,17 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                                 hour12: true,
                               })}
                             </div>
+
+                            {/* Duration - New Section */}
+                            <div style={{
+                              fontSize: '0.9em',
+                              color: '#5c7080',
+                              marginBottom: '4px',
+                              fontWeight: 500
+                            }}>
+                              Duration: {txn.metadata?.duration || 'N/A'}
+                            </div>
+
                             <div
                               style={{
                                 fontSize: '0.85em',
