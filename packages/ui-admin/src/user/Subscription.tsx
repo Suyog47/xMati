@@ -41,6 +41,8 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   const [isLoadingTransactions, setIsLoadingTransactions] = useState(true)
   const [isPaymentFailedDialogOpen, setIsPaymentFailedDialogOpen] = useState(false)
   const [paymentFailedMessage, setPaymentFailedMessage] = useState('')
+  const [isFailedCancelDialogOpen, setIsFailedCancelDialogOpen] = useState(false)
+  const [failedCancelMessage, setFailedCancelMessage] = useState('')
 
 
   const amount = useMemo(() => {
@@ -177,10 +179,12 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         setIsCancelDialogOpen(true)
         toggle()
       } else {
-        alert('Refund failed: ' + data.error)
+        setFailedCancelMessage(data.error || 'Refund failed. Please try again later.')
+        setIsFailedCancelDialogOpen(true)
       }
     } catch (err: any) {
-      alert('Refund error: ' + err.message)
+      setFailedCancelMessage(err.message || 'An error occurred while processing your cancellation.')
+      setIsFailedCancelDialogOpen(true)
     } finally {
       setIsCancelProcessing(false)
     }
@@ -494,7 +498,6 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         title="Subscribe & Pay"
         icon="dollar"
         isOpen={isOpen}
-        // onOpening={getClientSecret}
         onClose={toggle}
         canOutsideClickClose={false}
         style={{
@@ -1109,6 +1112,45 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
             onClick={() => {
               setIsPaymentDialogOpen(false)
               setIsPaymentFailedDialogOpen(false)
+            }}
+            style={{
+              marginTop: '20px',
+              padding: '14px 32px',
+              fontSize: '1.05em',
+              fontWeight: 'bold',
+              minWidth: '250px',
+              borderRadius: 6,
+            }}
+          >
+            Close
+          </Button>
+        </div>
+      </Dialog>
+
+      {/* Cancellation Failed dialog */}
+      <Dialog
+        isOpen={isFailedCancelDialogOpen}
+        onClose={() => {
+          setIsConfirmCancelDialogOpen(false)
+          setIsFailedCancelDialogOpen(false)
+        }}
+        title="Cancellation Failed"
+        icon="error"
+        canOutsideClickClose={true}
+      >
+        <div style={{ padding: '20px', textAlign: 'center' }}>
+          <h2 style={{ color: '#c23030', marginBottom: '10px' }}>Cancellation Failed</h2>
+          <p style={{ fontSize: '1.1em', color: '#666' }}>
+            Unfortunately, we could not cancel your subscription at this time.
+          </p>
+          <div style={{ marginTop: 10, color: '#c23030', fontWeight: 500, fontSize: 15 }}>
+            {failedCancelMessage || 'An unknown error occurred. Please try again later or contact support.'}
+          </div>
+          <Button
+            intent="primary"
+            onClick={() => {
+              setIsConfirmCancelDialogOpen(false)
+              setIsFailedCancelDialogOpen(false)
             }}
             style={{
               marginTop: '20px',
