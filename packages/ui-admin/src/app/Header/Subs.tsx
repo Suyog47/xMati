@@ -105,7 +105,7 @@ export const Subs = () => {
                   fontWeight: 600,
                   fontSize: 16,
                   color: '#106ba3',
-                  backgroundColor: '#CDCCCC',
+                  backgroundColor: '#e3e3e3',
                   padding: '6px 14px',              // Internal padding
                   borderRadius: '10px',
                   display: 'inline-block',          // Shrink to fit content

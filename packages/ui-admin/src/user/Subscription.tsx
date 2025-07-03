@@ -39,6 +39,8 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   const [isCancelProcessing, setIsCancelProcessing] = useState(false)
   const [selectedDuration, setSelectedDuration] = useState<string>('monthly')
   const [isLoadingTransactions, setIsLoadingTransactions] = useState(true)
+  const [isPaymentFailedDialogOpen, setIsPaymentFailedDialogOpen] = useState(false)
+  const [paymentFailedMessage, setPaymentFailedMessage] = useState('')
 
 
   const amount = useMemo(() => {
@@ -49,7 +51,6 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     }
     return selectedTab === 'Starter' ? 1800 : 10000 // Default monthly price
   }, [selectedTab, selectedDuration])
-
 
   const getClientSecret = useCallback(async () => {
     setIsLoadingSecret(true)
@@ -84,6 +85,33 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     }
   }, [amount])
 
+  const fetchedOnceRef = useRef(false)
+  useEffect(() => {
+    if (isOpen) {
+      void getClientSecret()
+
+      // Only fetch transactions once
+      if (!fetchedOnceRef.current) {
+        void fetchTransactions()
+        fetchedOnceRef.current = true
+      }
+    }
+
+    setSubscription(savedSubData.subscription || '')
+
+    const formattedExpiryTill = savedSubData.till
+      ? new Date(savedSubData.till).toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        // hour: '2-digit',
+        // minute: '2-digit',
+        // second: '2-digit',
+        // hour12: true, // Use 12-hour format
+      })
+      : ''
+    setExpiryTill(formattedExpiryTill)
+  }, [isOpen, getClientSecret])
 
   const fetchTransactions = async () => {
     setIsLoadingTransactions(true)
@@ -180,34 +208,6 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     }
   }
 
-  const fetchedOnceRef = useRef(false)
-  useEffect(() => {
-    if (isOpen) {
-      void getClientSecret()
-
-      // Only fetch transactions once
-      if (!fetchedOnceRef.current) {
-        void fetchTransactions()
-        fetchedOnceRef.current = true
-      }
-    }
-
-    setSubscription(savedSubData.subscription || '')
-
-    const formattedExpiryTill = savedSubData.till
-      ? new Date(savedSubData.till).toLocaleString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        // hour: '2-digit',
-        // minute: '2-digit',
-        // second: '2-digit',
-        // hour12: true, // Use 12-hour format
-      })
-      : ''
-    setExpiryTill(formattedExpiryTill)
-  }, [isOpen, getClientSecret])
-
 
   const CheckoutForm = useMemo(() => () => {
     const stripe = useStripe()
@@ -216,7 +216,6 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     const [isProcessing, setIsProcessing] = useState(false)
     const [paymentRequest, setPaymentRequest] = useState<PaymentRequest | null>(null)
 
-    // Initialize PaymentRequest (Apple/Google Pay)
     useEffect(() => {
       void (async () => {
         if (!stripe) {
@@ -239,8 +238,20 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
 
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault()
-      if (!stripe || !elements || !clientSecret) {
-        return // Add clientSecret check
+      // Validate Stripe and Elements instances
+      if (!stripe || !elements) {
+        setPaymentFailedMessage('Stripe is not initialized. Please try again later.')
+        setIsPaymentFailedDialogOpen(true)
+
+        throw new Error('Stripe is not initialized. Please try again later.')
+      }
+
+      // Validate clientSecret
+      if (!clientSecret || !isValidClientSecret(clientSecret)) {
+        setPaymentFailedMessage('Invalid client secret. Please contact support.')
+        setIsPaymentFailedDialogOpen(true)
+
+        throw new Error('Invalid client secret. Please contact support.')
       }
 
       setIsProcessing(true)
@@ -249,23 +260,27 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       try {
         const cardElement = elements.getElement(CardElement)
         if (!cardElement) {
-          throw new Error('Card details missing')
+          throw new Error('Card details are missing. Please enter your card information.')
         }
         const { error: paymentError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
           payment_method: {
-            card: cardElement, metadata: { // Attaches to PaymentMethod
+            card: cardElement!, metadata: { // Attaches to PaymentMethod
               subscription: selectedTab,
               duration: selectedDuration
             }
           },
         })
 
+        // Handle payment errors
         if (paymentError) {
-          throw paymentError
+          throw new Error(paymentError.message || 'An error occurred during payment processing.')
         }
 
         // Check the payment status
         if (paymentIntent?.status !== 'succeeded') {
+          setPaymentFailedMessage('Please try again or use a different payment method.')
+          setIsPaymentFailedDialogOpen(true)
+
           void paymentFailedEmail()
           throw new Error('Payment failed. Please try again or use a different payment method.')
         }
@@ -872,13 +887,27 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
           )}
 
           {paymentError && (
-            <div style={{ color: 'red', margin: '15px 0' }}>{paymentError}</div>
+            <div style={{ color: 'red', margin: '15px 0', textAlign: 'center' }}>
+              {paymentError || 'An error occurred while processing your payment. Please try again.'}
+            </div>
           )}
 
-          {!isLoadingSecret && clientSecret && (
+          {!isLoadingSecret && !clientSecret && (
+            <div style={{ color: 'red', margin: '15px 0', textAlign: 'center' }}>
+              Unable to proceed with payment. Please contact support or try again later.
+            </div>
+          )}
+
+          {!isLoadingSecret && clientSecret && isValidClientSecret(clientSecret) ? (
             <Elements stripe={stripePromise} options={{ clientSecret }}>
               <CheckoutForm />
             </Elements>
+          ) : (
+            !isLoadingSecret && (
+              <div style={{ color: 'red', margin: '15px 0', textAlign: 'center' }}>
+                {paymentError || 'Got Invalid Client secret. Please try again later.'}
+              </div>
+            )
           )}
         </div>
       </Dialog>
@@ -1057,8 +1086,48 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         </div>
       </Dialog>
 
+      <Dialog
+        isOpen={isPaymentFailedDialogOpen}
+        onClose={() => {
+          setIsPaymentDialogOpen(false)
+          setIsPaymentFailedDialogOpen(false)
+        }}
+        title="Payment Failed"
+        icon="error"
+        canOutsideClickClose={true}
+      >
+        <div style={{ padding: '20px', textAlign: 'center' }}>
+          <h2 style={{ color: '#c23030', marginBottom: '10px' }}>Payment Failed</h2>
+          <p style={{ fontSize: '1.1em', color: '#666' }}>
+            Unfortunately, your payment could not be processed.
+          </p>
+          <div style={{ marginTop: 10, color: '#c23030', fontWeight: 500, fontSize: 15 }}>
+            {paymentFailedMessage || 'An unknown error occurred. Please try again later.'}
+          </div>
+          <Button
+            intent="primary"
+            onClick={() => {
+              setIsPaymentDialogOpen(false)
+              setIsPaymentFailedDialogOpen(false)
+            }}
+            style={{
+              marginTop: '20px',
+              padding: '14px 32px',
+              fontSize: '1.05em',
+              fontWeight: 'bold',
+              minWidth: '250px',
+              borderRadius: 6,
+            }}
+          >
+            Close
+          </Button>
+        </div>
+      </Dialog>
     </>
   )
+}
+const isValidClientSecret = (secret: string) => {
+  return /^pi_[a-zA-Z0-9]+_secret_[a-zA-Z0-9]+$/.test(secret)
 }
 
 export default Subscription
