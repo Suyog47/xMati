@@ -123,7 +123,16 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: savedFormData.email })
       })
+
       const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error)
+      }
+
+      if (!data || !Array.isArray(data.charges)) {
+        throw new Error('Invalid data of transactions.')
+      }
 
       const latestCharge = data?.charges?.[0]
       if (latestCharge?.id) {
@@ -134,6 +143,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         setTransactions(data.charges)
       }
     } catch (error) {
+      alert(error)
       console.error('Failed to fetch transactions:', error)
     } finally {
       setIsLoadingTransactions(false)
