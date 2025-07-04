@@ -658,7 +658,7 @@ export class BotService {
     return this._loadBotTemplateFiles(templatePath)
   }
 
-  private async _serializeFolder(location: any = '../kbot') {
+  private async _serializeFolder(location: any = '../kbot2') {
     let result = ''
 
     function getFiles(dir: string): string[] {

@@ -1,0 +1,27 @@
+{
+  "version": "0.0.1",
+  "catchAll": {
+    "next": []
+  },
+  "startNode": "entry",
+  "skillData": {
+    "toAddress": "dummy@gmail.com",
+    "subjectElement": "builtin_text-1SjoYb",
+    "contentElement": "builtin_text-spyIQJ"
+  },
+  "nodes": [
+    {
+      "name": "entry",
+      "onEnter": [
+        "basic-skills/send_email {\"toAddress\":\"dummy@gmail.com\",\"subjectElement\":\"builtin_text-1SjoYb\",\"contentElement\":\"builtin_text-spyIQJ\"}"
+      ],
+      "next": [
+        {
+          "condition": "true",
+          "node": "#"
+        }
+      ],
+      "id": "903424"
+    }
+  ]
+}

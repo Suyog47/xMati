@@ -1,0 +1,29 @@
+{
+  "name": "renew_policy",
+  "utterances": {
+    "en": [
+      "\"I want to renew my insurance policy.\""
+    ]
+  },
+  "slots": [
+    {
+      "id": "a4aH0qnfXitUois747PC4",
+      "name": "policy_number",
+      "entities": [
+        "any"
+      ],
+      "color": 1
+    },
+    {
+      "id": "Tz5BxL55jr7DlkIdzBc4m",
+      "name": "renewal_date",
+      "entities": [
+        "time"
+      ],
+      "color": 2
+    }
+  ],
+  "contexts": [
+    "global"
+  ]
+}

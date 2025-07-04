@@ -100,9 +100,6 @@ class CreateBotModal extends Component<Props, State> {
   }
 
   openChannelDialog = (e) => {
-    console.log('botName', this.state.botName)
-    console.log('botPrompt', this.state.botPrompt)
-    console.log('selectedTemplate', this.state.selectedTemplate)
     e.preventDefault() // Prevents form submission if needed
     this.state.selectedChannel = undefined
     this.setState({ isChannelDialogOpen: true, verifyToken: this.generateRandomString(16) })

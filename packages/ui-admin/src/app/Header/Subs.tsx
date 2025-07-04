@@ -113,7 +113,7 @@ export const Subs = () => {
                   marginTop: 10,
                 }}
               >
-                {(subscription.toLowerCase() === 'trial' || subscription.toLowerCase() === 'starter')
+                {(subscription === 'Trial' || subscription.toLowerCase() === 'starter')
                   ? '3 bots included'
                   : subscription.toLowerCase() === 'professional'
                     ? '5 bots included'

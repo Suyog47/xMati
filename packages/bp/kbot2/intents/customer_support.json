@@ -1,0 +1,29 @@
+{
+  "name": "customer_support",
+  "utterances": {
+    "en": [
+      "\"I need help with my insurance policy.\""
+    ]
+  },
+  "slots": [
+    {
+      "id": "3rU1moUnmnDrmfZIckKHW",
+      "name": "issue_type",
+      "entities": [
+        "any"
+      ],
+      "color": 1
+    },
+    {
+      "id": "2umzgXdpsFmDyrZrdygho",
+      "name": "preferred_contact",
+      "entities": [
+        "any"
+      ],
+      "color": 2
+    }
+  ],
+  "contexts": [
+    "global"
+  ]
+}

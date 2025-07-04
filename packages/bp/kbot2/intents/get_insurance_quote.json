@@ -1,0 +1,30 @@
+{
+  "name": "get_insurance_quote",
+  "utterances": {
+    "en": [
+      "\"Can you give me a quote for health insurance?\""
+    ]
+  },
+  "slots": [
+    {
+      "id": "yoRd0qI2Ja8r9U1oHn8u3",
+      "name": "age",
+      "entities": [
+        "number",
+        "any"
+      ],
+      "color": 2
+    },
+    {
+      "id": "t8g6HEuwtJ2Ox4TwpxjXI",
+      "name": "coverage_amount",
+      "entities": [
+        "number"
+      ],
+      "color": 3
+    }
+  ],
+  "contexts": [
+    "global"
+  ]
+}
