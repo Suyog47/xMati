@@ -37,12 +37,43 @@ const UpdateCardDetails: FC<Props> = props => {
 
   useEffect(() => {
     const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
-    console.log('Saved Form Data:', savedFormData)
     setCardNumber(savedFormData.card || '')
     setCardCVC(savedFormData.cardCVC || '')
     setCardExpiry(savedFormData.cardExpiry || '')
     setErrors({})
   }, [props.isOpen])
+
+  const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value.replace(/-/g, '').replace(/\D/g, '') // Remove dashes and non-digit characters
+    const formattedValue = rawValue
+      .match(/.{1,4}/g) // Group digits in chunks of 4
+      ?.join('-') || '' // Join with '-' if there are groups
+
+    setCardNumber(formattedValue)
+    if (errors.cardNumber) {
+      setErrors({
+        ...errors,
+        cardNumber: '',
+      })
+    }
+  }
+
+  const handleExpiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value.replace(/\D/g, '') // Remove non-digit characters
+    let formattedValue = rawValue
+
+    if (rawValue.length > 2) {
+      formattedValue = `${rawValue.slice(0, 2)}/${rawValue.slice(2, 4)}` // Add '/' after the first 2 digits
+    }
+
+    setCardExpiry(formattedValue)
+    if (errors.cardExpiry) {
+      setErrors({
+        ...errors,
+        cardExpiry: '',
+      })
+    }
+  }
 
   const validate = (formData: any) => {
     const newErrors: { [key: string]: string } = {}
@@ -50,9 +81,9 @@ const UpdateCardDetails: FC<Props> = props => {
     // Card Number validation
     if (!formData.cardNumber.trim()) {
       newErrors.cardNumber = 'Card Number is required'
-    } else if (!/^\d{15,16}$/.test(formData.cardNumber.trim())) {
-      newErrors.cardNumber = 'Card Number must be 15 or 16 digits only'
-    } else if (!validateCardNumber(formData.cardNumber.trim())) {
+    } else if (!/^\d{15,16}$/.test(formData.cardNumber.replace(/-/g, '').trim())) { // Remove dashes before validation
+      newErrors.cardNumber = 'Card Number must be 15 or 16 digits'
+    } else if (!validateCardNumber(formData.cardNumber.replace(/-/g, '').trim())) { // Validate card number without dashes
       newErrors.cardNumber = 'The Card Number is Invalid'
     }
 
@@ -118,8 +149,6 @@ const UpdateCardDetails: FC<Props> = props => {
       }
     }
 
-    console.log('Card Type:', cardType)
-
     if (!cardType) {
       return false
     }
@@ -160,7 +189,7 @@ const UpdateCardDetails: FC<Props> = props => {
     // Trim all fields before validation and update
     const formData = {
       ...savedFormData,
-      card: cardNumber.trim(),
+      card: cardNumber.trim(), // Save card number without dashes
       cardCVC: cardCVC.trim(),
       cardExpiry: cardExpiry.trim()
     }
@@ -237,13 +266,13 @@ const UpdateCardDetails: FC<Props> = props => {
               <InputGroup
                 id="input-card-number"
                 value={cardNumber}
-                onChange={e => setCardNumber(e.target.value)}
+                onChange={handleCardNumberChange}
                 tabIndex={1}
                 autoFocus={true}
                 disabled={isLoading}
                 intent={errors.cardNumber ? Intent.DANGER : Intent.NONE}
-                maxLength={16}
-                placeholder="Enter 16-digit card number"
+                maxLength={19} // Account for dashes
+                placeholder="Enter card number (e.g., 4111-1111-1111-1111)"
               />
             </FormGroup>
             <FormGroup
@@ -272,11 +301,11 @@ const UpdateCardDetails: FC<Props> = props => {
               <InputGroup
                 id="input-card-expiry"
                 value={cardExpiry}
-                onChange={e => setCardExpiry(e.target.value)}
+                onChange={handleExpiryChange}
                 tabIndex={3}
                 disabled={isLoading}
                 intent={errors.cardExpiry ? Intent.DANGER : Intent.NONE}
-                maxLength={5}
+                maxLength={5} // Account for MM/YY format
                 placeholder="MM/YY"
               />
             </FormGroup>

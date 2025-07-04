@@ -170,6 +170,46 @@ const CustomerWizard: React.FC = () => {
     }
   }
 
+  const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value.replace(/-/g, '').replace(/\D/g, '') // Remove '-' and non-digit characters
+    const formattedValue = rawValue
+      .match(/.{1,4}/g) // Group digits in chunks of 4
+      ?.join('-') || '' // Join with '-' if there are groups
+
+    setFormData({
+      ...formData,
+      cardNumber: formattedValue,
+    })
+
+    if (errors.cardNumber) {
+      setErrors({
+        ...errors,
+        cardNumber: '',
+      })
+    }
+  }
+
+  const handleExpiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value.replace(/\D/g, '') // Remove non-digit characters
+    let formattedValue = rawValue
+
+    if (rawValue.length > 2) {
+      formattedValue = `${rawValue.slice(0, 2)}/${rawValue.slice(2, 4)}` // Add '/' after the first 2 digits
+    }
+
+    setFormData({
+      ...formData,
+      cardExpiry: formattedValue,
+    })
+
+    if (errors.cardExpiry) {
+      setErrors({
+        ...errors,
+        cardExpiry: '',
+      })
+    }
+  }
+
   const validateStep = async (): Promise<boolean> => {
     const newErrors: Errors = {}
 
@@ -224,9 +264,9 @@ const CustomerWizard: React.FC = () => {
     } else if (step === 3) {
       if (!formData.cardNumber.trim()) {
         newErrors.cardNumber = 'Card Number is required'
-      } else if (!/^\d{15,16}$/.test(formData.cardNumber.trim())) {
+      } else if (!/^\d{15,16}$/.test(formData.cardNumber.replace(/-/g, '').trim())) { // Remove dashes before validation
         newErrors.cardNumber = 'Card Number must be 15 or 16 digits'
-      } else if (!validateCardNumber(formData.cardNumber.trim())) {
+      } else if (!validateCardNumber(formData.cardNumber.replace(/-/g, '').trim())) {
         newErrors.cardNumber = 'The Card Number is Invalid'
       }
 
@@ -274,7 +314,6 @@ const CustomerWizard: React.FC = () => {
   const handleSubmit = async () => {
     if (await validateStep()) {
       if (formData && typeof formData === 'object') {
-        // setIsLoading(true)
         let status = await register()
         setIsLoading(false)
         if (status) {
@@ -427,7 +466,7 @@ const CustomerWizard: React.FC = () => {
     const updatedFormData = {
       fullName: formData.fullName,
       email: formData.email,
-      phoneNumber: formData.countryCode + formData.phoneNumber, // Save full number
+      phoneNumber: formData.phoneNumber, // Save full number
       countryCode: formData.countryCode, // Save separately as well if needed
       password: formData.password,
       organisationName: formData.organisationName,
@@ -492,8 +531,6 @@ const CustomerWizard: React.FC = () => {
         break
       }
     }
-
-    console.log('Card Type:', cardType)
 
     if (!cardType) {
       return false
@@ -777,8 +814,9 @@ const CustomerWizard: React.FC = () => {
                     name='cardNumber'
                     placeholder='Card Number'
                     value={formData.cardNumber}
-                    onChange={handleChange}
+                    onChange={handleCardNumberChange}
                     className='custom-input'
+                    maxLength={19} // Limit input length to account for '-' characters
                   />
                 </div>
                 {errors.cardNumber && <span className='error'>{errors.cardNumber}</span>}
@@ -798,15 +836,16 @@ const CustomerWizard: React.FC = () => {
                   </div>
                   {/* {errors.cardCVC && <span className='error'>{errors.cardCVC}</span>} */}
                   <div className='input-container'>
-                    <label htmlFor='cardExpiry'>Expiry Date (MM/YY)</label>
+                    <label htmlFor='cardExpiry'>Card Expiry</label>
                     <input
                       type='text'
                       id='cardExpiry'
                       name='cardExpiry'
                       placeholder='MM/YY'
                       value={formData.cardExpiry}
-                      onChange={handleChange}
+                      onChange={handleExpiryChange}
                       className='custom-input'
+                      maxLength={5} // Limit input length to 'MM/YY'
                     />
                   </div>
                   {/* {errors.cardExpiry && <span className='error'>{errors.cardExpiry}</span>} */}
