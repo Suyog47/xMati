@@ -50,8 +50,10 @@ const UpdateCardDetails: FC<Props> = props => {
     // Card Number validation
     if (!formData.cardNumber.trim()) {
       newErrors.cardNumber = 'Card Number is required'
-    } else if (!/^\d{16}$/.test(formData.cardNumber.trim())) {
-      newErrors.cardNumber = 'Card Number must be 16 digits'
+    } else if (!/^\d{15,16}$/.test(formData.cardNumber.trim())) {
+      newErrors.cardNumber = 'Card Number must be 15 or 16 digits only'
+    } else if (!validateCardNumber(formData.cardNumber.trim())) {
+      newErrors.cardNumber = 'The Card Number is Invalid'
     }
 
     // Card CVC validation
@@ -83,6 +85,73 @@ const UpdateCardDetails: FC<Props> = props => {
     }
 
     return newErrors
+  }
+
+  // Function to validate card number
+  function validateCardNumber(cardNumber) {
+    // Remove spaces or dashes from the card number
+    cardNumber = cardNumber.replace(/\s|-/g, '')
+
+    // Define regex patterns for card types
+    const cardPatterns = {
+      VISA: /^4[0-9]{12}(?:[0-9]{3})?$/,
+      MASTERCARD: /^5[1-5][0-9]{14}$/,
+      AMEX: /^3[47][0-9]{13}$/,
+      DISCOVER: /^6(?:011|5[0-9]{2})[0-9]{12}$/, // Discover cards (USA)
+      DINERS_CLUB: /^3(?:0[0-5]|[68][0-9])[0-9]{11}$/, // Diners Club
+      JCB: /^(?:2131|1800|35\d{3})\d{11}$/, // JCB cards
+      RUPAY: /^(60|65|81|82)[0-9]{14}$/, // RuPay cards (India)
+      UNIONPAY: /^(62[0-9]{14,17})$/, // UnionPay cards
+      MAESTRO: /^(5[0678]\d{11,18}|6\d{12,17})$/, // Maestro cards
+    }
+
+    if (!/^\d+$/.test(cardNumber)) {
+      return false
+    }
+
+    // Check card type
+    let cardType: string | null = null
+    for (const [type, pattern] of Object.entries(cardPatterns)) {
+      if (pattern.test(cardNumber)) {
+        cardType = type
+        break
+      }
+    }
+
+    console.log('Card Type:', cardType)
+
+    if (!cardType) {
+      return false
+    }
+
+    // Validate using Luhn algorithm
+    if (!isValidLuhn(cardNumber)) {
+      return false
+    }
+
+    return true
+  }
+
+  // Luhn algorithm implementation
+  function isValidLuhn(cardNumber) {
+    let sum = 0
+    let shouldDouble = false
+
+    for (let i = cardNumber.length - 1; i >= 0; i--) {
+      let digit = parseInt(cardNumber[i], 10)
+
+      if (shouldDouble) {
+        digit *= 2
+        if (digit > 9) {
+          digit -= 9
+        }
+      }
+
+      sum += digit
+      shouldDouble = !shouldDouble
+    }
+
+    return sum % 10 === 0
   }
 
   const submit = async event => {
