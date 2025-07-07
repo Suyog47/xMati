@@ -342,7 +342,7 @@ const CustomerWizard: React.FC = () => {
         return false
       }
 
-      // make an api call to login the admin
+      // make an api call for internal login
       const { data } = await api.getAnonymous({ toastErrors: false }).post('/admin/auth/login/basic/default', {
         email: 'admin@gmail.com',
         password: 'Admin@123'
@@ -351,9 +351,8 @@ const CustomerWizard: React.FC = () => {
       //set auth token after login
       auth.setToken(data.payload)
 
-      // create subscription for the user
-      await setSubscriber()
-      await setStripeCustomer()
+      // set stripe customer
+      void setStripeCustomer()
       return true
     } catch (error) {
       const errorMsg =
@@ -371,8 +370,8 @@ const CustomerWizard: React.FC = () => {
       const updatedFormData = {
         fullName: formData.fullName,
         email: formData.email,
-        phoneNumber: formData.phoneNumber, // Save full number
-        countryCode: formData.countryCode, // Save separately as well if needed
+        phoneNumber: formData.phoneNumber,
+        countryCode: formData.countryCode,
         password: formData.password,
         organisationName: formData.organisationName,
         industryType: formData.industryType,
@@ -383,7 +382,7 @@ const CustomerWizard: React.FC = () => {
         stripeCustomerId: custId.data
       }
 
-      const result = await fetch('https://www.app.xmati.ai/apis/user-auth', {
+      const result = await fetch('http://localhost:8000/user-auth', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -401,24 +400,24 @@ const CustomerWizard: React.FC = () => {
     }
   }
 
-  const setSubscriber = async () => {
-    try {
-      const result = await fetch('https://www.app.xmati.ai/apis/save-subscription', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key: formData.email, name: formData.fullName, subscription: 'Trial', duration: '15d', amount: '0' }),
-      })
+  // const setSubscriber = async () => {
+  //   try {
+  //     const result = await fetch('https://www.app.xmati.ai/apis/save-subscription', {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({ key: formData.email, name: formData.fullName, subscription: 'Trial', duration: '15d', amount: '0' }),
+  //     })
 
-      return result.json()
-    } catch (err: any) {
-      setIsLoading(false)
-      return { success: false, msg: 'Error uploading subscription to S3' }
-    }
-  }
+  //     return result.json()
+  //   } catch (err: any) {
+  //     setIsLoading(false)
+  //     return { success: false, msg: 'Error uploading subscription to S3' }
+  //   }
+  // }
 
   const setStripeCustomer = async () => {
     try {
-      const result = await fetch('https://www.app.xmati.ai/apis/create-stripe-customer', {
+      const result = await fetch('http://localhost:8000/create-stripe-customer', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: formData.email }),

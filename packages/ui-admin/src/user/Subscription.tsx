@@ -11,10 +11,10 @@ import { Dialog, Button, FormGroup, Icon, Spinner } from '@blueprintjs/core'
 import BasicAuthentication from '~/auth/basicAuth'
 
 // For development use
-// const stripePromise = loadStripe('pk_test_51RLimpPBSMPLjWxm3IUaX63iUb4TqhU5prbUsg7A5RwG2sZsukOa7doAAhPu2RpEkYXZ2dRLNrOA4Pby9IscZOse00unCEcNDG')
+const stripePromise = loadStripe('pk_test_51RLimpPBSMPLjWxm3IUaX63iUb4TqhU5prbUsg7A5RwG2sZsukOa7doAAhPu2RpEkYXZ2dRLNrOA4Pby9IscZOse00unCEcNDG')
 
 //For production use
-const stripePromise = loadStripe('pk_live_51RPPI0EncrURrNgDF2LNkLrh5Wf53SIe3WjqPqjtzqbJWDGfDFeG4VvzUXuC4nCmrPTNOTeFENuAqRBw1mvbNJg600URDxPnuc')
+//const stripePromise = loadStripe('pk_live_51RPPI0EncrURrNgDF2LNkLrh5Wf53SIe3WjqPqjtzqbJWDGfDFeG4VvzUXuC4nCmrPTNOTeFENuAqRBw1mvbNJg600URDxPnuc')
 
 interface Props {
   isOpen: boolean
@@ -58,7 +58,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     setIsLoadingSecret(true)
     setPaymentError('')
     try {
-      const result = await fetch('https://www.app.xmati.ai/apis/create-payment-intent', {
+      const result = await fetch('http://localhost:8000/create-payment-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -89,6 +89,9 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
 
   const fetchedOnceRef = useRef(false)
   useEffect(() => {
+    console.log(subscription !== 'Trial' &&
+      savedSubData.canCancel === true &&
+      savedSubData.expired !== true)
     if (isOpen) {
       void getClientSecret()
 
@@ -118,7 +121,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   const fetchTransactions = async () => {
     setIsLoadingTransactions(true)
     try {
-      const res = await fetch('https://www.app.xmati.ai/apis/get-stripe-transactions', {
+      const res = await fetch('http://localhost:8000/get-stripe-transactions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: savedFormData.email })
@@ -153,7 +156,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   const downloadCSV = async () => {
     const email = savedFormData.email
 
-    const res = await fetch('https://www.app.xmati.ai/apis/download-csv', {
+    const res = await fetch('http://localhost:8000/download-csv', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ data: transactions, email }),
@@ -173,7 +176,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     setIsCancelProcessing(true)
 
     try {
-      const res = await fetch('https://www.app.xmati.ai/apis/refund', {
+      const res = await fetch('http://localhost:8000/refund', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -204,7 +207,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     try {
       const { fullName, email } = savedFormData
 
-      const result = await fetch('https://www.app.xmati.ai/apis/save-subscription', {
+      const result = await fetch('http://localhost:8000/save-subscription', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ key: email, name: fullName, subscription: 'Trial', duration: '3d', amount: 0 }),
@@ -314,7 +317,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       try {
         const { fullName, email } = savedFormData
 
-        const result = await fetch('https://www.app.xmati.ai/apis/failed-payment', {
+        const result = await fetch('http://localhost:8000/failed-payment', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, name: fullName, subscription: selectedTab, amount: `$${amount / 100}` }),
@@ -332,7 +335,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
         const { fullName, email } = savedFormData
 
-        const result = await fetch('https://www.app.xmati.ai/apis/save-subscription', {
+        const result = await fetch('http://localhost:8000/save-subscription', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ key: email, name: fullName, subscription: selectedTab, duration: selectedDuration, amount: `$${amount / 100}` }),
@@ -664,7 +667,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                   fontSize: '1.1em',
                   fontWeight: 600,
                   borderRadius: 6,
-                  flex: subscription === 'Trial' ? 1 : 0.5, // Full width if trial, half otherwise
+                  flex: 1,
                 }}
                 onClick={() => togglePaymentDialog(true)}
               >
@@ -682,7 +685,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                       fontSize: '1.1em',
                       fontWeight: 600,
                       borderRadius: 6,
-                      flex: 0.5,
+                      flex: 1,
                     }}
                     onClick={() => {
                       setIsConfirmCancelDialogOpen(true)
@@ -750,7 +753,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
 
                 <button
                   onClick={() => {
-                    if (!isLoadingTransactions) {
+                    if (!isLoadingTransactions && transactions.length > 0) {
                       void downloadCSV()
                     }
                   }}
@@ -762,14 +765,15 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                     borderRadius: '6px',
                     fontSize: '1em',
                     fontWeight: 500,
-                    cursor: isLoadingTransactions ? 'not-allowed' : 'pointer',
-                    opacity: isLoadingTransactions ? 0.4 : 1,
+                    cursor: (transactions.length === 0 || isLoadingTransactions) ? 'not-allowed' : 'pointer',
+                    opacity: (transactions.length === 0 || isLoadingTransactions) ? 0.4 : 1,
                     display: 'flex',
                     alignItems: 'center',
                     gap: '8px',
                   }}
+                  disabled={transactions.length === 0 || isLoadingTransactions} // Disable button if no transactions or loading
                 >
-                  <span role="img" aria-label="download">📥</span> Download PDF
+                  <span role="img" aria-label="download">📥</span> Download CSV
                 </button>
 
               </div>

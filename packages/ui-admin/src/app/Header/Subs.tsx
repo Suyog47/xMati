@@ -226,7 +226,7 @@ export const Subs = () => {
               ? 'Your plan will expire today.'
               : days !== '-' && days > 0
                 ? `Your plan expires in ${days} day${days > 1 ? 's' : ''}`
-                : 'Your plan has expired.'}
+                : 'Your plan has been expired.'}
           </div>
 
           <hr

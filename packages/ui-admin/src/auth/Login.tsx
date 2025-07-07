@@ -141,7 +141,8 @@ const Login: FC<Props> = props => {
       }
 
       let subStatus = await userSubscription(email)
-      if (subStatus.success) {
+      console.log('Subscription result:', subStatus.status)
+      if (!subStatus.status) {
         setError(subStatus.msg)
         return
       }
@@ -162,7 +163,7 @@ const Login: FC<Props> = props => {
 
   const userLogin = async (email, password) => {
     try {
-      const result = await fetch('https://www.app.xmati.ai/apis/user-auth', {
+      const result = await fetch('http://localhost:8000/user-auth', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -183,7 +184,7 @@ const Login: FC<Props> = props => {
 
   const userSubscription = async (email) => {
     try {
-      const result = await fetch('https://www.app.xmati.ai/apis/get-subscription', {
+      const result = await fetch('http://localhost:8000/get-subscription', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -223,7 +224,6 @@ const Login: FC<Props> = props => {
     const createdDateUTC = new Date(subData.createdAt).toISOString().split('T')[0]
     const tillDateUTC = new Date(subData.till).toISOString().split('T')[0]
 
-    // Calculate days remaining
     const currentDate = new Date(currentUTC)
     const createdDate = new Date(createdDateUTC)
     const tillDate = new Date(tillDateUTC)
