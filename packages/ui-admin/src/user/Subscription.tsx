@@ -89,9 +89,6 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
 
   const fetchedOnceRef = useRef(false)
   useEffect(() => {
-    console.log(subscription !== 'Trial' &&
-      savedSubData.canCancel === true &&
-      savedSubData.expired !== true)
     if (isOpen) {
       void getClientSecret()
 
@@ -219,7 +216,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         throw new Error('Subscriber revoking failed')
       }
 
-      localStorage.setItem('subData', JSON.stringify({ ...savedSubData, subscription: 'Trial', duration: '3d', amount: 0, canCancel: false }))
+      localStorage.setItem('subData', JSON.stringify({ ...savedSubData, subscription: 'Trial', duration: '3d', amount: 0, canCancel: false, subsChanged: true }))
     } catch (err: any) {
       throw new Error('Something went wrong while revoking subscription data: ' + err.message)
     }
@@ -347,7 +344,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
           throw new Error('Subscriber activation failed')
         }
 
-        localStorage.setItem('subData', JSON.stringify({ ...savedSubData, subscription: selectedTab, duration: selectedDuration, amount: `$${amount / 100}`, expired: false, canCancel: true }))
+        localStorage.setItem('subData', JSON.stringify({ ...savedSubData, subscription: selectedTab, duration: selectedDuration, amount: `$${amount / 100}`, expired: false, canCancel: true, subsChanged: true }))
       } catch (err: any) {
         throw new Error('Something went wrong while saving subscription data: ' + err.message)
       }

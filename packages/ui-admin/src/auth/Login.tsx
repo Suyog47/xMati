@@ -254,7 +254,8 @@ const Login: FC<Props> = props => {
       promptRun: false,  // set the prompt run to false
       amount: subData.amount,
       duration: subData.duration,
-      canCancel
+      canCancel,
+      subsChanged: false,
     }
 
     localStorage.setItem('formData', JSON.stringify(updatedFormData))
