@@ -1,6 +1,5 @@
-import { Button, Classes, Dialog, FormGroup, InputGroup, Intent, Checkbox } from '@blueprintjs/core'
-import { logger } from 'botpress/sdk'
-import { lang, toast, auth } from 'botpress/shared'
+import { Button, Classes, Dialog, FormGroup, InputGroup, Intent, Spinner } from '@blueprintjs/core'
+import { lang, toast } from 'botpress/shared'
 import { UserProfile } from 'common/typings'
 import React, { FC, useState } from 'react'
 import api from '~/app/api'
@@ -16,8 +15,28 @@ const UpdatePassword: FC<Props> = props => {
   const [password, setPassword] = useState<string>('')
   const [newPassword, setNewPassword] = useState<string>('')
   const [confirmPassword, setConfirmPassword] = useState<string>('')
-  const [invalidateActiveSessions, setInvalidateActiveSessions] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
+  const loaderOverlayStyle: React.CSSProperties = {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100vw',
+    height: '100vh',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    zIndex: 99999, // Ensure it overlays the dialog
+  }
+
+  const loaderTextStyle: React.CSSProperties = {
+    marginTop: 24,
+    fontSize: 20,
+    fontWeight: 500,
+    color: 'black'
+  }
 
   const submit = async event => {
     event.preventDefault()
@@ -28,8 +47,12 @@ const UpdatePassword: FC<Props> = props => {
       return
     }
 
+    setIsLoading(true)
+
     const updatedFormData = { ...savedFormData, password: newPassword }
     let res = await s3Call(updatedFormData)
+    setIsLoading(false)
+
     if (!res.success) {
       toast.failure(res.msg)
       return
@@ -43,7 +66,7 @@ const UpdatePassword: FC<Props> = props => {
 
   const s3Call = async (data) => {
     try {
-      const result = await fetch('https://www.app.xmati.ai/apis/user-auth', {
+      const result = await fetch('http://localhost:8000/user-auth', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -60,7 +83,6 @@ const UpdatePassword: FC<Props> = props => {
     }
   }
 
-
   const clear = () => {
     setPassword('')
     setNewPassword('')
@@ -68,75 +90,72 @@ const UpdatePassword: FC<Props> = props => {
   }
 
   return (
-    <Dialog
-      title={lang.tr('admin.changeYourPassword')}
-      icon="key"
-      isOpen={props.isOpen}
-      onClose={props.toggle}
-      onClosed={clear}
-      transitionDuration={0}
-      canOutsideClickClose={false}
-    >
-      <form onSubmit={submit}>
-        <div className={Classes.DIALOG_BODY}>
-          <FormGroup label={lang.tr('admin.currentPassword')}>
-            <InputGroup
-              id="input-password"
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              tabIndex={1}
-              autoFocus={true}
-            />
-          </FormGroup>
+    <>
+      <Dialog
+        title={lang.tr('admin.changeYourPassword')}
+        icon="key"
+        isOpen={props.isOpen}
+        onClose={props.toggle}
+        onClosed={clear}
+        transitionDuration={0}
+        canOutsideClickClose={false}
+      >
+        <form onSubmit={submit}>
+          <div className={Classes.DIALOG_BODY}>
+            <FormGroup label={lang.tr('admin.currentPassword')}>
+              <InputGroup
+                id="input-password"
+                type="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                tabIndex={1}
+                autoFocus={true}
+              />
+            </FormGroup>
 
-          <FormGroup label={lang.tr('admin.newPassword')}>
-            <InputGroup
-              id="input-newPassword"
-              type="password"
-              value={newPassword}
-              onChange={e => setNewPassword(e.target.value)}
-              tabIndex={2}
-            />
-          </FormGroup>
+            <FormGroup label={lang.tr('admin.newPassword')}>
+              <InputGroup
+                id="input-newPassword"
+                type="password"
+                value={newPassword}
+                onChange={e => setNewPassword(e.target.value)}
+                tabIndex={2}
+              />
+            </FormGroup>
 
-          <FormGroup label={lang.tr('admin.confirmPassword')}>
-            <InputGroup
-              id="input-confirmPassword"
-              type="password"
-              value={confirmPassword}
-              onChange={e => setConfirmPassword(e.target.value)}
-              tabIndex={3}
-            />
-          </FormGroup>
-          <PasswordStrengthMeter pwdCandidate={newPassword} />
-
-          <FormGroup>
-            <Checkbox
-              checked={invalidateActiveSessions}
-              onChange={() => {
-                setInvalidateActiveSessions(!invalidateActiveSessions)
-              }}
-            >
-              {lang.tr('admin.invalidateActiveSessions')}
-            </Checkbox>
-          </FormGroup>
-        </div>
-
-        <div className={Classes.DIALOG_FOOTER}>
-          <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-            <Button
-              id="btn-submit-update-password"
-              type="submit"
-              text={lang.tr('save')}
-              tabIndex={4}
-              intent={Intent.PRIMARY}
-              disabled={!password || !newPassword || newPassword !== confirmPassword}
-            />
+            <FormGroup label={lang.tr('admin.confirmPassword')}>
+              <InputGroup
+                id="input-confirmPassword"
+                type="password"
+                value={confirmPassword}
+                onChange={e => setConfirmPassword(e.target.value)}
+                tabIndex={3}
+              />
+            </FormGroup>
+            <PasswordStrengthMeter pwdCandidate={newPassword} />
           </div>
-        </div>
-      </form>
-    </Dialog>
+
+          <div className={Classes.DIALOG_FOOTER}>
+            <div className={Classes.DIALOG_FOOTER_ACTIONS}>
+              <Button
+                id="btn-submit-update-password"
+                type="submit"
+                text={lang.tr('save')}
+                tabIndex={4}
+                intent={Intent.PRIMARY}
+                disabled={!password || !newPassword || newPassword !== confirmPassword}
+              />
+            </div>
+          </div>
+        </form>
+        {isLoading && (
+          <div style={loaderOverlayStyle}>
+            <Spinner size={50} />
+            <div style={loaderTextStyle}>Your password is being updated</div>
+          </div>
+        )}
+      </Dialog>
+    </>
   )
 }
 

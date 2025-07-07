@@ -68,7 +68,7 @@ export const ChangePasswordForm: FC<Props> = props => {
     setIsLoading(true)
     setPassChecked(false)
     try {
-      let result = await fetch('https://www.app.xmati.ai/apis/forgot-pass', {
+      let result = await fetch('http://localhost:8000/forgot-pass', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
