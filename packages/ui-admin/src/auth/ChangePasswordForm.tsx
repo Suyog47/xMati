@@ -1,18 +1,19 @@
 import { Button, FormGroup, InputGroup, Intent, Spinner, SpinnerSize } from '@blueprintjs/core'
 import { lang } from 'botpress/shared'
 import React, { FC, useState } from 'react'
-import { PasswordStrengthMeter } from './PasswordStrengthMeter/PasswordStrengthMeter'
 import { useHistory } from 'react-router-dom'
 
-interface Props {
-  // email?: string
-  // onChangePassword: (newPassword, confirmPassword) => void
-}
+interface Props { }
 
 export const ChangePasswordForm: FC<Props> = props => {
   const [email, setEmail] = useState('')
   const [isEmailValid, setEmailValid] = useState(false)
   const [emailChecked, setEmailChecked] = useState(false)
+
+  const [otp, setOtp] = useState('')
+  const [receivedOtp, setReceivedOtp] = useState('')
+  const [isOtpValid, setOtpValid] = useState(false)
+  const [otpChecked, setOtpChecked] = useState(false)
 
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -22,7 +23,6 @@ export const ChangePasswordForm: FC<Props> = props => {
 
   const [isLoading, setIsLoading] = useState(false)
   const history = useHistory()
-
 
   const validatePassword = (password: string) => {
     const minLength = 8
@@ -61,14 +61,69 @@ export const ChangePasswordForm: FC<Props> = props => {
 
   const onSubmit = async e => {
     e.preventDefault()
-    await updatePass()
+    if (!isEmailValid) {
+      await checkEmail()
+    } else if (!isOtpValid) {
+      await validateOtp()
+    } else {
+      await updatePass()
+    }
+  }
+
+  const checkEmail = async () => {
+    setIsLoading(true)
+    setEmailChecked(false)
+    try {
+      const result = await fetch('http://localhost:8000/check-user', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email.trim(),
+        }),
+      })
+
+      const data = await result.json()
+      if (result.status === 200) {     // Registered email
+        setEmailValid(true)
+        setEmailChecked(true)
+        console.log(data.otp)
+        setReceivedOtp(data.otp) // Capture OTP from response
+      } else { // Unregistered email
+        setEmailValid(false)
+        setEmailChecked(true)
+      }
+    } catch (error) {
+      setEmailValid(false)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const validateOtp = async () => {
+    setIsLoading(true)
+    setOtpChecked(false)
+    try {
+      if (otp === receivedOtp.toString()) {
+        setOtpValid(true)
+        setOtpChecked(true)
+      } else {
+        setOtpValid(false)
+        setOtpChecked(true)
+      }
+    } catch (error) {
+      setOtpValid(false)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const updatePass = async () => {
     setIsLoading(true)
     setPassChecked(false)
     try {
-      let result = await fetch('http://localhost:8000/forgot-pass', {
+      const result = await fetch('http://localhost:8000/forgot-pass', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -83,7 +138,7 @@ export const ChangePasswordForm: FC<Props> = props => {
         setPassSuccess(true)
         setPassChecked(true)
         history.push({
-          pathname: '/login'
+          pathname: '/login',
         })
       } else {
         setPassSuccess(false)
@@ -91,49 +146,14 @@ export const ChangePasswordForm: FC<Props> = props => {
       }
     } catch (error) {
       setPassSuccess(false)
-      return 'Error uploading credentials to S3'
     } finally {
       setIsLoading(false)
     }
   }
-
-  const checkEmail = async e => {
-    e.preventDefault()
-    setIsLoading(true)
-    setEmailChecked(false)
-    try {
-      const result = await fetch('https://www.app.xmati.ai/apis/check-user', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: email.trim(),
-        }),
-      })
-
-      if (result.status === 400) {    // 400 means email already registered
-        setEmailValid(true)
-        setEmailChecked(true)
-      } else if (result.status === 200) {     // 200 means email is available to register
-        setEmailValid(false)
-        setEmailChecked(true)
-      } else {       // 500 means something went wrong
-        setEmailValid(false)
-        setEmailChecked(true)
-      }
-    } catch (error) {
-      setEmailValid(false)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
 
   return (
     <div className="form-container" style={{ position: 'relative' }}>
-      <form onSubmit={isEmailValid ? onSubmit : checkEmail}>
-
+      <form onSubmit={onSubmit}>
         <FormGroup label={'Email'}>
           <InputGroup
             tabIndex={1}
@@ -152,22 +172,54 @@ export const ChangePasswordForm: FC<Props> = props => {
           )}
         </FormGroup>
 
-        <Button
-          tabIndex={2}
-          type="submit"
-          text='Check Email'
-          id="btn-check-email"
-          disabled={isLoading || isEmailValid || !email}
-          intent={Intent.WARNING}
-          rightIcon={isLoading ? <Spinner size={SpinnerSize.SMALL} /> : null}
-        />
-        <br /><br />
+        {!isEmailValid && (
+          <Button
+            tabIndex={2}
+            type="submit"
+            text="Check Email"
+            id="btn-check-email"
+            disabled={isLoading || !email}
+            intent={Intent.WARNING}
+            rightIcon={isLoading ? <Spinner size={SpinnerSize.SMALL} /> : null}
+          />
+        )}
 
-        {isEmailValid && (
+        {isEmailValid && !isOtpValid && (
+          <>
+            <FormGroup label={'OTP'}>
+              <InputGroup
+                tabIndex={3}
+                value={otp}
+                onChange={e => setOtp(e.target.value)}
+                type="text"
+                name="otp"
+                id="otp"
+                disabled={isLoading}
+              />
+              {otpChecked && !isOtpValid && (
+                <div className="error-message" style={{ color: 'red', marginTop: '5px' }}>
+                  Invalid OTP
+                </div>
+              )}
+            </FormGroup>
+
+            <Button
+              tabIndex={4}
+              type="submit"
+              text="Validate OTP"
+              id="btn-validate-otp"
+              disabled={isLoading || !otp}
+              intent={Intent.WARNING}
+              rightIcon={isLoading ? <Spinner size={SpinnerSize.SMALL} /> : null}
+            />
+          </>
+        )}
+
+        {isOtpValid && (
           <>
             <FormGroup label={lang.tr('admin.newPassword')}>
               <InputGroup
-                tabIndex={3}
+                tabIndex={5}
                 value={newPassword}
                 onChange={e => handlePasswordChange(e.target.value)}
                 type="password"
@@ -183,11 +235,9 @@ export const ChangePasswordForm: FC<Props> = props => {
               )}
             </FormGroup>
 
-
-
             <FormGroup label={lang.tr('admin.confirmPassword')}>
               <InputGroup
-                tabIndex={4}
+                tabIndex={6}
                 value={confirmPassword}
                 onChange={e => setConfirmPassword(e.target.value)}
                 type="password"
@@ -195,10 +245,8 @@ export const ChangePasswordForm: FC<Props> = props => {
                 id="confirmPassword"
                 disabled={isLoading}
               />
-
             </FormGroup>
 
-            {/* <PasswordStrengthMeter pwdCandidate={newPassword} /> */}
             {newPassword && confirmPassword && newPassword !== confirmPassword && (
               <div className="error-message" style={{ color: 'red' }}>
                 Passwords don't match
@@ -212,7 +260,7 @@ export const ChangePasswordForm: FC<Props> = props => {
             )}
 
             <Button
-              tabIndex={5}
+              tabIndex={7}
               type="submit"
               text={lang.tr('admin.change')}
               id="btn-change-pass"

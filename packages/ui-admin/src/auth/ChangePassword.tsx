@@ -18,20 +18,7 @@ export const ChangePassword: React.FC = () => {
     if (newPassword !== confirmPassword) {
       return setError(lang.tr('admin.passwordsDontMatch'))
     }
-
-    // try {
-    //   setError(undefined)
-    //   await props.auth.login({ email, password, newPassword }, loginUrl)
-    // } catch (err) {
-    //   setError(err.message)
-    // }
   }
-
-  // const subtitle = password === '' ? lang.tr('admin.firstTimeYouRun') : lang.tr('admin.setANewPassword')
-
-  // if (props.auth.isAuthenticated() || !email || !loginUrl) {
-  //   return <Redirect to="/" />
-  // }
 
   return (
     <LoginContainer title={'Forgot Password'} subtitle={''} error={error}>
