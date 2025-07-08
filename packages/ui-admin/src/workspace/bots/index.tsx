@@ -159,7 +159,7 @@ class Bots extends Component<Props> {
     ) {
       this.setState({ isLoading: true }) // Show the loader
       try {
-        await api.getSecured().post(`/admin/workspace/bots/${savedFormData.email}/${botId}/delete`)
+        await api.getSecured().post(`/admin/workspace/bots/${savedFormData.fullName}/${savedFormData.email}/${botId}/delete`)
         this.props.fetchBots()
         setTimeout(() => {
           window.location.reload()    // reloading for the bot creation limit check

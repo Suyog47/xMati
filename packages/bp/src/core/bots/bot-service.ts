@@ -67,6 +67,9 @@ export class BotService {
   private _updateBotHealthDebounce = _.debounce(this._updateBotHealth, 500)
   public dummyBot = ''
 
+  // Add static properties for global access
+  public static fullName: string | undefined
+  public static organisationName: string | undefined
 
   constructor(
     @inject(TYPES.Logger)
@@ -151,13 +154,17 @@ export class BotService {
     return workspace?.botPrefix ? `${workspace.botPrefix}__${botId}` : botId
   }
 
-  async addBot(bot: BotConfig, botTemplate: BotTemplate, source: BotConfig, desc: BotConfig, email: any): Promise<void> {
+  async addBot(bot: BotConfig, botTemplate: BotTemplate, source: BotConfig, desc: BotConfig, email: any, fullName: any, organisationName: any): Promise<void> {
     this.stats.track('bot', 'create')
 
     const { error } = Joi.validate(bot, BotCreationSchema)
     if (error) {
       throw new InvalidOperationError(`An error occurred while creating the bot: ${error.message}`)
     }
+
+    // Save fullName and organizationName globally
+    BotService.fullName = fullName
+    BotService.organisationName = organisationName
 
     let mergedConfigs
     if (source.from == 'llm') {
@@ -637,18 +644,23 @@ export class BotService {
     this._invalidateBotIds()
   }
 
-  async deleteFromS3(key: string) {
-    const result = await axios('https://www.app.xmati.ai/apis/delete-bot', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      data: {
-        key,
-      },
-    })
+  async deleteFromS3(key: string, fullName: string) {
+    try {
+      const result = await axios('http://localhost:8000/delete-bot', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        data: {
+          fullName: fullName,
+          key,
+        },
+      })
 
-    console.log(result.data);
+      console.log(result.data);
+    } catch (error) {
+      console.error('Error deleting from S3:', error);
+    }
   }
 
   public async getBotTemplate(moduleId: string, templateId: string): Promise<FileContent[]> {
@@ -908,12 +920,14 @@ export class BotService {
   private _saveData = async (key, data) => {
     try {
       const compressedData = await this._compressRequest(data);
-      const result = await axios('https://www.app.xmati.ai/apis/save-bot', {
+      const result = await axios('http://localhost:8000/save-bot', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         data: {
+          fullName: BotService.fullName,
+          organizationName: BotService.organisationName,
           key,
           data: compressedData,
         },

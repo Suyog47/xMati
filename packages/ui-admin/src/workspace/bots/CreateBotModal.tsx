@@ -135,6 +135,8 @@ class CreateBotModal extends Component<Props, State> {
     this.setState({ isProcessing: true, showFullScreenLoader: true })
 
     const newBot = {
+      fullName: savedFormData.fullName,
+      organisationName: savedFormData.organisationName,
       id: this.state.botId,
       name: this.state.botName,
       owner: savedFormData.email,

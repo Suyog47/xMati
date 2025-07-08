@@ -153,6 +153,7 @@ class BotsRouter extends CustomAdminRouter {
         const messengerVerifyToken = <BotConfig>_.pick(req.body, ['messengerVerifyToken'])
         const twilioAccountSid = <BotConfig>_.pick(req.body, ['twilioAccountSid'])
         const twilioAuthToken = <BotConfig>_.pick(req.body, ['twilioAuthToken'])
+        const { fullName, organisationName } = req.body
 
         await assertBotInWorkspace(bot.id, req.workspace, bot.name)
         const botExists = (await this.botService.getBotsIds()).includes(bot.id)
@@ -213,7 +214,7 @@ class BotsRouter extends CustomAdminRouter {
             }
           }
 
-          await this.botService.addBot(bot, req.body.template, source, botDesc, bot.owner)
+          await this.botService.addBot(bot, req.body.template, source, botDesc, bot.owner, fullName, organisationName)
         }
 
         if (botLinked) {
@@ -269,14 +270,14 @@ class BotsRouter extends CustomAdminRouter {
     )
 
     router.post(
-      '/:owner/:botId/delete',
+      '/:fullName/:owner/:botId/delete',
       this.needPermissions('write', this.resource),
       this.asyncMiddleware(async (req, res) => {
-        const { owner, botId } = req.params
+        const { fullName, owner, botId } = req.params
 
         try {
           await this.botService.deleteBot(botId)
-          await this.botService.deleteFromS3(`${owner}_${botId}`)
+          this.botService.deleteFromS3(`${owner}_${botId}`, fullName)
           await this.workspaceService.deleteBotRef(botId)
           return sendSuccess(res, 'Removed bot from team', { botId })
         } catch (err) {
