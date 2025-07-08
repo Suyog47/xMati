@@ -1,6 +1,6 @@
 import { Button, FormGroup, InputGroup, Intent, Spinner, SpinnerSize } from '@blueprintjs/core'
 import { lang } from 'botpress/shared'
-import React, { FC, useState } from 'react'
+import React, { FC, useState, useRef } from 'react'
 import { useHistory } from 'react-router-dom'
 
 interface Props { }
@@ -10,10 +10,11 @@ export const ChangePasswordForm: FC<Props> = props => {
   const [isEmailValid, setEmailValid] = useState(false)
   const [emailChecked, setEmailChecked] = useState(false)
 
-  const [otp, setOtp] = useState('')
+  const [otp, setOtp] = useState(['', '', '', '']) // Array for 4 OTP boxes
   const [receivedOtp, setReceivedOtp] = useState('')
   const [isOtpValid, setOtpValid] = useState(false)
   const [otpChecked, setOtpChecked] = useState(false)
+  const [otpSentMessage, setOtpSentMessage] = useState('')
 
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -23,6 +24,8 @@ export const ChangePasswordForm: FC<Props> = props => {
 
   const [isLoading, setIsLoading] = useState(false)
   const history = useHistory()
+
+  const otpRefs = useRef<HTMLInputElement[]>([]) // Refs for OTP input fields
 
   const validatePassword = (password: string) => {
     const minLength = 8
@@ -62,7 +65,7 @@ export const ChangePasswordForm: FC<Props> = props => {
   const onSubmit = async e => {
     e.preventDefault()
     if (!isEmailValid) {
-      await checkEmail()
+      await checkEmail(false)
     } else if (!isOtpValid) {
       await validateOtp()
     } else {
@@ -70,7 +73,7 @@ export const ChangePasswordForm: FC<Props> = props => {
     }
   }
 
-  const checkEmail = async () => {
+  const checkEmail = async (resend: boolean) => {
     setIsLoading(true)
     setEmailChecked(false)
     try {
@@ -85,11 +88,12 @@ export const ChangePasswordForm: FC<Props> = props => {
       })
 
       const data = await result.json()
-      if (result.status === 200) {     // Registered email
+      if (result.status === 200) { // Registered email
         setEmailValid(true)
         setEmailChecked(true)
-        console.log(data.otp)
         setReceivedOtp(data.otp) // Capture OTP from response
+        const message = resend ? `Your OTP has been resent to ${email}` : `Your OTP has been sent to ${email}`
+        setOtpSentMessage(message)
       } else { // Unregistered email
         setEmailValid(false)
         setEmailChecked(true)
@@ -105,7 +109,8 @@ export const ChangePasswordForm: FC<Props> = props => {
     setIsLoading(true)
     setOtpChecked(false)
     try {
-      if (otp === receivedOtp.toString()) {
+      const enteredOtp = otp.join('') // Combine the 4 OTP boxes into a single string
+      if (enteredOtp === receivedOtp.toString()) {
         setOtpValid(true)
         setOtpChecked(true)
       } else {
@@ -151,6 +156,24 @@ export const ChangePasswordForm: FC<Props> = props => {
     }
   }
 
+  const handleOtpChange = (index: number, value: string) => {
+    if (value.length <= 1) {
+      const newOtp = [...otp]
+      newOtp[index] = value
+      setOtp(newOtp)
+
+      // Automatically focus the next input field
+      if (value && index < otpRefs.current.length - 1) {
+        otpRefs.current[index + 1]?.focus()
+      }
+
+      // If clearing, focus back to the current or previous input field
+      if (!value && index > 0) {
+        otpRefs.current[index - 1]?.focus()
+      }
+    }
+  }
+
   return (
     <div className="form-container" style={{ position: 'relative' }}>
       <form onSubmit={onSubmit}>
@@ -186,16 +209,22 @@ export const ChangePasswordForm: FC<Props> = props => {
 
         {isEmailValid && !isOtpValid && (
           <>
+            <div style={{ marginBottom: '10px', color: 'green' }}>{otpSentMessage}</div>
             <FormGroup label={'OTP'}>
-              <InputGroup
-                tabIndex={3}
-                value={otp}
-                onChange={e => setOtp(e.target.value)}
-                type="text"
-                name="otp"
-                id="otp"
-                disabled={isLoading}
-              />
+              <div style={{ display: 'flex', gap: '10px' }}>
+                {otp.map((value, index) => (
+                  <InputGroup
+                    key={index}
+                    value={value}
+                    onChange={e => handleOtpChange(index, e.target.value)}
+                    type="text"
+                    maxLength={1}
+                    style={{ width: '50px', textAlign: 'center' }}
+                    disabled={isLoading}
+                    inputRef={el => (otpRefs.current[index] = el!)} // Assign ref to each input
+                  />
+                ))}
+              </div>
               {otpChecked && !isOtpValid && (
                 <div className="error-message" style={{ color: 'red', marginTop: '5px' }}>
                   Invalid OTP
@@ -208,9 +237,19 @@ export const ChangePasswordForm: FC<Props> = props => {
               type="submit"
               text="Validate OTP"
               id="btn-validate-otp"
-              disabled={isLoading || !otp}
+              disabled={isLoading || otp.some(value => value === '')}
               intent={Intent.WARNING}
               rightIcon={isLoading ? <Spinner size={SpinnerSize.SMALL} /> : null}
+            />
+
+            <Button
+              tabIndex={5}
+              text="Resend OTP"
+              id="btn-resend-otp"
+              onClick={() => checkEmail(true)}
+              disabled={isLoading}
+              intent={Intent.PRIMARY}
+              style={{ marginTop: '10px' }}
             />
           </>
         )}
@@ -219,7 +258,7 @@ export const ChangePasswordForm: FC<Props> = props => {
           <>
             <FormGroup label={lang.tr('admin.newPassword')}>
               <InputGroup
-                tabIndex={5}
+                tabIndex={6}
                 value={newPassword}
                 onChange={e => handlePasswordChange(e.target.value)}
                 type="password"
@@ -237,7 +276,7 @@ export const ChangePasswordForm: FC<Props> = props => {
 
             <FormGroup label={lang.tr('admin.confirmPassword')}>
               <InputGroup
-                tabIndex={6}
+                tabIndex={7}
                 value={confirmPassword}
                 onChange={e => setConfirmPassword(e.target.value)}
                 type="password"
@@ -260,7 +299,7 @@ export const ChangePasswordForm: FC<Props> = props => {
             )}
 
             <Button
-              tabIndex={7}
+              tabIndex={8}
               type="submit"
               text={lang.tr('admin.change')}
               id="btn-change-pass"
