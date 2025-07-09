@@ -170,6 +170,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   }
 
   const cancelSubscription = async () => {
+    const { fullName, email } = savedFormData
     setIsCancelProcessing(true)
 
     try {
@@ -178,13 +179,13 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ chargeId: savedSubData.transactionId, reason: '' }),
+        body: JSON.stringify({ chargeId: savedSubData.transactionId, reason: '', email, fullName }),
       })
 
       const data = await res.json()
 
       if (data.success) {
-        await revokeSubscription()
+        //await revokeSubscription()
         setIsConfirmCancelDialogOpen(false)
         setIsCancelDialogOpen(true)
         toggle()
@@ -200,27 +201,27 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     }
   }
 
-  const revokeSubscription = async () => {
-    try {
-      const { fullName, email } = savedFormData
+  // const revokeSubscription = async () => {
+  //   try {
+  //     const { fullName, email } = savedFormData
 
-      const result = await fetch('http://localhost:8000/save-subscription', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key: email, name: fullName, subscription: 'Trial', duration: '3d', amount: 0 }),
-      })
+  //     const result = await fetch('http://localhost:8000/save-subscription', {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({ key: email, name: fullName, subscription: 'Trial', duration: '3d', amount: 0 }),
+  //     })
 
-      const data = await result.json()
+  //     const data = await result.json()
 
-      if (data.status !== true) {
-        throw new Error('Subscriber revoking failed')
-      }
+  //     if (data.status !== true) {
+  //       throw new Error('Subscriber revoking failed')
+  //     }
 
-      localStorage.setItem('subData', JSON.stringify({ ...savedSubData, subscription: 'Trial', duration: '3d', amount: 0, canCancel: false, subsChanged: true }))
-    } catch (err: any) {
-      throw new Error('Something went wrong while revoking subscription data: ' + err.message)
-    }
-  }
+  //     localStorage.setItem('subData', JSON.stringify({ ...savedSubData, subscription: 'Trial', duration: '3d', amount: 0, canCancel: false, subsChanged: true }))
+  //   } catch (err: any) {
+  //     throw new Error('Something went wrong while revoking subscription data: ' + err.message)
+  //   }
+  // }
 
 
   const CheckoutForm = useMemo(() => () => {
@@ -341,7 +342,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         const data = await result.json()
 
         if (data.status !== true) {
-          throw new Error('Subscriber activation failed')
+          throw new Error(data.msg)
         }
 
         localStorage.setItem('subData', JSON.stringify({ ...savedSubData, subscription: selectedTab, duration: selectedDuration, amount: `$${amount / 100}`, expired: false, canCancel: true, subsChanged: true }))

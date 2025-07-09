@@ -268,7 +268,7 @@ export class BotService {
 
   async saveAllBots(keys) {
     keys.forEach(async (key) => {
-      await this._convertBot(`${key.owner}_${key.id}`, key.id)
+      await this._convertBot(`${key.owner}_${key.id}`, key.id, 'admin')
     })
   }
 
@@ -822,9 +822,9 @@ export class BotService {
     this._convertBot(`${owner}_${id}`, id);
   }
 
-  private async _convertBot(key, id) {
+  private async _convertBot(key, id, from = 'user') {
     const botFile = await this._serializeFolder(`./data/bots/${id}`)
-    await this._saveData(key, botFile)
+    await this._saveData(key, botFile, from)
   }
 
   private async _createBotFromLLM(botConfig: BotConfig, botDesc: string) {
@@ -927,7 +927,7 @@ export class BotService {
     }
   }
 
-  private _saveData = async (key, data) => {
+  private _saveData = async (key, data, from = 'user') => {
     try {
       //const compressedData = await this._compressRequest(data);
       const result = await axios('http://localhost:8000/save-bot', {
@@ -940,6 +940,7 @@ export class BotService {
           organizationName: BotService.organisationName,
           key,
           data: data,
+          from
         },
       })
 
@@ -951,32 +952,32 @@ export class BotService {
   }
 
   // Compress the request body
-  private async _compressRequest(data) {
-    return new Promise((resolve, reject) => {
-      zlib.gzip(JSON.stringify(data), (err, compressed) => {
-        if (err) reject(err);
-        else resolve(compressed);
-      });
-    });
-  };
+  // private async _compressRequest(data) {
+  //   return new Promise((resolve, reject) => {
+  //     zlib.gzip(JSON.stringify(data), (err, compressed) => {
+  //       if (err) reject(err);
+  //       else resolve(compressed);
+  //     });
+  //   });
+  // };
 
-  // Decompress the response body
-  private async _decompressResponse(buffer) {
-    try {
-      const decompressed = zlib.gunzipSync(buffer);
-      //console.log('Decompressed data:', decompressed.toString('utf-8'));
-      return decompressed.toString('utf-8');
-    } catch (err) {
-      console.error('Decompression failed:', err.message);
-      return false;
-    }
-    // return new Promise((resolve, reject) => {
-    //   zlib.gunzip(buffer, (err, decompressed) => {
-    //     if (err) reject(err);
-    //     else resolve(JSON.parse(decompressed.toString()));
-    //   });
-    // });
-  };
+  // // Decompress the response body
+  // private async _decompressResponse(buffer) {
+  //   try {
+  //     const decompressed = zlib.gunzipSync(buffer);
+  //     //console.log('Decompressed data:', decompressed.toString('utf-8'));
+  //     return decompressed.toString('utf-8');
+  //   } catch (err) {
+  //     console.error('Decompression failed:', err.message);
+  //     return false;
+  //   }
+  //   // return new Promise((resolve, reject) => {
+  //   //   zlib.gunzip(buffer, (err, decompressed) => {
+  //   //     if (err) reject(err);
+  //   //     else resolve(JSON.parse(decompressed.toString()));
+  //   //   });
+  //   // });
+  // };
 
 
   private _loadBotTemplateFiles(templatePath: string): FileContent[] {
