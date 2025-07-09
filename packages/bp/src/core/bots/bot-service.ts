@@ -197,23 +197,28 @@ export class BotService {
 
       result = result.data
 
-      let botIds: any[] = [];
-      for (let i = 0; i < result.data.length; i++) {
-        // convert the recieved data to buffer
-        const bufferData = Buffer.from(JSON.parse(result.data[i]['data']).data)
-        const buffer = Buffer.from(bufferData);
-        // console.log(buffer.slice(0, 50));
+      const botIds: string[] = [];
 
-        // decompress the buffer
-        const decompressedFile = await this._decompressResponse(buffer)
-        //console.log(decompressedFile)
+      for (const botRecord of result.data) {
+        try {
+          // Directly use the data from the response (no decompression needed)
+          const botConfig = botRecord.data;
 
-        // parse and save the bot inside folder 
-        const files = await this._parseBotFiles(JSON.parse(decompressedFile as string))
-        await this._saveFiles(result.data[i]['key'].toString().split('_')[1], files)
-        await this.mountBot(result.data[i]['key'].toString().split('_')[1])
-        botIds.push(result.data[i]['key'].toString().split('_')[1]);
+          // Extract bot ID from key
+          const botId = botRecord.key.toString().split('_')[1];
+
+          // Process and save the bot files
+          const files = await this._parseBotFiles(JSON.parse(botConfig));
+          await this._saveFiles(botId, files);
+          await this.mountBot(botId);
+
+          botIds.push(botId);
+        } catch (error) {
+          console.error(`Error processing bot with key ${botRecord.key}:`, error);
+          // Continue processing other bots even if one fails
+        }
       }
+
       return botIds;
     } catch (error) {
       console.log('Something went wrong in get bots', error)
@@ -232,23 +237,28 @@ export class BotService {
 
       result = result.data
 
-      let botIds: any[] = [];
-      for (let i = 0; i < result.data.length; i++) {
-        // convert the recieved data to buffer
-        const bufferData = Buffer.from(JSON.parse(result.data[i]['data']).data)
-        const buffer = Buffer.from(bufferData);
-        // console.log(buffer.slice(0, 50));
+      const botIds: string[] = [];
 
-        // decompress the buffer
-        const decompressedFile = await this._decompressResponse(buffer)
-        //console.log(decompressedFile)
+      for (const botRecord of result.data) {
+        try {
+          // Directly use the data from the response (no decompression needed)
+          const botConfig = botRecord.data;
 
-        // parse and save the bot inside folder 
-        const files = await this._parseBotFiles(JSON.parse(decompressedFile as string))
-        await this._saveFiles(result.data[i]['key'].toString().split('_')[1], files)
-        await this.mountBot(result.data[i]['key'].toString().split('_')[1])
-        botIds.push(result.data[i]['key'].toString().split('_')[1]);
+          // Extract bot ID from key
+          const botId = botRecord.key.toString().split('_')[1];
+
+          // Process and save the bot files
+          const files = await this._parseBotFiles(JSON.parse(botConfig));
+          await this._saveFiles(botId, files);
+          await this.mountBot(botId);
+
+          botIds.push(botId);
+        } catch (error) {
+          console.error(`Error processing bot with key ${botRecord.key}:`, error);
+          // Continue processing other bots even if one fails
+        }
       }
+
       return botIds;
     } catch (error) {
       console.log('Something went wrong in get bots', error)
@@ -919,7 +929,7 @@ export class BotService {
 
   private _saveData = async (key, data) => {
     try {
-      const compressedData = await this._compressRequest(data);
+      //const compressedData = await this._compressRequest(data);
       const result = await axios('http://localhost:8000/save-bot', {
         method: 'POST',
         headers: {
@@ -929,7 +939,7 @@ export class BotService {
           fullName: BotService.fullName,
           organizationName: BotService.organisationName,
           key,
-          data: compressedData,
+          data: data,
         },
       })
 
