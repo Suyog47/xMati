@@ -39,7 +39,7 @@ export const toastError = error => {
 }
 
 const createClient = (clientOptions: any, options: { toastErrors?: boolean }) => {
-  const client = axios.create({ timeout: 6000, withCredentials: window.USE_JWT_COOKIES, ...clientOptions })
+  const client = axios.create({ timeout: 600000, withCredentials: window.USE_JWT_COOKIES, ...clientOptions })
 
   client.interceptors.response.use(
     response => response,
@@ -84,7 +84,7 @@ export default {
   getSecured({
     token = undefined,
     toastErrors = true,
-    timeout = 20000,
+    timeout = 600000,
     useV1 = false,
     appendPath = ''
   }: SecuredApi = {}) {

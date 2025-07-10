@@ -142,6 +142,9 @@ class BotsRouter extends CustomAdminRouter {
       '/',
       this.needPermissions('write', this.resource),
       this.asyncMiddleware(async (req, res) => {
+        req.setTimeout(600000, () => {
+          this.logger.error('Timing out bot creation after 10 minutes')
+        })
         const bot = <BotConfig>_.pick(req.body, ['id', 'name', 'owner', 'category', 'defaultLanguage'])
         const source = <BotConfig>_.pick(req.body, ['from'])
         const botDesc = <BotConfig>_.pick(req.body, ['botDesc'])
