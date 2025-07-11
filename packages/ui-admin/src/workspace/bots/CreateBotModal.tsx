@@ -1,4 +1,4 @@
-import { Button, Classes, Dialog, FormGroup, InputGroup, Intent, Callout, Divider, Spinner } from '@blueprintjs/core'
+import { Button, Classes, Dialog, FormGroup, InputGroup, Intent, Callout, Divider, Spinner, Icon } from '@blueprintjs/core'
 import { BotChannel, BotConfig, BotTemplate } from 'botpress/sdk'
 import { lang } from 'botpress/shared'
 import _ from 'lodash'
@@ -55,6 +55,9 @@ interface State {
   selectedChannel?: BotChannel
   selectedCategory?: SelectOption<string>
   showFullScreenLoader?: boolean
+
+  showErrorDialog: boolean // New state property to control error dialog visibility
+  errorMessage: string // New state property to store error message
 }
 
 const defaultState = {
@@ -96,7 +99,9 @@ class CreateBotModal extends Component<Props, State> {
       { id: 'messenger', name: 'Facebook Messenger' },
       { id: 'whatsapp', name: 'Whatsapp' },
     ],
-    showFullScreenLoader: false
+    showFullScreenLoader: false,
+    showErrorDialog: false, // New state property to control error dialog visibility
+    errorMessage: '', // New state property to store error message
   }
 
   openChannelDialog = (e) => {
@@ -155,14 +160,34 @@ class CreateBotModal extends Component<Props, State> {
 
     try {
       let res = await api.getSecured({ timeout: 0 }).post('/admin/workspace/bots', newBot)
-      this.props.onCreateBotSuccess()
-      this.closeChannelDialog()
-      setTimeout(() => {
-        window.location.reload()    // reloading for the bot creation limit check
-      }, 500)
+      console.log(res.data.status)
+      if (res.data.status === 'success') {
+        this.props.onCreateBotSuccess()
+        this.closeChannelDialog()
+        setTimeout(() => {
+          window.location.reload()    // reloading for the bot creation limit check
+        }, 500)
+      } else {
+        this.setState({
+          errorMessage: 'Failed to create bot: ' + res.data.msg,
+          showErrorDialog: true,
+        })
+      }
     } catch (error) {
-      this.setState({ error: error.message, isProcessing: false, showFullScreenLoader: false })
+      this.setState({
+        errorMessage: error.message || 'An unexpected error occurred.',
+        showErrorDialog: true,
+      })
+    } finally {
+      this.setState({ showFullScreenLoader: false, isProcessing: false })
     }
+  }
+
+  closeErrorDialog = () => {
+    this.setState({ showErrorDialog: false, errorMessage: '' })
+    setTimeout(() => {
+      window.location.reload()    // reloading for the bot creation limit check
+    }, 500)
   }
 
   generateRandomString = (length: number = 16): string => {
@@ -185,24 +210,24 @@ class CreateBotModal extends Component<Props, State> {
   }
 
   get isPromptTooShort() {
-    return this.state.botPrompt && this.state.botPrompt.length < 10
+    return this.state.botPrompt.trim() && this.state.botPrompt.trim().length < 10
   }
 
   get isButtonDisabled() {
     const { isProcessing, botName, botPrompt, selectedTemplate } = this.state
 
     // Must have a name, not processing, and either a valid prompt or a template
-    if (!botName || isProcessing) {
+    if (!botName.trim() || isProcessing) {
       return true
     }
 
     // If both prompt and template are empty, disable
-    if (!botPrompt && !selectedTemplate) {
+    if (!botPrompt.trim() && !selectedTemplate) {
       return true
     }
 
     // If prompt is present, it must be at least 10 characters
-    if (botPrompt && botPrompt.length < 10) {
+    if (botPrompt.trim() && botPrompt.trim().length < 10) {
       return true
     }
 
@@ -218,16 +243,34 @@ class CreateBotModal extends Component<Props, State> {
     }
 
     if (selectedChannel.id === 'telegram') {
-      return !(botToken && !isProcessing)
+      return !(botToken.trim().length >= 20 && botToken.trim().length <= 90 && !isProcessing)
     }
     if (selectedChannel.id === 'slack') {
-      return !(slackBotToken && slackSigningSecret && !isProcessing)
+      return !(
+        slackBotToken.trim().length >= 20 &&
+        slackBotToken.trim().length <= 90 &&
+        slackSigningSecret.trim().length >= 20 &&
+        slackSigningSecret.trim().length <= 90 &&
+        !isProcessing
+      )
     }
     if (selectedChannel.id === 'messenger') {
-      return !(messengerAccessToken && messengerAppSecret && !isProcessing)
+      return !(
+        messengerAccessToken.trim().length >= 20 &&
+        messengerAccessToken.trim().length <= 90 &&
+        messengerAppSecret.trim().length >= 20 &&
+        messengerAppSecret.trim().length <= 90 &&
+        !isProcessing
+      )
     }
     if (selectedChannel.id === 'whatsapp') {
-      return !(twilioAccountSid && twilioAuthToken && !isProcessing)
+      return !(
+        twilioAccountSid.trim().length >= 20 &&
+        twilioAccountSid.trim().length <= 90 &&
+        twilioAuthToken.trim().length >= 20 &&
+        twilioAuthToken.trim().length <= 90 &&
+        !isProcessing
+      )
     }
 
     return false
@@ -245,7 +288,7 @@ class CreateBotModal extends Component<Props, State> {
   }
 
   render() {
-    const { botId, verifyToken } = this.state // Get the current botId from state
+    const { botId, verifyToken, selectedChannel } = this.state
 
     if (this.isBotLimitExceeded) {
       return (
@@ -317,15 +360,15 @@ class CreateBotModal extends Component<Props, State> {
       webchat: `
         <ol>
           <li>Below are the scripts that you have to implement inside your website code.</li>
-          <li><code>&lt;script src="https://www.app.xmati.ai/assets/modules/channel-web/inject.js"&gt;&lt;/script&gt;</code></li>
+          <li><code>&ltscript src="https://www.app.xmati.ai/assets/modules/channel-web/inject.js"&gt&lt/script&gt</code></li>
           <li>
             <code>
-              &lt;script&gt;<br/>
-              &nbsp;&nbsp;window.botpressWebChat.init({<br/>
-              &nbsp;&nbsp;&nbsp;&nbsp;host: "https://www.app.xmati.ai",<br/>
-              &nbsp;&nbsp;&nbsp;&nbsp;botId: "${botId}"<br/>
-              &nbsp;&nbsp;})<br/>
-              &lt;/script&gt;
+              &ltscript&gt<br/>
+              &nbsp&nbspwindow.botpressWebChat.init({<br/>
+              &nbsp&nbsp&nbsp&nbsphost: "https://www.app.xmati.ai",<br/>
+              &nbsp&nbsp&nbsp&nbspbotId: "${botId}"<br/>
+              &nbsp&nbsp})<br/>
+              &lt/script&gt
             </code>
           </li>
           <li>Please add these scripts after creating the bot here.</li>
@@ -397,10 +440,41 @@ class CreateBotModal extends Component<Props, State> {
           >
             <Spinner size={60} intent={Intent.PRIMARY} />
             <div style={{ marginTop: 24, fontSize: 18, color: '#333', fontWeight: 500 }}>
-              Your bot is getting created... This may take some time.
+              Your bot is getting created... This may take few minutes...
             </div>
           </div>
         )}
+
+        {/* Error Dialog */}
+        <Dialog
+          title="Error"
+          icon="error"
+          isOpen={this.state.showErrorDialog}
+          onClose={this.closeErrorDialog}
+          transitionDuration={0}
+          canOutsideClickClose={false}
+        >
+          <div style={{ padding: '20px', textAlign: 'center' }}>
+            <h2 style={{ color: '#c23030', marginBottom: '10px' }}>Bot Creation Failed</h2>
+            <div style={{ marginTop: 10, color: '#c23030', fontWeight: 500, fontSize: 15 }}>
+              {this.state.errorMessage || 'An unknown error occurred while creating bot. Please try again later.'}
+            </div>
+            <Button
+              intent="primary"
+              onClick={this.closeErrorDialog}
+              style={{
+                marginTop: '20px',
+                padding: '14px 32px',
+                fontSize: '1.05em',
+                fontWeight: 'bold',
+                minWidth: '250px',
+                borderRadius: 6,
+              }}
+            >
+              Close
+            </Button>
+          </div>
+        </Dialog>
 
         <Dialog
           title={lang.tr('admin.workspace.bots.create.newBot')}
@@ -523,7 +597,7 @@ class CreateBotModal extends Component<Props, State> {
           title="Select a Channel"
           icon="select"
           canOutsideClickClose={false}
-          style={{ width: '600px' }}
+          style={{ width: '600px', borderRadius: '8px', boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)' }}
         >
           <form ref={form => (this._form2 = form)}>
             <div className={Classes.DIALOG_BODY}>
@@ -538,7 +612,8 @@ class CreateBotModal extends Component<Props, State> {
                     this.setState({ selectedChannel: selectedChannel as any })
                   }}
                   getOptionLabel={o => o.name}
-                  getOptionValue={o => o.id} />
+                  getOptionValue={o => o.id}
+                />
               </FormGroup>
 
               {this.state.selectedChannel && (
@@ -557,7 +632,7 @@ class CreateBotModal extends Component<Props, State> {
                   <Divider></Divider>
                   {this.state.selectedChannel && this.state.selectedChannel.id === 'telegram' && (
                     <div>
-                      <FormGroup label="Bot Token" labelFor="bot-token">
+                      <FormGroup label="Bot Token" labelFor="bot-token" labelInfo="(Must be between 20 and 90 characters.)">
                         <InputGroup
                           id="bot-token"
                           placeholder="Enter Telegram Bot Token"
@@ -571,7 +646,7 @@ class CreateBotModal extends Component<Props, State> {
 
                   {this.state.selectedChannel && this.state.selectedChannel.id === 'slack' && (
                     <div>
-                      <FormGroup label="Slack Bot Token" labelFor="slack-bot-token">
+                      <FormGroup label="Slack Bot Token" labelFor="slack-bot-token" labelInfo="(Must be between 20 and 90 characters.)">
                         <InputGroup
                           id="slack-bot-token"
                           placeholder="Enter Slack Bot Token"
@@ -580,7 +655,7 @@ class CreateBotModal extends Component<Props, State> {
                           }}
                         />
                       </FormGroup>
-                      <FormGroup label="Slack Signing Secret" labelFor="slack-signing-secret">
+                      <FormGroup label="Slack Signing Secret" labelFor="slack-signing-secret" labelInfo="(Must be between 20 and 90 characters.)">
                         <InputGroup
                           id="slack-signing-secret"
                           placeholder="Enter Slack Signing Secret"
@@ -594,7 +669,7 @@ class CreateBotModal extends Component<Props, State> {
 
                   {this.state.selectedChannel && this.state.selectedChannel.id === 'messenger' && (
                     <div>
-                      <FormGroup label="Messenger Access Token" labelFor="messenger-access-token">
+                      <FormGroup label="Messenger Access Token" labelFor="messenger-access-token" labelInfo="(Must be between 20 and 90 characters.)">
                         <InputGroup
                           id="messenger-access-token"
                           placeholder="Enter Messenger Access Token"
@@ -603,7 +678,7 @@ class CreateBotModal extends Component<Props, State> {
                           }}
                         />
                       </FormGroup>
-                      <FormGroup label="Messenger App Secret" labelFor="messenger-app-secret">
+                      <FormGroup label="Messenger App Secret" labelFor="messenger-app-secret" labelInfo="(Must be between 20 and 90 characters.)">
                         <InputGroup
                           id="messenger-app-secret"
                           placeholder="Enter Messenger App Secret"
@@ -617,7 +692,7 @@ class CreateBotModal extends Component<Props, State> {
 
                   {this.state.selectedChannel && this.state.selectedChannel.id === 'whatsapp' && (
                     <div>
-                      <FormGroup label="Twilio account SID" labelFor="twilio-account-sid">
+                      <FormGroup label="Twilio account SID" labelFor="twilio-account-sid" labelInfo="(Must be between 20 and 90 characters.)">
                         <InputGroup
                           id="twilio-account-sid"
                           placeholder="Enter twilio account SID"
@@ -626,7 +701,7 @@ class CreateBotModal extends Component<Props, State> {
                           }}
                         />
                       </FormGroup>
-                      <FormGroup label="Twilio auth token" labelFor="twilio-auth-token">
+                      <FormGroup label="Twilio auth token" labelFor="twilio-auth-token" labelInfo="(Must be between 20 and 90 characters.)">
                         <InputGroup
                           id="twilio-auth-token"
                           placeholder="Enter Twlio auth token"
@@ -650,8 +725,8 @@ class CreateBotModal extends Component<Props, State> {
                   text={this.state.isProcessing ? lang.tr('pleaseWait') : lang.tr('admin.workspace.bots.create.create')}
                   onClick={this.createBot}
                   disabled={this.isChannelButtonDisabled}
-                  intent={Intent.PRIMARY} />
-                {/* <Button onClick={this.closeChannelDialog}>Close</Button> */}
+                  intent={Intent.PRIMARY}
+                />
               </div>
             </div>
           </form>

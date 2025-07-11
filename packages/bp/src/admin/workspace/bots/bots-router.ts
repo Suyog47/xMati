@@ -142,93 +142,109 @@ class BotsRouter extends CustomAdminRouter {
       '/',
       this.needPermissions('write', this.resource),
       this.asyncMiddleware(async (req, res) => {
-        req.setTimeout(600000, () => {
-          this.logger.error('Timing out bot creation after 10 minutes')
-        })
-        const bot = <BotConfig>_.pick(req.body, ['id', 'name', 'owner', 'category', 'defaultLanguage'])
-        const source = <BotConfig>_.pick(req.body, ['from'])
-        const botDesc = <BotConfig>_.pick(req.body, ['botDesc'])
-        const telegram = <BotConfig>_.pick(req.body, ['telegramToken'])
-        const slackBotToken = <BotConfig>_.pick(req.body, ['slackBotToken'])
-        const slackSigningSecret = <BotConfig>_.pick(req.body, ['slackSigningSecret'])
-        const messengerAccessToken = <BotConfig>_.pick(req.body, ['messengerAccessToken'])
-        const messengerAppSecret = <BotConfig>_.pick(req.body, ['messengerAppSecret'])
-        const messengerVerifyToken = <BotConfig>_.pick(req.body, ['messengerVerifyToken'])
-        const twilioAccountSid = <BotConfig>_.pick(req.body, ['twilioAccountSid'])
-        const twilioAuthToken = <BotConfig>_.pick(req.body, ['twilioAuthToken'])
-        const { fullName, organisationName } = req.body
+        let bot;
+        try {
+          req.setTimeout(600000, () => {
+            this.logger.error('Timing out bot creation after 10 minutes... Bot creation shifted background');
+          });
 
-        await assertBotInWorkspace(bot.id, req.workspace, bot.name)
-        const botExists = (await this.botService.getBotsIds()).includes(bot.id)
-        const botLinked = (await this.workspaceService.getBotRefs()).includes(bot.id)
+          bot = <BotConfig>_.pick(req.body, ['id', 'name', 'owner', 'category', 'defaultLanguage']);
+          const source = <BotConfig>_.pick(req.body, ['from']);
+          const botDesc = <BotConfig>_.pick(req.body, ['botDesc']);
+          const telegram = <BotConfig>_.pick(req.body, ['telegramToken']);
+          const slackBotToken = <BotConfig>_.pick(req.body, ['slackBotToken']);
+          const slackSigningSecret = <BotConfig>_.pick(req.body, ['slackSigningSecret']);
+          const messengerAccessToken = <BotConfig>_.pick(req.body, ['messengerAccessToken']);
+          const messengerAppSecret = <BotConfig>_.pick(req.body, ['messengerAppSecret']);
+          const messengerVerifyToken = <BotConfig>_.pick(req.body, ['messengerVerifyToken']);
+          const twilioAccountSid = <BotConfig>_.pick(req.body, ['twilioAccountSid']);
+          const twilioAuthToken = <BotConfig>_.pick(req.body, ['twilioAuthToken']);
+          const { fullName, organisationName } = req.body;
 
-        bot.id = await this.botService.makeBotId(bot.id, req.workspace!)
+          await assertBotInWorkspace(bot.id, req.workspace, bot.name);
+          const botExists = (await this.botService.getBotsIds()).includes(bot.id);
+          const botLinked = (await this.workspaceService.getBotRefs()).includes(bot.id);
 
-        if (botExists && botLinked) {
-          throw new ConflictError(`Bot "${bot.name}" already exists... Try creating with another name`)
-        }
+          bot.id = await this.botService.makeBotId(bot.id, req.workspace!);
 
-        if (botExists) {
-          this.logger.warn(`Bot "${bot.name}" already exists. Linking to workspace`)
-        } else {
-          const pipeline = await this.workspaceService.getPipeline(req.workspace!)
-
-          bot.pipeline_status = {
-            current_stage: {
-              id: pipeline![0].id,
-              promoted_on: new Date(),
-              promoted_by: req.tokenUser!.email
-            }
+          if (botExists && botLinked) {
+            throw new ConflictError(`Bot "${bot.name}" already exists... Try creating with another name`);
           }
 
+          if (botExists) {
+            this.logger.warn(`Bot "${bot.name}" already exists. Linking to workspace`);
+          } else {
+            const pipeline = await this.workspaceService.getPipeline(req.workspace!);
 
-          if (telegram.telegramToken || slackBotToken.slackBotToken || messengerAccessToken.messengerAccessToken || twilioAccountSid.twilioAccountSid) {
-            bot.messaging = {
-              channels: {
-                ...(telegram.telegramToken && {
-                  telegram: {
-                    enabled: true,
-                    botToken: telegram.telegramToken
-                  }
-                }),
-                ...(slackBotToken.slackBotToken && {
-                  slack: {
-                    enabled: true,
-                    botToken: slackBotToken.slackBotToken,
-                    signingSecret: slackSigningSecret.slackSigningSecret
-                  }
-                }),
-                ...(messengerAccessToken.messengerAccessToken && {
-                  messenger: {
-                    enabled: true,
-                    accessToken: messengerAccessToken.messengerAccessToken,
-                    appSecret: messengerAppSecret.messengerAppSecret,
-                    verifyToken: messengerVerifyToken.messengerVerifyToken
-                  }
-                }),
-                ...(twilioAccountSid.twilioAccountSid && {
-                  twilio: {
-                    enabled: true,
-                    accountSID: twilioAccountSid.twilioAccountSid,
-                    authToken: twilioAuthToken.twilioAuthToken
-                  }
-                })
-              }
+            bot.pipeline_status = {
+              current_stage: {
+                id: pipeline![0].id,
+                promoted_on: new Date(),
+                promoted_by: req.tokenUser!.email,
+              },
+            };
+
+            if (
+              telegram.telegramToken ||
+              slackBotToken.slackBotToken ||
+              messengerAccessToken.messengerAccessToken ||
+              twilioAccountSid.twilioAccountSid
+            ) {
+              bot.messaging = {
+                channels: {
+                  ...(telegram.telegramToken && {
+                    telegram: {
+                      enabled: true,
+                      botToken: telegram.telegramToken,
+                    },
+                  }),
+                  ...(slackBotToken.slackBotToken && {
+                    slack: {
+                      enabled: true,
+                      botToken: slackBotToken.slackBotToken,
+                      signingSecret: slackSigningSecret.slackSigningSecret,
+                    },
+                  }),
+                  ...(messengerAccessToken.messengerAccessToken && {
+                    messenger: {
+                      enabled: true,
+                      accessToken: messengerAccessToken.messengerAccessToken,
+                      appSecret: messengerAppSecret.messengerAppSecret,
+                      verifyToken: messengerVerifyToken.messengerVerifyToken,
+                    },
+                  }),
+                  ...(twilioAccountSid.twilioAccountSid && {
+                    twilio: {
+                      enabled: true,
+                      accountSID: twilioAccountSid.twilioAccountSid,
+                      authToken: twilioAuthToken.twilioAuthToken,
+                    },
+                  }),
+                },
+              };
             }
+
+            await this.botService.addBot(bot, req.body.template, source, botDesc, bot.owner, fullName, organisationName);
           }
 
-          await this.botService.addBot(bot, req.body.template, source, botDesc, bot.owner, fullName, organisationName)
-        }
+          if (botLinked) {
+            this.logger.warn(`Bot "${bot.id}" already linked in workspace. See workspaces.json for more details`);
+          } else {
+            await this.workspaceService.addBotRef(bot.id, req.workspace!);
+          }
 
-        if (botLinked) {
-          this.logger.warn(`Bot "${bot.id}" already linked in workspace. See workspaces.json for more details`)
-        } else {
-          await this.workspaceService.addBotRef(bot.id, req.workspace!)
+          return sendSuccess(res, 'Added new bot', {
+            botId: bot.id,
+          });
+        } catch (error) {
+          return res.json({
+            status: 'failed',
+            msg: `${error.message}`,
+            payload: {
+              botId: bot.id,
+            }
+          })
         }
-
-        return sendSuccess(res, 'Added new bot', {
-          botId: bot.id
-        })
       })
     )
 
