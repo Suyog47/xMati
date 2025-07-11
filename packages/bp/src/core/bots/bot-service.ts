@@ -656,7 +656,7 @@ export class BotService {
 
   async deleteFromS3(key: string, fullName: string) {
     try {
-      const result = await axios('http://localhost:8000/delete-bot', {
+      const result = await axios('https://www.app.xmati.ai/apis/delete-bot', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -930,7 +930,7 @@ export class BotService {
   private _saveData = async (key, data, from = 'user') => {
     try {
       //const compressedData = await this._compressRequest(data);
-      const result = await axios('http://localhost:8000/save-bot', {
+      const result = await axios('https://www.app.xmati.ai/apis/save-bot', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

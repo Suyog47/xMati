@@ -77,7 +77,7 @@ export const ChangePasswordForm: FC<Props> = props => {
     setIsLoading(true)
     setEmailChecked(false)
     try {
-      const result = await fetch('http://localhost:8000/check-user', {
+      const result = await fetch('https://www.app.xmati.ai/apis/check-user', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -128,7 +128,7 @@ export const ChangePasswordForm: FC<Props> = props => {
     setIsLoading(true)
     setPassChecked(false)
     try {
-      const result = await fetch('http://localhost:8000/forgot-pass', {
+      const result = await fetch('https://www.app.xmati.ai/apis/forgot-pass', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

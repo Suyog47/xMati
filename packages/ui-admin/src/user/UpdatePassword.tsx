@@ -66,7 +66,7 @@ const UpdatePassword: FC<Props> = props => {
 
   const s3Call = async (data) => {
     try {
-      const result = await fetch('http://localhost:8000/user-auth', {
+      const result = await fetch('https://www.app.xmati.ai/apis/user-auth', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
