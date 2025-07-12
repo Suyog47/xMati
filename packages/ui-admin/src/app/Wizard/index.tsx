@@ -445,9 +445,9 @@ const CustomerWizard: React.FC = () => {
         }),
       })
 
-      if (result.status === 400) {    // 400 means email already registered
+      if (result.status === 200) {    // 200 means email already registered
         return true
-      } else if (result.status === 200) {     // 200 means email is available to register
+      } else if (result.status === 400) {     // 400 means email is available to register
         return false
       } else {       // 500 means something went wrong
         return false
