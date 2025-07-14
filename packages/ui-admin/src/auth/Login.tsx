@@ -163,7 +163,7 @@ const Login: FC<Props> = props => {
 
   const userLogin = async (email, password) => {
     try {
-      const result = await fetch('https://www.app.xmati.ai/apis/user-auth', {
+      const result = await fetch('http://localhost:8000/user-auth', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -184,7 +184,7 @@ const Login: FC<Props> = props => {
 
   const userSubscription = async (email) => {
     try {
-      const result = await fetch('https://www.app.xmati.ai/apis/get-subscription', {
+      const result = await fetch('http://localhost:8000/get-subscription', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -241,7 +241,8 @@ const Login: FC<Props> = props => {
       const daysSinceCreation = (currentDate.getTime() - createdDate.getTime()) / msInOneDay
       const isWithinOneWeek = daysSinceCreation >= 0 && daysSinceCreation <= 7
 
-      canCancel = isWithinOneWeek
+      // keep true for now
+      canCancel = true //isWithinyarOneWeek
     }
 
 

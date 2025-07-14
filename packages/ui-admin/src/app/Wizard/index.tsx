@@ -382,7 +382,7 @@ const CustomerWizard: React.FC = () => {
         stripeCustomerId: custId.data
       }
 
-      const result = await fetch('https://www.app.xmati.ai/apis/user-auth', {
+      const result = await fetch('http://localhost:8000/user-auth', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -417,7 +417,7 @@ const CustomerWizard: React.FC = () => {
 
   const setStripeCustomer = async () => {
     try {
-      const result = await fetch('https://www.app.xmati.ai/apis/create-stripe-customer', {
+      const result = await fetch('http://localhost:8000/create-stripe-customer', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: formData.email }),
@@ -435,7 +435,7 @@ const CustomerWizard: React.FC = () => {
   const checkUser = async () => {
     setIsLoading(true)
     try {
-      const result = await fetch('https://www.app.xmati.ai/apis/check-user', {
+      const result = await fetch('http://localhost:8000/check-user', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -32,7 +32,6 @@ export const Subs = () => {
   } = savedSubData
 
   const days = typeof daysRemaining === 'string' ? parseInt(daysRemaining, 10) : daysRemaining
-
   return (
     <div id="subscription_dropdown">
       <Tooltip content="View Subscription" position="bottom">
