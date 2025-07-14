@@ -814,7 +814,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                           }}
                         >
                           <div style={{ flex: 1 }}>
-                            {/* Subscription Header - New Section */}
+                            {/* Subscription Header */}
                             <div style={{
                               fontWeight: 700,
                               fontSize: '1.1em',
@@ -839,7 +839,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                               })}
                             </div>
 
-                            {/* Duration - New Section */}
+                            {/* Duration */}
                             <div style={{
                               fontSize: '0.9em',
                               color: '#5c7080',
@@ -857,17 +857,26 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                             >
                               Status: {txn.refunded ? 'Refunded' : txn.status}
                             </div>
-                            {txn.refunded && txn.refunds?.data?.length > 0 && (
-                              <div style={{ fontSize: '0.8em', color: '#b58900' }}>
-                                Refunded: on{' '}
-                                {new Date(txn.refunds.data[0].created * 1000).toLocaleDateString('en-US', {
-                                  year: 'numeric',
-                                  month: 'short',
-                                  day: 'numeric',
-                                  hour: '2-digit',
-                                  minute: '2-digit',
-                                  hour12: true,
-                                })}
+
+                            {/* Partial Refund Details */}
+                            {!txn.refunded && txn.refunds?.data?.length > 0 && (
+                              <div style={{ fontSize: '0.8em', color: '#b58900', marginTop: '6px' }}>
+                                <strong>Partial Refund:</strong>
+                                <ul style={{ paddingLeft: '20px', marginTop: '4px' }}>
+                                  {txn.refunds.data.map((refund, refundIdx) => (
+                                    <li key={refundIdx}>
+                                      Amount Refunded: ${refund.amount / 100} on{' '}
+                                      {new Date(refund.created * 1000).toLocaleDateString('en-US', {
+                                        year: 'numeric',
+                                        month: 'short',
+                                        day: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                        hour12: true,
+                                      })}
+                                    </li>
+                                  ))}
+                                </ul>
                               </div>
                             )}
                           </div>
