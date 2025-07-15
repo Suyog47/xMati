@@ -190,6 +190,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         setIsConfirmCancelDialogOpen(false)
         setIsCancelDialogOpen(true)
         toggle()
+        localStorage.setItem('subData', JSON.stringify({ ...savedSubData, canCancel: false, subsChanged: true }))
       } else {
         setFailedCancelMessage(data.error || 'Refund failed. Please try again later.')
         setIsFailedCancelDialogOpen(true)
@@ -201,29 +202,6 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       setIsCancelProcessing(false)
     }
   }
-
-  // const revokeSubscription = async () => {
-  //   try {
-  //     const { fullName, email } = savedFormData
-
-  //     const result = await fetch('http://localhost:8000/save-subscription', {
-  //       method: 'POST',
-  //       headers: { 'Content-Type': 'application/json' },
-  //       body: JSON.stringify({ key: email, name: fullName, subscription: 'Trial', duration: '3d', amount: 0 }),
-  //     })
-
-  //     const data = await result.json()
-
-  //     if (data.status !== true) {
-  //       throw new Error('Subscriber revoking failed')
-  //     }
-
-  //     localStorage.setItem('subData', JSON.stringify({ ...savedSubData, subscription: 'Trial', duration: '3d', amount: 0, canCancel: false, subsChanged: true }))
-  //   } catch (err: any) {
-  //     throw new Error('Something went wrong while revoking subscription data: ' + err.message)
-  //   }
-  // }
-
 
   const CheckoutForm = useMemo(() => () => {
     const stripe = useStripe()
@@ -675,6 +653,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
 
               {subscription !== 'Trial' &&
                 savedSubData.canCancel === true &&
+                savedSubData.duration !== 'custom' &&
                 savedSubData.expired !== true && (
                   <Button
                     intent="danger"
@@ -1035,10 +1014,10 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         <div style={{ padding: '20px', textAlign: 'center' }}>
           <h2 style={{ color: '#d9822b', marginBottom: '10px' }}>Are you sure?</h2>
           <p style={{ fontSize: '1.1em', color: '#666' }}>
-            Cancelling your subscription will <strong>revoke your account</strong> and convert it to a <strong>3-day trial</strong>. You will get the refund on your Bank Account.
+            Cancelling will keep you subscription active until the end of the current subscription period. Any applicable refund for the remaining month (If any) will be processed shortly..
           </p>
           <div style={{ marginTop: 24, color: '#c23030', fontWeight: 500, fontSize: 16 }}>
-            This action is irreversible. You will need to <strong>log-in again</strong> to continue using the trial plan.
+            This action is irreversible. You will need to <strong>log-in again</strong> to continue using the plan.
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginTop: 30 }}>
@@ -1111,6 +1090,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         </div>
       </Dialog>
 
+      {/* Payment Failed dialog */}
       <Dialog
         isOpen={isPaymentFailedDialogOpen}
         onClose={() => {
