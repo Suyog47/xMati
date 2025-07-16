@@ -43,6 +43,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   const [paymentFailedMessage, setPaymentFailedMessage] = useState('')
   const [isFailedCancelDialogOpen, setIsFailedCancelDialogOpen] = useState(false)
   const [failedCancelMessage, setFailedCancelMessage] = useState('')
+  const [cardData, setCardData] = useState<any>(null) // State to store card_data
 
 
   const amount = useMemo(() => {
@@ -64,6 +65,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         body: JSON.stringify({
           amount, currency: 'usd',
           customerId: { id: savedFormData.stripeCustomerId },
+          paymentMethodId: savedFormData.stripePayementId,
           email: savedFormData.email,
           subscription: selectedTab,
           duration: selectedDuration
@@ -79,6 +81,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         throw new Error('Invalid server response')
       }
       setClientSecret(data.client_secret.client_secret)
+      setCardData(data.card_data)
     } catch (err: any) {
       setPaymentError(err.message)
       setClientSecret('')
@@ -227,11 +230,12 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         if (result) {
           setPaymentRequest(pr)
         }
-      })
+      })()
     }, [stripe, amount])
 
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault()
+
       // Validate Stripe and Elements instances
       if (!stripe || !elements) {
         setPaymentFailedMessage('Stripe is not initialized. Please try again later.')
@@ -252,17 +256,12 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       setError('')
 
       try {
-        const cardElement = elements.getElement(CardElement)
-        if (!cardElement) {
-          throw new Error('Card details are missing. Please enter your card information.')
-        }
+        // const cardElement = elements.getElement(CardElement)
+        // if (!cardElement) {
+        //   throw new Error('Card details are missing. Please enter your card information.')
+        // }
         const { error: paymentError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-          payment_method: {
-            card: cardElement!, metadata: { // Attaches to PaymentMethod
-              subscription: selectedTab,
-              duration: selectedDuration
-            }
-          },
+          payment_method: savedFormData.stripePayementId,
         })
 
         // Handle payment errors
@@ -374,30 +373,41 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
             </div>
           </div>
         )}
-        <div style={{ padding: 10 }}>
-          {/* Dedicated Card Section */}
+        <div style={{ padding: 10, textAlign: 'center' }}>
+          {/* Display card_data */}
+          {cardData && (
+            <div style={{ marginBottom: '10px', padding: '10px', textAlign: 'center' }}>
+              <h4 style={{ marginBottom: '10px', fontSize: '1.2em', color: '#333' }}>
+                Your Card Details:
+              </h4>
+
+              {/* Card Brand */}
+              <p style={{ margin: 0, fontSize: '1.1em', color: '#666' }}>
+                <strong>Card Brand:</strong> {cardData.brand}
+              </p>
+
+              {/* Last 4 Digits and Expiry in One Line */}
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10px', gap: '20px' }}>
+                <p style={{ margin: 0, fontSize: '1.1em', color: '#666' }}>
+                  <strong>Last 4 Digits:</strong> **** **** **** {cardData.last4}
+                </p>
+                <p style={{ margin: 0, fontSize: '1.1em', color: '#666' }}>
+                  <strong>Expiry:</strong> {cardData.exp_month}/{cardData.exp_year}
+                </p>
+              </div>
+            </div>
+          )}
+
+
+          {/* Divider */}
+          <div style={{
+            borderTop: '1px solid #e0e0e0',
+            margin: '20px 0',
+          }}></div>
+
+
+          {/* Payment Form */}
           <form onSubmit={handleSubmit}>
-
-            <FormGroup label="Credit/Debit Card Details">
-              <CardElement
-                options={{
-                  style: {
-                    base: { fontSize: '16px', color: '#424770' },
-                    invalid: { color: '#9e2146' },
-                  },
-                  hidePostalCode: true,
-                }}
-              />
-            </FormGroup>
-
-            {error && <div style={{ color: 'red', margin: '15px 0' }}>{error}</div>}
-
-            {/* Divider */}
-            <div style={{
-              borderTop: '1px solid #e0e0e0',
-              margin: '20px 0',
-            }}></div>
-
             {/* Radio Buttons for Half-yearly and Yearly Options */}
             <div style={{ marginTop: '20px', textAlign: 'center' }}>
               <h4>Select Subscription Duration</h4>
@@ -454,21 +464,35 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
               loading={isProcessing}
               fill
               style={{ marginTop: '20px' }}
+              onSubmit={handleSubmit}
             >
               {isProcessing ? 'Processing...' : `Pay $${amount / 100}`}
             </Button>
-            <p style={{ fontSize: '0.85em', color: '#666', textAlign: 'center' }}>You will be logged-out once the subscription plan has been purchased</p>
-          </form>
-          {/* Apple/Google Pay Section
+
+            {/* <FormGroup label="Credit/Debit Card Details">
+              <CardElement
+                options={{
+                  style: {
+                    base: { fontSize: '16px', color: '#424770' },
+                    invalid: { color: '#9e2146' },
+                  },
+                  hidePostalCode: true,
+                }}
+              />
+            </FormGroup> */}
+
+            {/* Apple/Google Pay Section
           {paymentRequest && (
             <div style={{ marginTop: 30 }}>
               <PaymentRequestButtonElement options={{ paymentRequest }} />
             </div>
           )} */}
+            {error && <div style={{ color: 'red', margin: '15px 0' }}>{error}</div>}
+          </form>
         </div>
       </>
     )
-  }, [clientSecret, amount, toggle]) // Add required dependencies
+  }, [clientSecret, amount, cardData, toggle])
 
 
   const togglePaymentDialog = async (val) => {

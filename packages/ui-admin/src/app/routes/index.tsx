@@ -34,6 +34,7 @@ import PrivateRoute from './PrivateRoute'
 import SegmentHandler from './SegmentHandler'
 import CustomerWizard from '../Wizard'
 import MaintenanceWrapper from './MaintenanceWrapper'
+import MainScreen from '../Wizard/MainScreen'
 
 const setupBranding = () => {
   window.document.title = window.APP_NAME || 'xMati Panel'
@@ -89,8 +90,8 @@ export const makeMainRoutes = () => {
         <ConnectedRouter history={history}>
           <MaintenanceWrapper>
             <Switch>
-              <Route path="/botCreation" component={CustomerWizard} />
-              <Route path="/botCreation/admin123" component={CustomerWizard} />
+              <Route path="/botCreation" component={MainScreen} />
+              <Route path="/botCreation/admin123" component={MainScreen} />
               <Route path="/login/:strategy?/:workspace?" render={props => <LoginPage auth={auth} {...props} />} />
               <Route path="/login/admin123/:strategy?/:workspace?" render={props => <LoginPage auth={auth} {...props} />} />
               <Route path="/register/:strategy?/:workspace?" render={props => <RegisterPage auth={auth} {...props} />} />

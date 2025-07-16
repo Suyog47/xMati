@@ -9,9 +9,9 @@ import bgImage from '../../assets/images/background.jpg'
 import logo from '../../assets/images/xmati.png'
 import api from '~/app/api'
 import { auth } from 'botpress/shared'
-// import ms from 'ms'
-// import { AnyRecord } from 'dns'
-
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
+import { loadStripe } from '@stripe/stripe-js'
+import { FormGroup } from '@blueprintjs/core'
 
 interface FormData {
   fullName: string
@@ -91,6 +91,7 @@ const CustomerWizard: React.FC = () => {
   const history = useHistory()
   const [step, setStep] = useState<number>(1)
   const [customerId, setCustomerId] = useState<string>('')
+  const [paymentMethodId, setPaymentMethodId] = useState<string>('')
   const [formData, setFormData] = useState<FormData>({
     fullName: '',
     email: '',
@@ -262,39 +263,39 @@ const CustomerWizard: React.FC = () => {
         newErrors.subIndustryType = 'Sub-Industry Type is required'
       }
     } else if (step === 3) {
-      if (!formData.cardNumber.trim()) {
-        newErrors.cardNumber = 'Card Number is required'
-      } else if (!/^\d{15,16}$/.test(formData.cardNumber.replace(/-/g, '').trim())) { // Remove dashes before validation
-        newErrors.cardNumber = 'Card Number must be 15 or 16 digits'
-      } else if (!validateCardNumber(formData.cardNumber.replace(/-/g, '').trim())) {
-        newErrors.cardNumber = 'The Card Number is Invalid'
-      }
+      // if (!formData.cardNumber.trim()) {
+      //   newErrors.cardNumber = 'Card Number is required'
+      // } else if (!/^\d{15,16}$/.test(formData.cardNumber.replace(/-/g, '').trim())) { // Remove dashes before validation
+      //   newErrors.cardNumber = 'Card Number must be 15 or 16 digits'
+      // } else if (!validateCardNumber(formData.cardNumber.replace(/-/g, '').trim())) {
+      //   newErrors.cardNumber = 'The Card Number is Invalid'
+      // }
 
-      if (!formData.cardCVC.trim()) {
-        newErrors.cardCVC = 'CVC/CVV is required'
-      } else if (!/^\d{3,4}$/.test(formData.cardCVC.trim())) {
-        newErrors.cardCVC = 'CVC/CVV must be 3 or 4 digits'
-      }
+      // if (!formData.cardCVC.trim()) {
+      //   newErrors.cardCVC = 'CVC/CVV is required'
+      // } else if (!/^\d{3,4}$/.test(formData.cardCVC.trim())) {
+      //   newErrors.cardCVC = 'CVC/CVV must be 3 or 4 digits'
+      // }
 
-      if (!formData.cardExpiry.trim()) {
-        newErrors.cardExpiry = 'Expiry Date is required'
-      } else {
-        const [month, year] = formData.cardExpiry.split('/').map(Number)
-        const currentDate = new Date()
-        const currentMonth = currentDate.getMonth() + 1
-        const currentYear = parseInt(currentDate.getFullYear().toString().slice(-2))
+      // if (!formData.cardExpiry.trim()) {
+      //   newErrors.cardExpiry = 'Expiry Date is required'
+      // } else {
+      //   const [month, year] = formData.cardExpiry.split('/').map(Number)
+      //   const currentDate = new Date()
+      //   const currentMonth = currentDate.getMonth() + 1
+      //   const currentYear = parseInt(currentDate.getFullYear().toString().slice(-2))
 
-        if (
-          !month ||
-          !year ||
-          month < 1 ||
-          month > 12 ||
-          year < currentYear ||
-          (year === currentYear && month < currentMonth)
-        ) {
-          newErrors.cardExpiry = 'Expiry Date must be valid and not in the past'
-        }
-      }
+      //   if (
+      //     !month ||
+      //     !year ||
+      //     month < 1 ||
+      //     month > 12 ||
+      //     year < currentYear ||
+      //     (year === currentYear && month < currentMonth)
+      //   ) {
+      //     newErrors.cardExpiry = 'Expiry Date must be valid and not in the past'
+      //   }
+      // }
     }
 
     setErrors(newErrors)
@@ -364,7 +365,6 @@ const CustomerWizard: React.FC = () => {
   }
 
   const s3Upload = async () => {
-    const custId = await setStripeCustomer()
 
     try {
       const updatedFormData = {
@@ -379,7 +379,8 @@ const CustomerWizard: React.FC = () => {
         card: formData.cardNumber,
         cardCVC: formData.cardCVC,
         cardExpiry: formData.cardExpiry,
-        stripeCustomerId: custId.data
+        stripeCustomerId: customerId,
+        stripePayementId: paymentMethodId
       }
 
       const result = await fetch('http://localhost:8000/user-auth', {
@@ -400,32 +401,42 @@ const CustomerWizard: React.FC = () => {
     }
   }
 
-  // const setSubscriber = async () => {
-  //   try {
-  //     const result = await fetch('https://www.app.xmati.ai/apis/save-subscription', {
-  //       method: 'POST',
-  //       headers: { 'Content-Type': 'application/json' },
-  //       body: JSON.stringify({ key: formData.email, name: formData.fullName, subscription: 'Trial', duration: '15d', amount: '0' }),
-  //     })
-
-  //     return result.json()
-  //   } catch (err: any) {
-  //     setIsLoading(false)
-  //     return { success: false, msg: 'Error uploading subscription to S3' }
-  //   }
-  // }
-
   const setStripeCustomer = async () => {
     try {
+      if (!stripe || !elements) {
+        return { success: false, msg: 'Stripe not loaded' }
+      }
+
+      const cardElement = elements.getElement(CardElement)
+      if (!cardElement) {
+        return { success: false, msg: 'Card Element not available' }
+      }
+
+      const { paymentMethod, error } = await stripe.createPaymentMethod({
+        type: 'card',
+        card: cardElement,
+        billing_details: { email: formData.email }
+      })
+
+      if (!paymentMethod) {
+        return { success: false, msg: 'Error creating payment method' }
+      }
+
       const result = await fetch('http://localhost:8000/create-stripe-customer', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: formData.email }),
+        body: JSON.stringify({ email: formData.email, paymentMethodId: paymentMethod.id || '' }),
       })
 
       let data = await result.json()
-      setCustomerId(data.data)
-      return data
+
+      if (!data.success) {
+        return { success: false, msg: data.msg }
+      }
+
+      setCustomerId(data.customerId)
+      setPaymentMethodId(data.paymentMethodId)
+      return { success: true, msg: data.msg, data }
     } catch (err: any) {
       setIsLoading(false)
       return { success: false, msg: 'Error uploading subscription to S3' }
@@ -460,7 +471,6 @@ const CustomerWizard: React.FC = () => {
   }
 
   const setLocalData = async () => {
-    const custId = await setStripeCustomer()
 
     const updatedFormData = {
       fullName: formData.fullName,
@@ -474,9 +484,11 @@ const CustomerWizard: React.FC = () => {
       card: formData.cardNumber,
       cardCVC: formData.cardCVC,
       cardExpiry: formData.cardExpiry,
-      stripeCustomerId: custId.data
+      stripeCustomerId: customerId,
+      stripePayementId: paymentMethodId
     }
 
+    console.log(updatedFormData)
     const currentUTC = new Date().toISOString().split('T')[0] // Always UTC
     const tillDateUTC = new Date()
     tillDateUTC.setDate(tillDateUTC.getDate() + 15) // Add 15 days
@@ -501,71 +513,33 @@ const CustomerWizard: React.FC = () => {
     localStorage.setItem('subData', JSON.stringify(updatedSubData))
   }
 
-  // Function to validate card number
-  function validateCardNumber(cardNumber) {
-    // Remove spaces or dashes from the card number
-    cardNumber = cardNumber.replace(/\s|-/g, '')
+  const stripe = useStripe()
+  const elements = useElements()
 
-    // Define regex patterns for card types
-    const cardPatterns = {
-      VISA: /^4[0-9]{12}(?:[0-9]{3})?$/,
-      MASTERCARD: /^5[1-5][0-9]{14}$/,
-      AMEX: /^3[47][0-9]{13}$/,
-      DISCOVER: /^6(?:011|5[0-9]{2})[0-9]{12}$/, // Discover cards (USA)
-      DINERS_CLUB: /^3(?:0[0-5]|[68][0-9])[0-9]{11}$/, // Diners Club
-      JCB: /^(?:2131|1800|35\d{3})\d{11}$/, // JCB cards
-      RUPAY: /^(60|65|81|82)[0-9]{14}$/, // RuPay cards (India)
-      UNIONPAY: /^(62[0-9]{14,17})$/, // UnionPay cards
-      MAESTRO: /^(5[0678]\d{11,18}|6\d{12,17})$/, // Maestro cards
+  const verifyCard = async () => {
+    if (!stripe || !elements) {
+      setErrorMessage('Stripe is not loaded yet. Please try again later.')
+      return
     }
 
-    if (!/^\d+$/.test(cardNumber)) {
-      return false
+    const cardElement = elements.getElement(CardElement)
+    if (!cardElement) {
+      setErrorMessage('Card Element is not available.')
+      return
     }
 
-    // Check card type
-    let cardType: string | null = null
-    for (const [type, pattern] of Object.entries(cardPatterns)) {
-      if (pattern.test(cardNumber)) {
-        cardType = type
-        break
-      }
-    }
-
-    if (!cardType) {
-      return false
-    }
-
-    // Validate using Luhn algorithm
-    if (!isValidLuhn(cardNumber)) {
-      return false
-    }
-
-    return true
-  }
-
-  // Luhn algorithm implementation
-  function isValidLuhn(cardNumber) {
-    let sum = 0
-    let shouldDouble = false
-
-    for (let i = cardNumber.length - 1; i >= 0; i--) {
-      let digit = parseInt(cardNumber[i], 10)
-
-      if (shouldDouble) {
-        digit *= 2
-        if (digit > 9) {
-          digit -= 9
-        }
+    try {
+      const { token, error } = await stripe.createToken(cardElement)
+      if (error) {
+        setErrorMessage(`Card verification failed: ${error.message}`)
+        return
       }
 
-      sum += digit
-      shouldDouble = !shouldDouble
+      await setStripeCustomer() // Ensure customer is set before proceeding
+    } catch (err) {
+      setErrorMessage('An error occurred while verifying the card.')
     }
-
-    return sum % 10 === 0
   }
-
 
   return (
     <div className='parent-wizard-container' style={{
@@ -735,7 +709,7 @@ const CustomerWizard: React.FC = () => {
                       ) : (
                         <>
                           {/* <p>{errorMessage}</p>
-                            <button onClick={() => setErrorMessage(null)}>Close</button> */}
+                              <button onClick={() => setErrorMessage(null)}>Close</button> */}
                         </>
                       )}
                     </div>
@@ -806,86 +780,70 @@ const CustomerWizard: React.FC = () => {
               <div className='step'>
                 <p className='stepHeader'>Payment Information</p>
                 <p className='stepSubtitleSmall'>We are securely saving your credit card details to simplify future subscription plan purchases. No charges will be made at this time.</p>
-                <div className='input-container'>
-                  <label htmlFor='cardNumber'>Card Number</label>
-                  <input
-                    type='text'
-                    id='cardNumber'
-                    name='cardNumber'
-                    placeholder='Card Number'
-                    value={formData.cardNumber}
-                    onChange={handleCardNumberChange}
-                    className='custom-input'
-                    maxLength={19} // Limit input length to account for '-' characters
-                  />
-                </div>
-                {errors.cardNumber && <span className='error'>{errors.cardNumber}</span>}
 
-                <div className='horizontal-container'>
-                  <div className='input-container'>
-                    <label htmlFor='cardCVC'>CVC/CVV</label>
-                    <input
-                      type='text'
-                      id='cardCVC'
-                      name='cardCVC'
-                      placeholder='CVC/CVV'
-                      value={formData.cardCVC}
-                      onChange={handleChange}
-                      className='custom-input'
+                <div className='card-element-container'>
+                  <FormGroup label="Credit/Debit Card Details">
+                    <CardElement
+                      options={{
+                        style: {
+                          base: { fontSize: '16px', color: '#424770', lineHeight: '24px', letterSpacing: '0.025em' },
+                          invalid: { color: '#9e2146' },
+                        },
+                        hidePostalCode: true,
+                      }}
                     />
-                  </div>
-                  {/* {errors.cardCVC && <span className='error'>{errors.cardCVC}</span>} */}
-                  <div className='input-container'>
-                    <label htmlFor='cardExpiry'>Card Expiry</label>
-                    <input
-                      type='text'
-                      id='cardExpiry'
-                      name='cardExpiry'
-                      placeholder='MM/YY'
-                      value={formData.cardExpiry}
-                      onChange={handleExpiryChange}
-                      className='custom-input'
-                      maxLength={5} // Limit input length to 'MM/YY'
-                    />
-                  </div>
-                  {/* {errors.cardExpiry && <span className='error'>{errors.cardExpiry}</span>} */}
+                    <button
+                      onClick={verifyCard}
+                      className='validate-card-button'
+                      style={{
+                        marginTop: '20px',
+                        padding: '10px 20px',
+                        backgroundColor: '#007BFF',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '16px',
+                      }}
+                      disabled={isLoading || !stripe || !elements}
+                    >
+                      Validate Card
+                    </button>
+                  </FormGroup>
                 </div>
-                <div className='horizontal-container'>
-                  {errors.cardCVC && <span className='error'>{errors.cardCVC}</span>}
-                  {errors.cardExpiry && <span className='error'>{errors.cardExpiry}</span>}
-                </div>
-
+                {errorMessage && <span className='error'>{errorMessage}</span>}
               </div>
 
               <div className='button-container'>
                 <div className='buttons'>
                   <button onClick={prevStep}>Back</button>
-                  <button onClick={handleSubmit} disabled={isLoading}>Submit</button>
-                  {(isLoading || errorMessage) && (
-                    <div className='modal-overlay'>
-                      <div className='modal-content'>
-                        {isLoading ? (
-                          <>
-                            <div className='loader'></div>
-                            <p>Your xMati account is getting created... Please wait...</p>
-                          </>
-                        ) : (
-                          <>
-                            <p>{errorMessage}</p>
-                            <button onClick={() => setErrorMessage(null)}>Close</button>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
+                  <button onClick={handleSubmit} disabled={isLoading || !stripe || !elements}>
+                    Submit
+                  </button>
                 </div>
+                {(isLoading || errorMessage) && (
+                  <div className='modal-overlay'>
+                    <div className='modal-content'>
+                      {isLoading ? (
+                        <>
+                          <div className='loader'></div>
+                          <p>Your xMati account is getting created... Please wait...</p>
+                        </>
+                      ) : (
+                        <>
+                          <p>{errorMessage}</p>
+                          <button onClick={() => setErrorMessage(null)}>Close</button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             </>
           )}
         </div>
       </div>
-    </div >
+    </div>
   )
 }
 
