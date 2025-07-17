@@ -195,7 +195,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         toggle()
         localStorage.setItem('subData', JSON.stringify({ ...savedSubData, canCancel: false, subsChanged: true }))
       } else {
-        setFailedCancelMessage(data.error || 'Refund failed. Please try again later.')
+        setFailedCancelMessage(data.message || 'Cancellation failed. Please try again later.')
         setIsFailedCancelDialogOpen(true)
       }
     } catch (err: any) {

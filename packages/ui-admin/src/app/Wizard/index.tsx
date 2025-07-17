@@ -496,7 +496,6 @@ const CustomerWizard: React.FC = () => {
       stripePayementId: paymentMethodId
     }
 
-    console.log(updatedFormData)
     const currentUTC = new Date().toISOString().split('T')[0] // Always UTC
     const tillDateUTC = new Date()
     tillDateUTC.setDate(tillDateUTC.getDate() + 15) // Add 15 days

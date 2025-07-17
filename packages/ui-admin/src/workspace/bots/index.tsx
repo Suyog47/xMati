@@ -102,7 +102,7 @@ class Bots extends Component<Props> {
       }
 
       if (daysRemaining === 15 || daysRemaining === 7 || daysRemaining === 3 || daysRemaining === 1) {
-        msg = `You have ${daysRemaining} days left for expiry. Please renew your subscription on time to continue uninterrupted access to the platform.`
+        msg = `You have ${daysRemaining} days left for expiry. We will be reneving your subscription automatically. If you want to cancel the subscription, please visit the Subscription page.`
       }
 
       if (daysRemaining === -1 || daysRemaining === -2 || daysRemaining === -3) {
