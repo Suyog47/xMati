@@ -107,8 +107,11 @@ const CustomerWizard: React.FC = () => {
   })
   const [errors, setErrors] = useState<Errors>({})
   const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [errorMessage, setErrorMessage] = useState<string | null>(null) // Fix applied
+  const [isLoading, setIsLoading] = useState(false) // Big loader for "Check User"
+  const [isValidatingCard, setIsValidatingCard] = useState(false) // Small loader for "Validate Card"
+  const [cardValidated, setCardValidated] = useState(false) // State to track card validation success
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [cardErrorMessage, setCardErrorMessage] = useState<string | null>(null)
   const togglePasswordVisibility = () => {
     setShowPassword(prevState => !prevState)
   }
@@ -313,6 +316,11 @@ const CustomerWizard: React.FC = () => {
   }
 
   const handleSubmit = async () => {
+    if (!paymentMethodId) {
+      setCardErrorMessage('Please validate your card before submitting.')
+      return
+    }
+
     if (await validateStep()) {
       if (formData && typeof formData === 'object') {
         let status = await register()
@@ -320,7 +328,7 @@ const CustomerWizard: React.FC = () => {
         if (status) {
           await setLocalData()
           history.push({
-            pathname: '/login'
+            pathname: '/login',
           })
           history.replace('/home')
         }
@@ -444,7 +452,7 @@ const CustomerWizard: React.FC = () => {
   }
 
   const checkUser = async () => {
-    setIsLoading(true)
+    setIsLoading(true) // Show big loader
     try {
       const result = await fetch('http://localhost:8000/check-user', {
         method: 'POST',
@@ -456,17 +464,17 @@ const CustomerWizard: React.FC = () => {
         }),
       })
 
-      if (result.status === 200) {    // 200 means email already registered
-        return true
-      } else if (result.status === 400) {     // 400 means email is available to register
-        return false
-      } else {       // 500 means something went wrong
-        return false
+      if (result.status === 200) {
+        return true // Email already registered
+      } else if (result.status === 400) {
+        return false // Email available to register
+      } else {
+        return false // Something went wrong
       }
     } catch (error) {
       return false
     } finally {
-      setIsLoading(false)
+      setIsLoading(false) // Hide big loader
     }
   }
 
@@ -517,27 +525,41 @@ const CustomerWizard: React.FC = () => {
   const elements = useElements()
 
   const verifyCard = async () => {
+    setIsValidatingCard(true) // Show small loader
+    setCardValidated(false) // Reset card validation state
+    setCardErrorMessage(null) // Clear any previous error messages
+
     if (!stripe || !elements) {
-      setErrorMessage('Stripe is not loaded yet. Please try again later.')
+      setIsValidatingCard(false)
+      setCardErrorMessage('Stripe is not loaded yet. Please try again later.')
       return
     }
 
     const cardElement = elements.getElement(CardElement)
     if (!cardElement) {
-      setErrorMessage('Card Element is not available.')
+      setIsValidatingCard(false)
+      setCardErrorMessage('Card Element is not available.')
       return
     }
 
     try {
       const { token, error } = await stripe.createToken(cardElement)
       if (error) {
-        setErrorMessage(`Card verification failed: ${error.message}`)
+        setIsValidatingCard(false)
+        setCardErrorMessage(`Card verification failed: ${error.message}`)
         return
       }
 
-      await setStripeCustomer() // Ensure customer is set before proceeding
+      const stripeCustomerResponse = await setStripeCustomer()
+      if (stripeCustomerResponse.success) {
+        setCardValidated(true) // Set card validation success
+      } else {
+        setCardErrorMessage(stripeCustomerResponse.msg)
+      }
     } catch (err) {
-      setErrorMessage('An error occurred while verifying the card.')
+      setCardErrorMessage('An error occurred while verifying the card.')
+    } finally {
+      setIsValidatingCard(false) // Hide small loader
     }
   }
 
@@ -804,14 +826,33 @@ const CustomerWizard: React.FC = () => {
                         borderRadius: '4px',
                         cursor: 'pointer',
                         fontSize: '16px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '10px',
                       }}
-                      disabled={isLoading || !stripe || !elements}
+                      disabled={isValidatingCard || !stripe || !elements}
                     >
-                      Validate Card
+                      {isValidatingCard && <div className='small-loader'></div>}
+                      Verify your Card
                     </button>
                   </FormGroup>
+
+                  {/* Success Message */}
+                  {cardValidated && (
+                    <div className='success-message'>
+                      <img
+                        src='https://cdn-icons-png.flaticon.com/512/845/845646.png' // Tick icon URL
+                        alt='Success'
+                        className='success-icon'
+                      />
+                      <span>Your card has been successfully verified.</span>
+                    </div>
+                  )}
+
+                  {/* Error Message */}
+                  {/* {errorMessage && <span className='error'>{errorMessage}</span>} */}
                 </div>
-                {errorMessage && <span className='error'>{errorMessage}</span>}
               </div>
 
               <div className='button-container'>
@@ -821,7 +862,7 @@ const CustomerWizard: React.FC = () => {
                     Submit
                   </button>
                 </div>
-                {(isLoading || errorMessage) && (
+                {(isLoading || errorMessage || cardErrorMessage || isValidatingCard) && (
                   <div className='modal-overlay'>
                     <div className='modal-content'>
                       {isLoading ? (
@@ -831,8 +872,18 @@ const CustomerWizard: React.FC = () => {
                         </>
                       ) : (
                         <>
-                          <p>{errorMessage}</p>
-                          <button onClick={() => setErrorMessage(null)}>Close</button>
+                          {(errorMessage && <><p>{errorMessage}</p><button onClick={() => setErrorMessage(null)}>Close</button></>)}
+                        </>
+                      )}
+
+                      {isValidatingCard ? (
+                        <>
+                          <div className='loader'></div>
+                          <p>You card is being validated... Please wait...</p>
+                        </>
+                      ) : (
+                        <>
+                          {(cardErrorMessage && <><p>{cardErrorMessage}</p><button onClick={() => setCardErrorMessage(null)}>Close</button></>)}
                         </>
                       )}
                     </div>

@@ -475,6 +475,49 @@ button:hover {
   }
 }
 
+.card-element-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Add spacing between elements */
+  padding: 20px; /* Add padding for better layout */
+  background-color: #ffffff; /* Optional: Add background color */
+  border: 1px solid #ddd; /* Optional: Add border for better visibility */
+  border-radius: 8px; /* Optional: Add rounded corners */
+  width: 100%; /* Ensure it takes full width */
+  max-width: 400px; /* Limit the maximum width */
+  margin: 0 auto; /* Center the container */
+}
+
+.validate-card-button {
+  width: 100%; /* Make the button full width */
+  text-align: center;
+}
+
+.card-element-container .StripeElement {
+  padding: 10px; /* Add padding inside the Stripe element */
+  border: 1px solid #ccc; /* Add border for better visibility */
+  border-radius: 4px; /* Add rounded corners */
+  background-color: #f9f9f9; /* Optional: Add background color */
+}
+
+.success-message {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  border-radius: 4px;
+  color: #155724;
+  font-size: 14px;
+}
+
+.success-icon {
+  width: 20px;
+  height: 20px;
+}
+
 @media (max-width: 907px) {
   .wizard-container {
     display: flex;
@@ -627,5 +670,4 @@ button:hover {
     transform: translateX(-24%);
     height: 2px;
   }
-
 }
