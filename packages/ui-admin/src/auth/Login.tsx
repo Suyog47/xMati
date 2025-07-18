@@ -258,6 +258,7 @@ const Login: FC<Props> = props => {
       duration: subData.duration,
       canCancel,
       subsChanged: false,
+      isCancelled: subData.isCancelled || false,
     }
 
     localStorage.setItem('formData', JSON.stringify(updatedFormData))

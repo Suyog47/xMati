@@ -677,8 +677,8 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
 
               {subscription !== 'Trial' &&
                 savedSubData.canCancel === true &&
-                savedSubData.duration !== 'custom' &&
-                savedSubData.expired !== true && (
+                savedSubData.isCancelled === false &&
+                savedSubData.expired === false && (
                   <Button
                     intent="danger"
                     fill
