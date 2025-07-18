@@ -45,6 +45,15 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   const [failedCancelMessage, setFailedCancelMessage] = useState('')
   const [cardData, setCardData] = useState<any>(null) // State to store card_data
 
+  // Add a new state to store refund details
+  const [refundDetails, setRefundDetails] = useState<{
+    status: boolean
+    daysRemainingInCycle?: number
+    remainingMonths?: number
+    refundAmount?: string
+    message?: string
+  } | null>(null)
+
 
   const amount = useMemo(() => {
     if (selectedDuration === 'half-yearly') {
@@ -505,6 +514,102 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     const auth: BasicAuthentication = new BasicAuthentication()
     await auth.logout()
   }
+
+  function formatToISODate(date) {
+    const d = new Date(date)
+    const year = d.getFullYear()
+    const month = String(d.getMonth() + 1).padStart(2, '0') // 0-based
+    const day = String(d.getDate()).padStart(2, '0')
+
+    return `${year}-${month}-${day}`
+  }
+
+  function getMonthDifference(startDate, endDate) {
+    const start = new Date(startDate)
+    const end = new Date(endDate)
+    const years = end.getFullYear() - start.getFullYear()
+    const months = end.getMonth() - start.getMonth()
+    const totalMonths = years * 12 + months
+
+    return totalMonths
+  }
+
+  function calculateRefundDetails(startDate, expiryDate, totalAmount) {
+    try {
+      const currentDate = new Date()
+      const start = new Date(formatToISODate(startDate))
+      const expiry = new Date(formatToISODate(expiryDate))
+
+      // Validate dates
+      if (isNaN(start.getTime()) || isNaN(expiry.getTime())) {
+        throw new Error('Invalid date format')
+      }
+
+      // Total number of months in the subscription
+      let totalMonths = getMonthDifference(start, expiry)
+
+      // Find current cycle number (0-based)
+      let currentCycleStart = new Date(start)
+      let cycleNumber = 0
+
+      while (currentCycleStart <= currentDate) {
+        const nextCycleStart = new Date(currentCycleStart)
+        nextCycleStart.setMonth(nextCycleStart.getMonth() + 1)
+
+        if (currentDate < nextCycleStart) {
+          break
+        }
+        currentCycleStart = nextCycleStart
+        cycleNumber++
+      }
+
+      // Calculate current cycle end
+      const tentativeCycleEnd = new Date(currentCycleStart)
+      tentativeCycleEnd.setMonth(tentativeCycleEnd.getMonth() + 1)
+      const currentCycleEnd = tentativeCycleEnd > expiry ? expiry : tentativeCycleEnd
+
+      // Calculate remaining days
+      const msInDay = 1000 * 60 * 60 * 24
+      const daysRemaining = Math.ceil((currentCycleEnd.getTime() - currentDate.getTime()) / msInDay)
+
+      // Calculate remaining full months
+      const remainingMonths = totalMonths - (cycleNumber + 1)
+
+      // Calculate refund
+      const monthlyAmount = totalAmount / totalMonths
+      const refundAmount = Math.max(0, remainingMonths * monthlyAmount)
+
+      return {
+        status: true,
+        daysRemainingInCycle: daysRemaining,
+        remainingMonths,
+        refundAmount: refundAmount.toFixed(2),
+      }
+    } catch (error) {
+      console.error('Error calculating refund details:', error.message)
+      return { status: false, message: 'Failed to calculate refund details', error: error.message }
+    }
+  }
+
+  // Function to calculate refund details
+  const handleCalculateRefundDetails = useCallback(() => {
+    const { createdAt: startDate, till: expiryDate, amount: totalAmount } = savedSubData
+
+    const numericAmount = parseFloat(totalAmount.replace(/^\$/, ''))
+    if (startDate && expiryDate && numericAmount) {
+      const refundData = calculateRefundDetails(startDate, expiryDate, numericAmount)
+      setRefundDetails(refundData)
+    } else {
+      setRefundDetails({ status: false, message: 'Invalid subscription data' })
+    }
+  }, [savedSubData])
+
+  // Trigger refund calculation when the confirm cancel dialog is opened
+  useEffect(() => {
+    if (isConfirmCancelDialogOpen) {
+      handleCalculateRefundDetails()
+    }
+  }, [isConfirmCancelDialogOpen])
 
   return (
     <>
@@ -1033,19 +1138,43 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
               Your refund is being initiated...
             </div>
           </div>
-        )
-        }
+        )}
         <div style={{ padding: '20px', textAlign: 'center' }}>
           <h2 style={{ color: '#d9822b', marginBottom: '10px' }}>Are you sure?</h2>
           <p style={{ fontSize: '1.1em', color: '#666' }}>
-            Cancelling will keep you subscription active until the end of the current subscription period. Any applicable refund for the remaining month (If any) will be processed shortly..
+            {refundDetails && typeof refundDetails.daysRemainingInCycle === 'number'
+              ? (
+                <>
+                  Cancelling your account will keep your subscription active until{' '}
+                  <strong>
+                    {new Date(
+                      new Date().setDate(new Date().getDate() + refundDetails.daysRemainingInCycle)
+                    ).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </strong>.
+                  {' '}
+                  {Number(refundDetails.refundAmount) === 0
+                    ? 'No refund will be processed.'
+                    : (
+                      <>
+                        A refund of $<strong>{refundDetails.refundAmount}</strong> will be processed for the remaining <strong>{refundDetails.remainingMonths}</strong> months.
+                      </>
+                    )
+                  }
+                </>
+              )
+              : 'Cancelling your account will keep your subscription active until the end of your current cycle. Any applicable refund for the remaining months (if any) will be processed shortly.'}
           </p>
+
+          {/* Display refund details */}
           <div style={{ marginTop: 24, color: '#c23030', fontWeight: 500, fontSize: 16 }}>
-            This action is irreversible. You will need to <strong>log-in again</strong> to continue using the plan.
+            This action is irreversible. You will need to <strong>log in again</strong> to continue using the plan.
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginTop: 30 }}>
-
             <Button
               intent="danger"
               onClick={async () => {
