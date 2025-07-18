@@ -11,10 +11,10 @@ import { Dialog, Button, FormGroup, Icon, Spinner } from '@blueprintjs/core'
 import BasicAuthentication from '~/auth/basicAuth'
 
 // For development use
-const stripePromise = loadStripe('pk_test_51RLimpPBSMPLjWxm3IUaX63iUb4TqhU5prbUsg7A5RwG2sZsukOa7doAAhPu2RpEkYXZ2dRLNrOA4Pby9IscZOse00unCEcNDG')
+// const stripePromise = loadStripe('pk_test_51RLimpPBSMPLjWxm3IUaX63iUb4TqhU5prbUsg7A5RwG2sZsukOa7doAAhPu2RpEkYXZ2dRLNrOA4Pby9IscZOse00unCEcNDG')
 
 //For production use
-// const stripePromise = loadStripe('pk_live_51RPPI0EncrURrNgDF2LNkLrh5Wf53SIe3WjqPqjtzqbJWDGfDFeG4VvzUXuC4nCmrPTNOTeFENuAqRBw1mvbNJg600URDxPnuc')
+const stripePromise = loadStripe('pk_live_51RPPI0EncrURrNgDF2LNkLrh5Wf53SIe3WjqPqjtzqbJWDGfDFeG4VvzUXuC4nCmrPTNOTeFENuAqRBw1mvbNJg600URDxPnuc')
 
 interface Props {
   isOpen: boolean
@@ -68,7 +68,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     setIsLoadingSecret(true)
     setPaymentError('')
     try {
-      const result = await fetch('http://localhost:8000/create-payment-intent', {
+      const result = await fetch('https://www.app.xmati.ai/apis/create-payment-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -130,7 +130,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   const fetchTransactions = async () => {
     setIsLoadingTransactions(true)
     try {
-      const res = await fetch('http://localhost:8000/get-stripe-transactions', {
+      const res = await fetch('https://www.app.xmati.ai/apis/get-stripe-transactions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: savedFormData.email })
@@ -165,7 +165,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   const downloadCSV = async () => {
     const email = savedFormData.email
 
-    const res = await fetch('http://localhost:8000/download-csv', {
+    const res = await fetch('https://www.app.xmati.ai/apis/download-csv', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ data: transactions, email }),
@@ -187,7 +187,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     setIsCancelProcessing(true)
 
     try {
-      const res = await fetch('http://localhost:8000/cancel-subscription', {
+      const res = await fetch('https://www.app.xmati.ai/apis/cancel-subscription', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -302,7 +302,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       try {
         const { fullName, email } = savedFormData
 
-        const result = await fetch('http://localhost:8000/failed-payment', {
+        const result = await fetch('https://www.app.xmati.ai/apis/failed-payment', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, name: fullName, subscription: selectedTab, amount: `$${amount / 100}` }),
@@ -320,7 +320,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
         const { fullName, email } = savedFormData
 
-        const result = await fetch('http://localhost:8000/save-subscription', {
+        const result = await fetch('https://www.app.xmati.ai/apis/save-subscription', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ key: email, name: fullName, subscription: selectedTab, duration: selectedDuration, amount: `$${amount / 100}` }),
@@ -385,24 +385,43 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         <div style={{ padding: 10, textAlign: 'center' }}>
           {/* Display card_data */}
           {cardData && (
-            <div style={{ marginBottom: '10px', padding: '10px', textAlign: 'center' }}>
-              <h4 style={{ marginBottom: '10px', fontSize: '1.2em', color: '#333' }}>
-                Your Card Details:
+            <div
+              style={{
+                marginBottom: '20px',
+                padding: '20px',
+                background: '#ffffff',
+                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                borderRadius: '8px',
+                maxWidth: '400px',
+                marginLeft: 'auto',
+                marginRight: 'auto',
+              }}
+            >
+              <h4
+                style={{
+                  marginBottom: '15px',
+                  fontSize: '1.4em',
+                  color: '#333333',
+                  textAlign: 'center',
+                  borderBottom: '1px solid #f0f0f0',
+                  paddingBottom: '10px',
+                }}
+              >
+                Your Card Details
               </h4>
-
-              {/* Card Brand */}
-              <p style={{ margin: 0, fontSize: '1.1em', color: '#666' }}>
-                <strong>Card Brand:</strong> {cardData.brand}
-              </p>
-
-              {/* Last 4 Digits and Expiry in One Line */}
-              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10px', gap: '20px' }}>
-                <p style={{ margin: 0, fontSize: '1.1em', color: '#666' }}>
-                  <strong>Last 4 Digits:</strong> **** **** **** {cardData.last4}
-                </p>
-                <p style={{ margin: 0, fontSize: '1.1em', color: '#666' }}>
-                  <strong>Expiry:</strong> {cardData.exp_month}/{cardData.exp_year}
-                </p>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                <span style={{ fontWeight: 600, color: '#555555' }}>Card Brand:</span>
+                <span style={{ color: '#777777' }}>{cardData.brand}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                <span style={{ fontWeight: 600, color: '#555555' }}>Last 4 Digits:</span>
+                <span style={{ color: '#777777' }}>**** **** **** {cardData.last4}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ fontWeight: 600, color: '#555555' }}>Expiry:</span>
+                <span style={{ color: '#777777' }}>
+                  {cardData.exp_month}/{cardData.exp_year}
+                </span>
               </div>
             </div>
           )}
@@ -478,6 +497,17 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
               {isProcessing ? 'Processing...' : `Pay $${amount / 100}`}
             </Button>
 
+            <p
+              style={{
+                marginTop: '10px',
+                fontSize: '0.85em',
+                color: '#555',
+                textAlign: 'center',
+                lineHeight: '1.4',
+              }}
+            >
+              Once a plan has been purchased, the subscription will auto-renew based on the selected duration.
+            </p>
             {/* <FormGroup label="Credit/Debit Card Details">
               <CardElement
                 options={{
