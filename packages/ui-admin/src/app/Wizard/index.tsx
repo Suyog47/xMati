@@ -391,7 +391,7 @@ const CustomerWizard: React.FC = () => {
         stripePayementId: paymentMethodId
       }
 
-      const result = await fetch('https://www.app.xmati.ai/apis/user-auth', {
+      const result = await fetch('http://localhost:8000/user-auth', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -430,7 +430,7 @@ const CustomerWizard: React.FC = () => {
         return { success: false, msg: 'Error creating payment method' }
       }
 
-      const result = await fetch('https://www.app.xmati.ai/apis/create-stripe-customer', {
+      const result = await fetch('http://localhost:8000/create-stripe-customer', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: formData.email, paymentMethodId: paymentMethod.id || '' }),
@@ -454,7 +454,7 @@ const CustomerWizard: React.FC = () => {
   const checkUser = async () => {
     setIsLoading(true) // Show big loader
     try {
-      const result = await fetch('https://www.app.xmati.ai/apis/check-user', {
+      const result = await fetch('http://localhost:8000/check-user', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -498,7 +498,7 @@ const CustomerWizard: React.FC = () => {
 
     const currentUTC = new Date().toISOString().split('T')[0] // Always UTC
     const tillDateUTC = new Date()
-    tillDateUTC.setDate(tillDateUTC.getDate() + 15) // Add 15 days
+    tillDateUTC.setDate(tillDateUTC.getDate() + 5) // Add 15 days
 
     const currentDate = new Date(currentUTC)
     const tillDate = new Date(tillDateUTC.toISOString().split('T')[0]) // Ensure it's in the same format
@@ -508,10 +508,10 @@ const CustomerWizard: React.FC = () => {
       createdAt: currentDate,
       till: tillDate,
       expired: false,
-      daysRemaining: 15,
+      daysRemaining: 5,
       promptRun: false,  // set the prompt run to false
       amount: 0,
-      duration: '15d',
+      duration: '5d',
       canCancel: false,
       subsChanged: false,
     }

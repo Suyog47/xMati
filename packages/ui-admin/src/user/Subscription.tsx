@@ -11,10 +11,10 @@ import { Dialog, Button, FormGroup, Icon, Spinner } from '@blueprintjs/core'
 import BasicAuthentication from '~/auth/basicAuth'
 
 // For development use
-// const stripePromise = loadStripe('pk_test_51RLimpPBSMPLjWxm3IUaX63iUb4TqhU5prbUsg7A5RwG2sZsukOa7doAAhPu2RpEkYXZ2dRLNrOA4Pby9IscZOse00unCEcNDG')
+const stripePromise = loadStripe('pk_test_51RLimpPBSMPLjWxm3IUaX63iUb4TqhU5prbUsg7A5RwG2sZsukOa7doAAhPu2RpEkYXZ2dRLNrOA4Pby9IscZOse00unCEcNDG')
 
 //For production use
-const stripePromise = loadStripe('pk_live_51RPPI0EncrURrNgDF2LNkLrh5Wf53SIe3WjqPqjtzqbJWDGfDFeG4VvzUXuC4nCmrPTNOTeFENuAqRBw1mvbNJg600URDxPnuc')
+//const stripePromise = loadStripe('pk_live_51RPPI0EncrURrNgDF2LNkLrh5Wf53SIe3WjqPqjtzqbJWDGfDFeG4VvzUXuC4nCmrPTNOTeFENuAqRBw1mvbNJg600URDxPnuc')
 
 interface Props {
   isOpen: boolean
@@ -68,7 +68,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     setIsLoadingSecret(true)
     setPaymentError('')
     try {
-      const result = await fetch('https://www.app.xmati.ai/apis/create-payment-intent', {
+      const result = await fetch('http://localhost:8000/create-payment-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -130,7 +130,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   const fetchTransactions = async () => {
     setIsLoadingTransactions(true)
     try {
-      const res = await fetch('https://www.app.xmati.ai/apis/get-stripe-transactions', {
+      const res = await fetch('http://localhost:8000/get-stripe-transactions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: savedFormData.email })
@@ -165,7 +165,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   const downloadCSV = async () => {
     const email = savedFormData.email
 
-    const res = await fetch('https://www.app.xmati.ai/apis/download-csv', {
+    const res = await fetch('http://localhost:8000/download-csv', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ data: transactions, email }),
@@ -187,7 +187,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     setIsCancelProcessing(true)
 
     try {
-      const res = await fetch('https://www.app.xmati.ai/apis/cancel-subscription', {
+      const res = await fetch('http://localhost:8000/cancel-subscription', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -302,7 +302,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       try {
         const { fullName, email } = savedFormData
 
-        const result = await fetch('https://www.app.xmati.ai/apis/failed-payment', {
+        const result = await fetch('http://localhost:8000/failed-payment', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, name: fullName, subscription: selectedTab, amount: `$${amount / 100}` }),
@@ -320,7 +320,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
         const { fullName, email } = savedFormData
 
-        const result = await fetch('https://www.app.xmati.ai/apis/save-subscription', {
+        const result = await fetch('http://localhost:8000/save-subscription', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ key: email, name: fullName, subscription: selectedTab, duration: selectedDuration, amount: `$${amount / 100}` }),
@@ -564,7 +564,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     return totalMonths
   }
 
-  function calculateRefundDetails(startDate, expiryDate, totalAmount) {
+  function calculateRefundDetails(startDate, expiryDate, totalAmount, subs) {
     try {
       const currentDate = new Date()
       const start = new Date(formatToISODate(startDate))
@@ -603,11 +603,14 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       const daysRemaining = Math.ceil((currentCycleEnd.getTime() - currentDate.getTime()) / msInDay)
 
       // Calculate remaining full months
-      const remainingMonths = totalMonths - (cycleNumber + 1)
+      const usedMonth = cycleNumber + 1 // 0-based cycle number, so add 1 for used months
+      const remainingMonths = totalMonths - usedMonth
 
       // Calculate refund
-      const monthlyAmount = totalAmount / totalMonths
-      const refundAmount = Math.max(0, remainingMonths * monthlyAmount)
+      const monthlyAmount = (subs === 'Professional') ? 100 : 18 //totalAmount / totalMonths
+      const usedAmount = usedMonth * monthlyAmount
+      const remainingAmount = totalAmount - usedAmount
+      const refundAmount = Math.max(0, remainingAmount)
 
       return {
         status: true,
@@ -623,11 +626,11 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
 
   // Function to calculate refund details
   const handleCalculateRefundDetails = useCallback(() => {
-    const { createdAt: startDate, till: expiryDate, amount: totalAmount } = savedSubData
+    const { createdAt: startDate, till: expiryDate, amount: totalAmount, subscription: subs } = savedSubData
 
     const numericAmount = parseFloat(totalAmount.replace(/^\$/, ''))
     if (startDate && expiryDate && numericAmount) {
-      const refundData = calculateRefundDetails(startDate, expiryDate, numericAmount)
+      const refundData = calculateRefundDetails(startDate, expiryDate, numericAmount, subs)
       setRefundDetails(refundData)
     } else {
       setRefundDetails({ status: false, message: 'Invalid subscription data' })
