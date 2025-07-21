@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { IoIosCall, IoMdPerson, IoMdMail, IoMdBusiness, IoIosLock, IoMdEye, IoMdEyeOff } from 'react-icons/io'
-import axios from 'axios'
 import Check from '../../assets/images/check.png'
 import './style.css'
-import BotSetupInstructions from '~/channels/getChannelInstructions'
 import { useHistory } from 'react-router-dom'
 import bgImage from '../../assets/images/background.jpg'
 import logo from '../../assets/images/xmati.png'
 import api from '~/app/api'
 import { auth } from 'botpress/shared'
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
-import { loadStripe } from '@stripe/stripe-js'
 import { FormGroup } from '@blueprintjs/core'
 
 interface FormData {
@@ -46,6 +43,7 @@ const CustomerWizard: React.FC = () => {
   const steps = [
     'Personal Info',
     'Industry Type',
+    'Subscriptions',
     'Payment'
   ]
 
@@ -112,6 +110,9 @@ const CustomerWizard: React.FC = () => {
   const [cardValidated, setCardValidated] = useState(false) // State to track card validation success
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [cardErrorMessage, setCardErrorMessage] = useState<string | null>(null)
+  const [selectedPlan, setSelectedPlan] = useState<string>('Starter')
+  const [selectedDuration, setSelectedDuration] = useState<string>('monthly')
+  const [price, setPrice] = useState(18)
   const togglePasswordVisibility = () => {
     setShowPassword(prevState => !prevState)
   }
@@ -146,6 +147,21 @@ const CustomerWizard: React.FC = () => {
     }))
   }, [formData.industryType])
 
+
+  useEffect(() => {
+    let finalPrice = 0
+    if (selectedDuration === 'monthly') {
+      finalPrice = selectedPlan === 'Starter' ? 18 : 100
+    } else if (selectedDuration === 'half-yearly') {
+      const raw = selectedPlan === 'Starter' ? 18 * 6 * 0.97 : 100 * 6 * 0.97
+      finalPrice = Math.round(raw * 100) / 100
+    } else if (selectedDuration === 'yearly') {
+      const raw = selectedPlan === 'Starter' ? 18 * 12 * 0.95 : 100 * 12 * 0.95
+      finalPrice = Math.round(raw * 100) / 100
+    }
+    setPrice(finalPrice)
+  }, [selectedPlan, selectedDuration])
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -174,45 +190,45 @@ const CustomerWizard: React.FC = () => {
     }
   }
 
-  const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const rawValue = e.target.value.replace(/-/g, '').replace(/\D/g, '') // Remove '-' and non-digit characters
-    const formattedValue = rawValue
-      .match(/.{1,4}/g) // Group digits in chunks of 4
-      ?.join('-') || '' // Join with '-' if there are groups
+  // const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const rawValue = e.target.value.replace(/-/g, '').replace(/\D/g, '') // Remove '-' and non-digit characters
+  //   const formattedValue = rawValue
+  //     .match(/.{1,4}/g) // Group digits in chunks of 4
+  //     ?.join('-') || '' // Join with '-' if there are groups
 
-    setFormData({
-      ...formData,
-      cardNumber: formattedValue,
-    })
+  //   setFormData({
+  //     ...formData,
+  //     cardNumber: formattedValue,
+  //   })
 
-    if (errors.cardNumber) {
-      setErrors({
-        ...errors,
-        cardNumber: '',
-      })
-    }
-  }
+  //   if (errors.cardNumber) {
+  //     setErrors({
+  //       ...errors,
+  //       cardNumber: '',
+  //     })
+  //   }
+  // }
 
-  const handleExpiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const rawValue = e.target.value.replace(/\D/g, '') // Remove non-digit characters
-    let formattedValue = rawValue
+  // const handleExpiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const rawValue = e.target.value.replace(/\D/g, '') // Remove non-digit characters
+  //   let formattedValue = rawValue
 
-    if (rawValue.length > 2) {
-      formattedValue = `${rawValue.slice(0, 2)}/${rawValue.slice(2, 4)}` // Add '/' after the first 2 digits
-    }
+  //   if (rawValue.length > 2) {
+  //     formattedValue = `${rawValue.slice(0, 2)}/${rawValue.slice(2, 4)}` // Add '/' after the first 2 digits
+  //   }
 
-    setFormData({
-      ...formData,
-      cardExpiry: formattedValue,
-    })
+  //   setFormData({
+  //     ...formData,
+  //     cardExpiry: formattedValue,
+  //   })
 
-    if (errors.cardExpiry) {
-      setErrors({
-        ...errors,
-        cardExpiry: '',
-      })
-    }
-  }
+  //   if (errors.cardExpiry) {
+  //     setErrors({
+  //       ...errors,
+  //       cardExpiry: '',
+  //     })
+  //   }
+  // }
 
   const validateStep = async (): Promise<boolean> => {
     const newErrors: Errors = {}
@@ -265,40 +281,6 @@ const CustomerWizard: React.FC = () => {
       if (!formData.subIndustryType.trim()) {
         newErrors.subIndustryType = 'Sub-Industry Type is required'
       }
-    } else if (step === 3) {
-      // if (!formData.cardNumber.trim()) {
-      //   newErrors.cardNumber = 'Card Number is required'
-      // } else if (!/^\d{15,16}$/.test(formData.cardNumber.replace(/-/g, '').trim())) { // Remove dashes before validation
-      //   newErrors.cardNumber = 'Card Number must be 15 or 16 digits'
-      // } else if (!validateCardNumber(formData.cardNumber.replace(/-/g, '').trim())) {
-      //   newErrors.cardNumber = 'The Card Number is Invalid'
-      // }
-
-      // if (!formData.cardCVC.trim()) {
-      //   newErrors.cardCVC = 'CVC/CVV is required'
-      // } else if (!/^\d{3,4}$/.test(formData.cardCVC.trim())) {
-      //   newErrors.cardCVC = 'CVC/CVV must be 3 or 4 digits'
-      // }
-
-      // if (!formData.cardExpiry.trim()) {
-      //   newErrors.cardExpiry = 'Expiry Date is required'
-      // } else {
-      //   const [month, year] = formData.cardExpiry.split('/').map(Number)
-      //   const currentDate = new Date()
-      //   const currentMonth = currentDate.getMonth() + 1
-      //   const currentYear = parseInt(currentDate.getFullYear().toString().slice(-2))
-
-      //   if (
-      //     !month ||
-      //     !year ||
-      //     month < 1 ||
-      //     month > 12 ||
-      //     year < currentYear ||
-      //     (year === currentYear && month < currentMonth)
-      //   ) {
-      //     newErrors.cardExpiry = 'Expiry Date must be valid and not in the past'
-      //   }
-      // }
     }
 
     setErrors(newErrors)
@@ -384,11 +366,13 @@ const CustomerWizard: React.FC = () => {
         organisationName: formData.organisationName,
         industryType: formData.industryType,
         subIndustryType: formData.subIndustryType,
-        card: formData.cardNumber,
-        cardCVC: formData.cardCVC,
-        cardExpiry: formData.cardExpiry,
         stripeCustomerId: customerId,
-        stripePayementId: paymentMethodId
+        stripePayementId: paymentMethodId,
+        nextSubs: {
+          plan: selectedPlan,
+          duration: selectedDuration,
+          price
+        }
       }
 
       const result = await fetch('http://localhost:8000/user-auth', {
@@ -489,11 +473,13 @@ const CustomerWizard: React.FC = () => {
       organisationName: formData.organisationName,
       industryType: formData.industryType,
       subIndustryType: formData.subIndustryType,
-      card: formData.cardNumber,
-      cardCVC: formData.cardCVC,
-      cardExpiry: formData.cardExpiry,
       stripeCustomerId: customerId,
-      stripePayementId: paymentMethodId
+      stripePayementId: paymentMethodId,
+      nextSubs: {
+        plan: selectedPlan,
+        duration: selectedDuration,
+        price
+      }
     }
 
     const currentUTC = new Date().toISOString().split('T')[0] // Always UTC
@@ -795,8 +781,168 @@ const CustomerWizard: React.FC = () => {
             </>
           )}
 
-
           {step === 3 && (
+            <>
+              <div
+                style={{
+                  padding: 20,
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-start',
+                }}
+              >
+                {/* Left: Subscription Plan Container */}
+                <div
+                  style={{
+                    flex: 1,
+                    marginRight: '20px',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '8px',
+                    padding: '15px',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                  }}
+                >
+                  <h2 style={{ marginBottom: '15px', fontSize: '1.3em', color: '#333' }}>
+                    Select Your Subscription Plan
+                  </h2>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-around',
+                      marginBottom: '20px',
+                    }}
+                  >
+                    {['Starter', 'Professional'].map((plan) => (
+                      <div
+                        key={plan}
+                        onClick={() => setSelectedPlan(plan)}
+                        style={{
+                          flex: 1,
+                          margin: '0 10px',
+                          border: `2px solid ${selectedPlan === plan ? '#2196f3' : '#e0e0e0'
+                            }`,
+                          borderRadius: '8px',
+                          padding: '20px',
+                          cursor: 'pointer',
+                          backgroundColor: selectedPlan === plan ? '#f8fbff' : '#fff',
+                          transition: 'all 0.2s ease',
+                        }}
+                      >
+                        <h3 style={{ margin: '0 0 10px 0', fontSize: '1.2em' }}>
+                          {plan}
+                        </h3>
+                        <h4 style={{ margin: '0 0 10px 0', fontSize: '1.1em', color: '#555' }}>
+                          {plan === 'Starter' ? '$18/month' : '$100/month'}
+                        </h4>
+                        <p style={{ margin: '0 0 5px 0', fontSize: '0.95em', color: '#777' }}>
+                          {plan === 'Starter' ? '3 bots included' : '5 bots included'}
+                        </p>
+                        <div
+                          style={{
+                            marginTop: '10px',
+                            textAlign: 'left',
+                            fontSize: '0.9em',
+                            color: '#555',
+                          }}
+                        >
+                          <strong>Includes:</strong>
+                          <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
+                            <li>LLM Support</li>
+                            <li>HITL Enabled</li>
+                            <li>Bot Analytics</li>
+                          </ul>
+                          <strong>Supported Channels:</strong>
+                          <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
+                            <li>WhatsApp</li>
+                            <li>Web Chat</li>
+                            <li>Telegram</li>
+                            <li>Slack</li>
+                            <li>Facebook Messenger</li>
+                          </ul>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Right: Subscription Duration Section */}
+                <div
+                  style={{
+                    flexBasis: '35%',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '8px',
+                    padding: '20px',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                    textAlign: 'left',
+                  }}
+                >
+                  <h4 style={{ marginBottom: '15px', fontSize: '1.2em', color: '#333' }}>
+                    Subscription Duration
+                  </h4>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <label style={{ fontSize: '1em', color: '#555' }}>
+                      <input
+                        type="radio"
+                        name="subscriptionDuration"
+                        value="monthly"
+                        checked={selectedDuration === 'monthly'}
+                        onChange={() => setSelectedDuration('monthly')}
+                        style={{ marginRight: '10px' }}
+                      />
+                      Monthly
+                    </label>
+                    <label style={{ fontSize: '1em', color: '#555' }}>
+                      <input
+                        type="radio"
+                        name="subscriptionDuration"
+                        value="half-yearly"
+                        checked={selectedDuration === 'half-yearly'}
+                        onChange={() => setSelectedDuration('half-yearly')}
+                        style={{ marginRight: '10px' }}
+                      />
+                      Half-Yearly
+                    </label>
+                    <label style={{ fontSize: '1em', color: '#555' }}>
+                      <input
+                        type="radio"
+                        name="subscriptionDuration"
+                        value="yearly"
+                        checked={selectedDuration === 'yearly'}
+                        onChange={() => setSelectedDuration('yearly')}
+                        style={{ marginRight: '10px' }}
+                      />
+                      Yearly
+                    </label>
+                  </div>
+                  <div style={{ marginTop: '20px', fontSize: '0.95em', color: '#666' }}>
+                    <p>
+                      Enjoy a 30-day free trial. Your subscription will be activated only after the trial period ends.
+                    </p>
+                  </div>
+
+                  {/* Computed Price Display (moved below the two sections) */}
+                  <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                    <p style={{ fontSize: '1.1em', fontWeight: 'bold', color: '#333' }}>
+                      Price after 30-day free trial: ${price}
+                      {selectedDuration === 'monthly'
+                        ? ' per month'
+                        : selectedDuration === 'half-yearly'
+                          ? ' every 6 months (3% discount)'
+                          : ' every year (5% discount)'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className='button-container'>
+                <div className='buttons'>
+                  <button onClick={prevStep}>Back</button>
+                  <button onClick={nextStep}>Next</button>
+                </div>
+              </div>
+            </>
+          )}
+
+          {step === 4 && (
             <>
               <div className='step'>
                 <p className='stepHeader'>Payment Information</p>
@@ -891,6 +1037,8 @@ const CustomerWizard: React.FC = () => {
               </div>
             </>
           )}
+
+
         </div>
       </div>
     </div>

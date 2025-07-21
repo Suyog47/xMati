@@ -81,6 +81,7 @@ class Bots extends Component<Props> {
       this.props.fetchLicensing()
     }
 
+    console.log(this.formData)
     // Check subscription expiry from localStorage
     let expiry
     const daysRemaining = this.subData.daysRemaining || 0

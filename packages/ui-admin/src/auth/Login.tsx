@@ -214,11 +214,9 @@ const Login: FC<Props> = props => {
       organisationName: formData.organisationName,
       industryType: formData.industryType,
       subIndustryType: formData.subIndustryType,
-      card: formData.card,
-      cardCVC: formData.cardCVC,
-      cardExpiry: formData.cardExpiry,
       stripeCustomerId: formData.stripeCustomerId,
       stripePayementId: formData.stripePayementId,
+      nextSubs: formData.nextSubs
     }
 
     const currentUTC = new Date().toISOString().split('T')[0] // Always UTC
