@@ -64,6 +64,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     return selectedTab === 'Starter' ? 1800 : 10000 // Default monthly price
   }, [selectedTab, selectedDuration])
 
+
   const getClientSecret = useCallback(async () => {
     setIsLoadingSecret(true)
     setPaymentError('')
@@ -99,6 +100,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     }
   }, [amount])
 
+
   const fetchedOnceRef = useRef(false)
   useEffect(() => {
     if (isOpen) {
@@ -126,6 +128,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       : ''
     setExpiryTill(formattedExpiryTill)
   }, [isOpen, getClientSecret])
+
 
   const fetchTransactions = async () => {
     setIsLoadingTransactions(true)
@@ -187,13 +190,24 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     setIsCancelProcessing(true)
 
     try {
-      const res = await fetch('http://localhost:8000/cancel-subscription', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ chargeId: savedSubData.transactionId, reason: '', email, fullName, subscription, amount, start: createdAt, expiry: till }),
-      })
+      let res
+      if (subscription !== 'Trial') {
+        res = await fetch('http://localhost:8000/cancel-subscription', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ chargeId: savedSubData.transactionId, reason: '', email, fullName, subscription, amount, start: createdAt, expiry: till }),
+        })
+      } else {
+        res = await fetch('http://localhost:8000/trial-cancellation', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email }),
+        })
+      }
 
       const data = await res.json()
 
@@ -202,7 +216,6 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         setIsConfirmCancelDialogOpen(false)
         setIsCancelDialogOpen(true)
         toggle()
-        localStorage.setItem('subData', JSON.stringify({ ...savedSubData, canCancel: false, subsChanged: true }))
       } else {
         setFailedCancelMessage(data.message || 'Cancellation failed. Please try again later.')
         setIsFailedCancelDialogOpen(true)
@@ -639,10 +652,17 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
 
   // Trigger refund calculation when the confirm cancel dialog is opened
   useEffect(() => {
-    if (isConfirmCancelDialogOpen) {
-      handleCalculateRefundDetails()
+    // Don't need the refund calculation for trial subscriptions as it is free
+    if (subscription !== 'Trial') {
+      if (isConfirmCancelDialogOpen) {
+        handleCalculateRefundDetails()
+      }
     }
   }, [isConfirmCancelDialogOpen])
+
+  const isValidClientSecret = (secret: string) => {
+    return /^pi_[a-zA-Z0-9]+_secret_[a-zA-Z0-9]+$/.test(secret)
+  }
 
   return (
     <>
@@ -813,8 +833,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                 Subscribe Now
               </Button>
 
-              {subscription !== 'Trial' &&
-                savedSubData.canCancel === true &&
+              {savedSubData.canCancel === true &&
                 savedSubData.isCancelled === false &&
                 savedSubData.expired === false && (
                   <Button
@@ -1168,38 +1187,39 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
               `}
             </style>
             <div style={{ fontSize: 20, color: '#106ba3', fontWeight: 600 }}>
-              Your refund is being initiated...
+              Your Cancellation is in progress...
             </div>
           </div>
         )}
         <div style={{ padding: '20px', textAlign: 'center' }}>
           <h2 style={{ color: '#d9822b', marginBottom: '10px' }}>Are you sure?</h2>
           <p style={{ fontSize: '1.1em', color: '#666' }}>
-            {refundDetails && typeof refundDetails.daysRemainingInCycle === 'number'
-              ? (
-                <>
-                  Cancelling your account will keep your subscription active until{' '}
-                  <strong>
-                    {new Date(
-                      new Date().setDate(new Date().getDate() + refundDetails.daysRemainingInCycle)
-                    ).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
-                  </strong>.
-                  {' '}
-                  {Number(refundDetails.refundAmount) === 0
-                    ? 'No refund will be processed.'
-                    : (
-                      <>
-                        A refund of $<strong>{refundDetails.refundAmount}</strong> will be processed for the remaining <strong>{refundDetails.remainingMonths}</strong> months.
-                      </>
-                    )
-                  }
-                </>
-              )
-              : 'Cancelling your account will keep your subscription active until the end of your current cycle. Any applicable refund for the remaining months (if any) will be processed shortly.'}
+            {subscription === 'Trial' ? 'Cancelling will stop the subscription plan from getting activated after Trial period. Till then you can use the service.'
+              : refundDetails && typeof refundDetails.daysRemainingInCycle === 'number'
+                ? (
+                  <>
+                    Cancelling your account will keep your subscription active until{' '}
+                    <strong>
+                      {new Date(
+                        new Date().setDate(new Date().getDate() + refundDetails.daysRemainingInCycle)
+                      ).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                      })}
+                    </strong>.
+                    {' '}
+                    {Number(refundDetails.refundAmount) === 0
+                      ? 'No refund will be processed.'
+                      : (
+                        <>
+                          A refund of $<strong>{refundDetails.refundAmount}</strong> will be processed for the remaining <strong>{refundDetails.remainingMonths}</strong> months.
+                        </>
+                      )
+                    }
+                  </>
+                )
+                : 'Cancelling your account will keep your subscription active until the end of your current cycle. Any applicable refund for the remaining months (if any) will be processed shortly.'}
           </p>
 
           {/* Display refund details */}
@@ -1355,9 +1375,6 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       </Dialog>
     </>
   )
-}
-const isValidClientSecret = (secret: string) => {
-  return /^pi_[a-zA-Z0-9]+_secret_[a-zA-Z0-9]+$/.test(secret)
 }
 
 export default Subscription

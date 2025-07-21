@@ -231,18 +231,21 @@ const Login: FC<Props> = props => {
     const timeDifference = tillDate.getTime() - currentDate.getTime()
     const daysRemaining = Math.ceil(timeDifference / (1000 * 60 * 60 * 24))
 
-    let canCancel = false
-    if (subData.subscription === 'Trial') {
+    let canCancel = true
+    if (subData.isCancelled === true) {
       canCancel = false
-    } else {
-      // Check if current date is within 7 days from createdDate
-      const msInOneDay = 24 * 60 * 60 * 1000
-      const daysSinceCreation = (currentDate.getTime() - createdDate.getTime()) / msInOneDay
-      const isWithinOneWeek = daysSinceCreation >= 0 && daysSinceCreation <= 7
-
-      // keep true for now
-      canCancel = true //isWithinyarOneWeek
     }
+    // if (subData.subscription === 'Trial') {
+    //   canCancel = false
+    // } else {
+    //   // Check if current date is within 7 days from createdDate
+    //   const msInOneDay = 24 * 60 * 60 * 1000
+    //   const daysSinceCreation = (currentDate.getTime() - createdDate.getTime()) / msInOneDay
+    //   const isWithinOneWeek = daysSinceCreation >= 0 && daysSinceCreation <= 7
+
+    //   // keep true for now
+    //   canCancel = true //isWithinyarOneWeek
+    // }
 
 
     const updatedSubData = {
