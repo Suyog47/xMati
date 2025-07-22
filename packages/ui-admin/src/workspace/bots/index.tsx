@@ -66,10 +66,11 @@ class Bots extends Component<Props> {
     showExpiryPrompt: false,
     expiryMessage: '',
     numberOfBots: this.formData.numberOfBots || 0, // Initialize from localStorage
-    isLoading: false, // Add a state variable for the loader
-    showDummyDialog: false,
+    isLoading: false, // existing loader state
+    showSuggestionsDialog: false,
     upgradeSelectedDuration: 'monthly',
-    upgradePrice: 100
+    upgradePrice: 100,
+    upgradeInProgress: false // new state for upgrade loader
   }
 
   // New handler to update upgrade selection and price
@@ -84,7 +85,44 @@ class Bots extends Component<Props> {
     this.setState({ upgradeSelectedDuration: duration, upgradePrice: price })
   }
 
-  componentDidMount() {
+  // New handler to call the /trial-sub-upgrade API with proper loader and error handling
+  handleUpgradeNow = async (from) => {
+    this.setState({ upgradeInProgress: true })
+    const { upgradeSelectedDuration, upgradePrice } = this.state
+    const email = this.formData.email
+    const plan = from === 'upgrade' ? 'Professional' : 'Starter'
+
+    try {
+      const response = await fetch('http://localhost:8000/trial-sub-upgrade', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          plan,
+          duration: upgradeSelectedDuration,
+          price: upgradePrice
+        }),
+      })
+
+      const res = await response.json()
+
+      if (!res.success) {
+        toast.failure(lang.tr('Failed to save suggestion'))
+        return
+      }
+
+      toast.success(lang.tr('Suggestion saved successfully'))
+    } catch (err) {
+      console.error(err)
+      toast.failure(lang.tr('Failed to save suggestion'))
+    } finally {
+      this.setState({ showSuggestionsDialog: false, upgradeInProgress: false })
+    }
+  }
+
+  async componentDidMount() {
     this.props.fetchBots()
     this.props.fetchBotHealth()
     this.props.fetchBotNLULanguages()
@@ -98,7 +136,6 @@ class Bots extends Component<Props> {
     }
 
     console.log(this.formData)
-    console.log(this.subData)
 
     // Check subscription expiry from localStorage
     let expiry
@@ -121,9 +158,16 @@ class Bots extends Component<Props> {
         return
       }
 
-      if (daysRemaining === 15 || daysRemaining === 7 || daysRemaining === 4 || daysRemaining === 3 || daysRemaining === 1) {
-        if (daysRemaining <= 4 && daysRemaining > 0) {
-          this.setState({ showDummyDialog: true })
+      if (daysRemaining === 15 || daysRemaining === 7 || daysRemaining === 3 || daysRemaining === 3 || daysRemaining === 1) {
+
+        // This dialog should be shown only for Trial (non-cancelled) users before 1 to 3 days remaining for expiry
+        if (daysRemaining <= 3 && daysRemaining > 0 &&
+          this.subData.subscription === 'Trial' &&
+          this.formData.nextSubs && this.formData.nextSubs.plan === 'Starter' &&
+          this.formData.nextSubs && this.formData.nextSubs.suggested === false &&
+          this.state.numberOfBots > 3 &&
+          this.subData.isCancelled === false) {
+          this.setState({ showSuggestionsDialog: true })
         }
 
         if (this.subData.isCancelled === true) {
@@ -159,6 +203,8 @@ class Bots extends Component<Props> {
 
   componentDidUpdate(prevProps: Props) {
     if (prevProps.numberOfBots !== this.props.numberOfBots) {
+      this.formData = JSON.parse(localStorage.getItem('formData') || '{}')
+      console.log('Updated formData:', this.formData)
       this.setState({ numberOfBots: this.props.numberOfBots })
     }
   }
@@ -493,7 +539,7 @@ class Bots extends Component<Props> {
   }
 
   render() {
-    const { showExpiryPrompt, expiryMessage, isLoading, showDummyDialog, upgradeSelectedDuration, upgradePrice } = this.state
+    const { showExpiryPrompt, expiryMessage, isLoading, showSuggestionsDialog, upgradeSelectedDuration, upgradePrice, upgradeInProgress } = this.state
 
     if (!this.props.bots) {
       return <LoadingSection />
@@ -501,7 +547,7 @@ class Bots extends Component<Props> {
 
     return (
       <PageContainer title={lang.tr('admin.workspace.bots.bots')}>
-        {/* Full-screen loader */}
+        {/* Full-screen loader for other actions */}
         {isLoading && (
           <div
             style={{
@@ -521,6 +567,30 @@ class Bots extends Component<Props> {
           </div>
         )}
 
+        {/* Full-screen loader for upgrade suggestion */}
+        {upgradeInProgress && (
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              backgroundColor: 'rgba(255, 255, 255, 0.75)',
+              zIndex: 10000,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              fontSize: '1.5em',
+              color: '#106ba3'
+            }}
+          >
+            <Spinner intent="primary" size={50} />
+            <div style={{ marginTop: '20px' }}>suggestion getting saved</div>
+          </div>
+        )}
+
         {/* Expiry Prompt */}
         {showExpiryPrompt && (
           <div className={style.expiryPrompt}>
@@ -529,7 +599,7 @@ class Bots extends Component<Props> {
         )}
 
         {/* Subscription suggestion Dialog Professional upgrade UI */}
-        {showDummyDialog && (
+        {showSuggestionsDialog && (
           <Dialog
             isOpen={true}
             canEscapeKeyClose={false}
@@ -540,7 +610,7 @@ class Bots extends Component<Props> {
           >
             <div style={{ padding: '30px' }}>
               <p>
-                You have originally opted for {(this.formData.nextSubs && this.formData.nextSubs.plan) || 'Starter'} plan for the duration {(this.formData.nextSubs && this.formData.nextSubs.duration) || ''}
+                You have originally opted for {(this.formData.nextSubs && this.formData.nextSubs.plan) || 'Starter'} plan for the {(this.formData.nextSubs && this.formData.nextSubs.duration) || 'certain'} duration.
               </p>
               <p>However, we have noticed that you are using more than 3 bots, so we suggest you to upgrade the plan from Starter to Professional, as Starter plan supports max 3 bots.</p>
 
@@ -652,12 +722,7 @@ class Bots extends Component<Props> {
                     borderRadius: '4px',
                     cursor: 'pointer'
                   }}
-                  onClick={() => {
-                    console.log('Upgrade Now clicked')
-                    console.log('Selected Duration:', upgradeSelectedDuration)
-                    console.log('Calculated Price:', upgradePrice)
-                    // Trigger further upgrade logic here.
-                  }}
+                  onClick={() => this.handleUpgradeNow('upgrade')}
                 >
                   Upgrade Now
                 </button>
@@ -673,9 +738,7 @@ class Bots extends Component<Props> {
                     borderRadius: '4px',
                     cursor: 'pointer'
                   }}
-                  onClick={() => {
-                    console.log('Keeping current subscription.')
-                  }}
+                  onClick={() => this.handleUpgradeNow('current')}
                 >
                   No, Keep the current
                 </button>

@@ -148,7 +148,6 @@ const Login: FC<Props> = props => {
 
       await setLocalData(status.s3Data, subStatus.data)
       await props.auth.login({ owner: status.s3Data.email, email: 'admin@gmail.com', password: 'Admin@123' }, loginUrl, redirectTo)
-
     } catch (err) {
       if (err.type === 'PasswordExpiredError') {
         props.history.push({ pathname: '/changePassword', state: { email, password, loginUrl } })

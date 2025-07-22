@@ -122,6 +122,7 @@ export const fetchBotCategories = (): AppThunk => {
 }
 
 export const fetchBots = (): AppThunk => {
+  console.log('fetch called')
   return async dispatch => {
     dispatch({ type: FETCH_BOTS_REQUESTED })
 
@@ -155,6 +156,8 @@ export const fetchBots = (): AppThunk => {
     }
     localStorage.setItem('formData', JSON.stringify(updatedFormData))
 
+    let formData = JSON.parse(localStorage.getItem('formData') || '{}')
+    console.log('fetchBots: ', formData)
     dispatch({
       type: FETCH_BOTS_RECEIVED,
       bots: filteredBots,
