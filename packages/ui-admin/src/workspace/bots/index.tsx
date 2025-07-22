@@ -104,11 +104,15 @@ class Bots extends Component<Props> {
       }
 
       if (daysRemaining === 15 || daysRemaining === 7 || daysRemaining === 5 || daysRemaining === 3 || daysRemaining === 1) {
-        msg = `You have ${daysRemaining} days left for expiry. We will be renewing your subscription automatically. If you want to cancel the subscription, please visit the Subscription page.`
+        if (this.subData.isCancelled === true) {
+          msg = `You have ${daysRemaining} days left for expiry. You won't be able to use the services after that. Please visit the Subscription page to renew a plan.`
+        } else {
+          msg = `You have ${daysRemaining} days left for expiry. We will be renewing your subscription automatically. If you want to cancel the subscription, please visit the Subscription page.`
+        }
       }
 
       if (daysRemaining === -1 || daysRemaining === -2 || daysRemaining === -3) {
-        msg = `Currently your subscription has expired. But you have ${Math.abs(daysRemaining + 4)} complimentary days to renew your subscription.`
+        msg = `Currently your subscription plan has been expired. But ${(daysRemaining === -1) ? 'we have decided to give you' : 'you still have'} ${Math.abs(daysRemaining + 4)} complimentary days to renew your subscription.`
       }
 
       if (msg) {
@@ -119,10 +123,10 @@ class Bots extends Component<Props> {
 
         localStorage.setItem('subData', JSON.stringify({ ... this.subData, promptRun: true }))  // set prompt run to false
 
-        // Hide the prompt after 2 seconds
+        // Hide the prompt after 10 seconds
         setTimeout(() => {
           this.setState({ showExpiryPrompt: false })
-        }, 5000)
+        }, 10000)
       }
 
     }
