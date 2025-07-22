@@ -4,6 +4,7 @@ import {
   ButtonGroup,
   Callout,
   Checkbox,
+  Dialog,
   Icon,
   InputGroup,
   Intent,
@@ -66,6 +67,21 @@ class Bots extends Component<Props> {
     expiryMessage: '',
     numberOfBots: this.formData.numberOfBots || 0, // Initialize from localStorage
     isLoading: false, // Add a state variable for the loader
+    showDummyDialog: false,
+    upgradeSelectedDuration: 'monthly',
+    upgradePrice: 100
+  }
+
+  // New handler to update upgrade selection and price
+  handleUpgradeDurationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const duration = e.target.value
+    let price = 100
+    if (duration === 'half-yearly') {
+      price = Math.round(100 * 6 * 0.97 * 100) / 100
+    } else if (duration === 'yearly') {
+      price = Math.round(100 * 12 * 0.95 * 100) / 100
+    }
+    this.setState({ upgradeSelectedDuration: duration, upgradePrice: price })
   }
 
   componentDidMount() {
@@ -83,6 +99,7 @@ class Bots extends Component<Props> {
 
     console.log(this.formData)
     console.log(this.subData)
+
     // Check subscription expiry from localStorage
     let expiry
     const daysRemaining = this.subData.daysRemaining || 0
@@ -97,13 +114,18 @@ class Bots extends Component<Props> {
 
     this.setState({ isExpired: expiry })
 
+    // check for prompt run status and trigger it accordingly
     if (!promptRun) {
       let msg
       if ((daysRemaining === 15 && subscription === 'Trial') || (daysRemaining < 0 && subscription === 'Trial')) {
         return
       }
 
-      if (daysRemaining === 15 || daysRemaining === 7 || daysRemaining === 5 || daysRemaining === 3 || daysRemaining === 1) {
+      if (daysRemaining === 15 || daysRemaining === 7 || daysRemaining === 4 || daysRemaining === 3 || daysRemaining === 1) {
+        if (daysRemaining <= 4 && daysRemaining > 0) {
+          this.setState({ showDummyDialog: true })
+        }
+
         if (this.subData.isCancelled === true) {
           msg = `You have ${daysRemaining} days left for expiry. You won't be able to use the services after that. Please visit the Subscription page to renew a plan.`
         } else {
@@ -471,7 +493,7 @@ class Bots extends Component<Props> {
   }
 
   render() {
-    const { showExpiryPrompt, expiryMessage, isLoading } = this.state
+    const { showExpiryPrompt, expiryMessage, isLoading, showDummyDialog, upgradeSelectedDuration, upgradePrice } = this.state
 
     if (!this.props.bots) {
       return <LoadingSection />
@@ -506,6 +528,162 @@ class Bots extends Component<Props> {
           </div>
         )}
 
+        {/* Subscription suggestion Dialog Professional upgrade UI */}
+        {showDummyDialog && (
+          <Dialog
+            isOpen={true}
+            canEscapeKeyClose={false}
+            canOutsideClickClose={false}
+            icon="info-sign"
+            title="Subscription Suggestion"
+            style={{ width: '700px', textAlign: 'center' }}
+          >
+            <div style={{ padding: '30px' }}>
+              <p>
+                You have originally opted for {(this.formData.nextSubs && this.formData.nextSubs.plan) || 'Starter'} plan for the duration {(this.formData.nextSubs && this.formData.nextSubs.duration) || ''}
+              </p>
+              <p>However, we have noticed that you are using more than 3 bots, so we suggest you to upgrade the plan from Starter to Professional, as Starter plan supports max 3 bots.</p>
+
+              <div style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
+                {/* Professional Plan Container - 60% width */}
+                <div style={{
+                  flex: '0 0 50%',
+                  backgroundColor: '#fff',
+                  border: '1px solid #e0e0e0',
+                  borderRadius: '8px',
+                  padding: '20px',
+                  boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+                }}>
+                  <h2 style={{ color: '#333', marginBottom: '10px', textDecoration: 'underline' }}>Professional</h2>
+                  <h3 style={{ color: '#555', margin: '0 0 10px 0' }}>$100/month</h3>
+                  <p style={{ color: 'black', fontWeight: 'bold', fontSize: '1.1em' }}>5 bots included</p>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '25px' }}>
+                    <div style={{ textAlign: 'left', fontSize: '0.9em', color: '#555' }}>
+                      <strong>Includes:</strong>
+                      <ul style={{ listStyleType: 'disc', paddingLeft: '20px', marginTop: '5px', marginLeft: '0' }}>
+                        <li>LLM Support</li>
+                        <li>HITL Enabled</li>
+                        <li>Bot Analytics</li>
+                      </ul>
+                    </div>
+                    <div style={{ textAlign: 'left', fontSize: '0.9em', color: '#555' }}>
+                      <strong>Supported Channels:</strong>
+                      <ul style={{ listStyleType: 'disc', paddingLeft: '20px', marginTop: '5px', marginLeft: '0' }}>
+                        <li>WhatsApp</li>
+                        <li>Web Chat</li>
+                        <li>Telegram</li>
+                        <li>Slack</li>
+                        <li>Facebook Messenger</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Subscription Duration Selection Box - 40% width */}
+                <div style={{
+                  flex: '0 0 50%',
+                  backgroundColor: '#fff',
+                  border: '1px solid #e0e0e0',
+                  borderRadius: '8px',
+                  padding: '20px',
+                  boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                  textAlign: 'left'
+                }}>
+                  <h3 style={{ marginBottom: '15px', color: '#333' }}>Subscription Duration</h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <label style={{ fontSize: '1.1em', color: '#555' }}>
+                      <input
+                        type="radio"
+                        name="upgradeDuration"
+                        value="monthly"
+                        checked={upgradeSelectedDuration === 'monthly'}
+                        onChange={this.handleUpgradeDurationChange}
+                        style={{ marginRight: '10px' }}
+                      />
+                      <span style={{ fontWeight: 500 }}>Monthly</span>
+                    </label>
+                    <label style={{ fontSize: '1em', color: '#555' }}>
+                      <input
+                        type="radio"
+                        name="upgradeDuration"
+                        value="half-yearly"
+                        checked={upgradeSelectedDuration === 'half-yearly'}
+                        onChange={this.handleUpgradeDurationChange}
+                        style={{ marginRight: '10px' }}
+                      />
+                      <span style={{ fontWeight: 500 }}>Half-Yearly</span> <span style={{ fontSize: '0.9em', color: 'green' }}>(3% discount)</span>
+                    </label>
+                    <label style={{ fontSize: '1em', color: '#555' }}>
+                      <input
+                        type="radio"
+                        name="upgradeDuration"
+                        value="yearly"
+                        checked={upgradeSelectedDuration === 'yearly'}
+                        onChange={this.handleUpgradeDurationChange}
+                        style={{ marginRight: '10px' }}
+                      />
+                      <span style={{ fontWeight: 500 }}>Yearly</span> <span style={{ fontSize: '0.9em', color: 'green' }}>(5% discount)</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                <p style={{ fontSize: '1.4em', fontWeight: 'bold', color: '#333' }}>
+                  Amount:-  ${upgradePrice}
+                  {upgradeSelectedDuration === 'monthly'
+                    ? ' per month'
+                    : upgradeSelectedDuration === 'half-yearly'
+                      ? ' half-yearly'
+                      : ' yearly'}
+                </p>
+              </div>
+
+              {/* Big Horizontal Buttons */}
+              <div style={{ display: 'flex', marginTop: '30px', gap: '10px' }}>
+                <button
+                  style={{
+                    flex: 1,
+                    backgroundColor: '#106ba3',
+                    color: 'white',
+                    height: '60px',
+                    fontSize: '18px',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => {
+                    console.log('Upgrade Now clicked')
+                    console.log('Selected Duration:', upgradeSelectedDuration)
+                    console.log('Calculated Price:', upgradePrice)
+                    // Trigger further upgrade logic here.
+                  }}
+                >
+                  Upgrade Now
+                </button>
+
+                <button
+                  style={{
+                    flex: 1,
+                    backgroundColor: '#c23030',
+                    color: 'white',
+                    height: '60px',
+                    fontSize: '18px',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => {
+                    console.log('Keeping current subscription.')
+                  }}
+                >
+                  No, Keep the current
+                </button>
+              </div>
+            </div>
+          </Dialog>
+        )}
+
         <SplitPage sideMenu={(this.state.isExpired) ? !this.isPipelineView : !this.isPipelineView && this.renderCreateNewBotButton()}>
           <Fragment>
             <Subscription
@@ -527,8 +705,9 @@ class Bots extends Component<Props> {
                   backgroundColor: 'white',
                 }}
               >
-                <h3>Your {(this.subData.subscription === 'Trial') ?
-                  'Trial' : this.subData.subscription} subscription {(this.subData.subscription !== 'Trial') ? 'and a 3 day complimentary trail' : ''} has been Expired</h3>
+                <h3>
+                  Your {(this.subData.subscription === 'Trial') ? 'Trial' : this.subData.subscription} subscription {(this.subData.subscription !== 'Trial') ? 'and a 3 day complimentary trial' : ''} has been Expired
+                </h3>
                 <p style={{ margin: '20px 0' }}>
                   To continue using the platform, please purchase a subscription.
                 </p>
@@ -545,7 +724,6 @@ class Bots extends Component<Props> {
               <>
                 <Downloader url={this.state.archiveUrl} filename={this.state.archiveName} />
                 {this.renderBots()}
-
                 <AccessControl resource="admin.bots.*" operation="write">
                   <RollbackBotModal
                     botId={this.state.focusedBot}

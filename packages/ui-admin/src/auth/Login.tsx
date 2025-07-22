@@ -141,7 +141,6 @@ const Login: FC<Props> = props => {
       }
 
       let subStatus = await userSubscription(email)
-      console.log('Subscription result:', subStatus.status)
       if (!subStatus.status) {
         setError(subStatus.msg)
         return

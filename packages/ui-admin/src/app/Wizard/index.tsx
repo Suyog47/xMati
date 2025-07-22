@@ -355,7 +355,6 @@ const CustomerWizard: React.FC = () => {
   }
 
   const s3Upload = async () => {
-
     try {
       const updatedFormData = {
         fullName: formData.fullName,
@@ -371,7 +370,8 @@ const CustomerWizard: React.FC = () => {
         nextSubs: {
           plan: selectedPlan,
           duration: selectedDuration,
-          price
+          price,
+          suggested: false
         }
       }
 
@@ -478,7 +478,8 @@ const CustomerWizard: React.FC = () => {
       nextSubs: {
         plan: selectedPlan,
         duration: selectedDuration,
-        price
+        price,
+        suggested: false
       }
     }
 
