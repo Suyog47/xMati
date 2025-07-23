@@ -131,7 +131,7 @@ class CreateBotModal extends Component<Props, State> {
 
   createBot = async e => {
     e.preventDefault()
-    const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
+    this.savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
     let frm = (this.state.botPrompt) ? 'llm' : 'template'
 
     if (this.isChannelButtonDisabled || this.isButtonDisabled) {
@@ -140,11 +140,11 @@ class CreateBotModal extends Component<Props, State> {
     this.setState({ isProcessing: true, showFullScreenLoader: true })
 
     const newBot = {
-      fullName: savedFormData.fullName,
-      organisationName: savedFormData.organisationName,
+      fullName: this.savedFormData.fullName,
+      organisationName: this.savedFormData.organisationName,
       id: this.state.botId,
       name: this.state.botName,
-      owner: savedFormData.email,
+      owner: this.savedFormData.email,
       template: { id: this.state.selectedTemplate?.id, moduleId: 'builtin' },
       from: frm,
       botDesc: this.state.botPrompt,
@@ -277,11 +277,12 @@ class CreateBotModal extends Component<Props, State> {
   }
 
   get isBotLimitExceeded() {
+    this.savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
     const { subscription } = this.savedSubData
     const numberOfBots = this.savedFormData.numberOfBots || 0
 
     // Determine the bot limit based on the subscription type
-    const botLimit = subscription === 'Professional' ? 5 : 3
+    const botLimit = subscription === 'Starter' ? 3 : 5
 
     // Check if the number of bots exceeds the limit
     return numberOfBots >= botLimit
@@ -304,11 +305,11 @@ class CreateBotModal extends Component<Props, State> {
             <Callout intent="danger">
               <h4>You have reached the maximum number of bots allowed for your subscription plan.</h4>
               <p>
-                Your current subscription plan ({this.savedFormData.subscription}) allows a maximum of{' '}
-                {this.savedFormData.subscription === 'Professional' ? 5 : 3} bots.
+                Your current subscription plan ({this.savedSubData.subscription}) allows a maximum of{' '}
+                {this.savedSubData.subscription === 'Starter' ? 3 : 5} bots.
               </p>
               <p>
-                To create more bots, please upgrade your subscription or delete an existing bot.
+                {this.savedSubData.subscription === 'Starter' ? 'To create more bots, please upgrade your subscription or delete an existing bot.' : ''}
               </p>
             </Callout>
           </div>

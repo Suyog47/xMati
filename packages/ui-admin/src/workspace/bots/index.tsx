@@ -135,32 +135,35 @@ class Bots extends Component<Props> {
       this.props.fetchLicensing()
     }
 
-    console.log(this.formData)
+    setTimeout(() => {
+      this.formData = JSON.parse(localStorage.getItem('formData') || '{}')
+      this.subData = JSON.parse(localStorage.getItem('subData') || '{}')
 
-    // Check subscription expiry from localStorage
-    let expiry
-    const daysRemaining = this.subData.daysRemaining || 0
-    const subscription = this.subData.subscription || 'Trial'
-    const promptRun = this.subData.promptRun || false
+      this.state.numberOfBots = this.formData.numberOfBots || 0 // Initialize from localStorage
+      console.log(this.formData)
 
-    if (subscription === 'Trial') {
-      expiry = this.subData.expired || false
-    } else {
-      expiry = this.subData.expired && daysRemaining <= -4
-    }
+      // Check subscription expiry from localStorage
+      let expiry
+      const daysRemaining = this.subData.daysRemaining || 0
+      const subscription = this.subData.subscription || 'Trial'
+      const promptRun = this.subData.promptRun || false
 
-    this.setState({ isExpired: expiry })
-
-    // check for prompt run status and trigger it accordingly
-    if (!promptRun) {
-      let msg
-      if ((daysRemaining === 15 && subscription === 'Trial') || (daysRemaining < 0 && subscription === 'Trial')) {
-        return
+      if (subscription === 'Trial') {
+        expiry = this.subData.expired || false
+      } else {
+        expiry = this.subData.expired && daysRemaining <= -4
       }
 
-      if (daysRemaining === 15 || daysRemaining === 7 || daysRemaining === 3 || daysRemaining === 3 || daysRemaining === 1) {
+      this.setState({ isExpired: expiry })
 
-        // This dialog should be shown only for Trial (non-cancelled) users before 1 to 3 days remaining for expiry
+      // check for prompt run status and trigger it accordingly
+      if (!promptRun) {
+        let msg
+        if ((daysRemaining === 15 && subscription === 'Trial') || (daysRemaining < 0 && subscription === 'Trial')) {
+          return
+        }
+
+        // This dialog should be shown only for Trial(non - cancelled) users before 1 to 3 days remaining for expiry
         if (daysRemaining <= 3 && daysRemaining > 0 &&
           this.subData.subscription === 'Trial' &&
           this.formData.nextSubs && this.formData.nextSubs.plan === 'Starter' &&
@@ -170,32 +173,36 @@ class Bots extends Component<Props> {
           this.setState({ showSuggestionsDialog: true })
         }
 
-        if (this.subData.isCancelled === true) {
-          msg = `You have ${daysRemaining} days left for expiry. You won't be able to use the services after that. Please visit the Subscription page to renew a plan.`
-        } else {
-          msg = `You have ${daysRemaining} days left for expiry. We will be renewing your subscription automatically. If you want to cancel the subscription, please visit the Subscription page.`
+
+        if (daysRemaining === 15 || daysRemaining === 7 || daysRemaining === 5 || daysRemaining === 3 || daysRemaining === 1) {
+
+          if (this.subData.isCancelled === true) {
+            msg = `You have ${daysRemaining} days left for expiry. You won't be able to use the services after that. Please visit the Subscription page to renew a plan.`
+          } else {
+            msg = `You have ${daysRemaining} days left for expiry. We will be renewing your subscription automatically. If you want to cancel the subscription, please visit the Subscription page.`
+          }
         }
+
+        if (daysRemaining === -1 || daysRemaining === -2 || daysRemaining === -3) {
+          msg = `Currently your subscription plan has been expired. But ${(daysRemaining === -1) ? 'we have decided to give you' : 'you still have'} ${Math.abs(daysRemaining + 4)} complimentary days to renew your subscription.`
+        }
+
+        if (msg) {
+          this.setState({
+            showExpiryPrompt: true,
+            expiryMessage: msg
+          })
+
+          localStorage.setItem('subData', JSON.stringify({ ... this.subData, promptRun: true }))  // set prompt run to false
+
+          // Hide the prompt after 10 seconds
+          setTimeout(() => {
+            this.setState({ showExpiryPrompt: false })
+          }, 10000)
+        }
+
       }
-
-      if (daysRemaining === -1 || daysRemaining === -2 || daysRemaining === -3) {
-        msg = `Currently your subscription plan has been expired. But ${(daysRemaining === -1) ? 'we have decided to give you' : 'you still have'} ${Math.abs(daysRemaining + 4)} complimentary days to renew your subscription.`
-      }
-
-      if (msg) {
-        this.setState({
-          showExpiryPrompt: true,
-          expiryMessage: msg
-        })
-
-        localStorage.setItem('subData', JSON.stringify({ ... this.subData, promptRun: true }))  // set prompt run to false
-
-        // Hide the prompt after 10 seconds
-        setTimeout(() => {
-          this.setState({ showExpiryPrompt: false })
-        }, 10000)
-      }
-
-    }
+    }, 1500) // Delay to ensure localStorage is populated
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     telemetry.startFallback(api.getSecured({ useV1: true })).catch()
@@ -203,8 +210,6 @@ class Bots extends Component<Props> {
 
   componentDidUpdate(prevProps: Props) {
     if (prevProps.numberOfBots !== this.props.numberOfBots) {
-      this.formData = JSON.parse(localStorage.getItem('formData') || '{}')
-      console.log('Updated formData:', this.formData)
       this.setState({ numberOfBots: this.props.numberOfBots })
     }
   }
@@ -274,7 +279,7 @@ class Bots extends Component<Props> {
     const { numberOfBots } = this.state
 
     // Determine the bot limit based on the subscription type
-    const botLimit = subscription === 'Professional' ? 5 : 3
+    const botLimit = subscription === 'Starter' ? 3 : 5
 
     // Check if the number of bots exceeds the limit
     if (numberOfBots >= botLimit) {
@@ -612,7 +617,7 @@ class Bots extends Component<Props> {
               <p>
                 You have originally opted for {(this.formData.nextSubs && this.formData.nextSubs.plan) || 'Starter'} plan for the {(this.formData.nextSubs && this.formData.nextSubs.duration) || 'certain'} duration.
               </p>
-              <p>However, we have noticed that you are using more than 3 bots, so we suggest you to upgrade the plan from Starter to Professional, as Starter plan supports max 3 bots.</p>
+              <p>However, we have noticed that you are using more than 3 bots, so we suggest you to upgrade the plan from Starter to Professional, as Starter plan supports maximum 3 bots.</p>
 
               <div style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
                 {/* Professional Plan Container - 60% width */}
