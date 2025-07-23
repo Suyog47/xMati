@@ -375,7 +375,7 @@ const CustomerWizard: React.FC = () => {
         }
       }
 
-      const result = await fetch('http://localhost:8000/user-auth', {
+      const result = await fetch('https://www.app.xmati.ai/apis/user-auth', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -414,7 +414,7 @@ const CustomerWizard: React.FC = () => {
         return { success: false, msg: 'Error creating payment method' }
       }
 
-      const result = await fetch('http://localhost:8000/create-stripe-customer', {
+      const result = await fetch('https://www.app.xmati.ai/apis/create-stripe-customer', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: formData.email, paymentMethodId: paymentMethod.id || '' }),
@@ -438,7 +438,7 @@ const CustomerWizard: React.FC = () => {
   const checkUser = async () => {
     setIsLoading(true) // Show big loader
     try {
-      const result = await fetch('http://localhost:8000/check-user', {
+      const result = await fetch('https://www.app.xmati.ai/apis/check-user', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

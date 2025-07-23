@@ -93,7 +93,7 @@ class Bots extends Component<Props> {
     const plan = from === 'upgrade' ? 'Professional' : 'Starter'
 
     try {
-      const response = await fetch('http://localhost:8000/trial-sub-upgrade', {
+      const response = await fetch('https://www.app.xmati.ai/apis/trial-sub-upgrade', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -705,7 +705,7 @@ class Bots extends Component<Props> {
 
               <div style={{ marginTop: '20px', textAlign: 'center' }}>
                 <p style={{ fontSize: '1.4em', fontWeight: 'bold', color: '#333' }}>
-                  Amount:-  ${upgradePrice}
+                  Amount:  ${upgradePrice}
                   {upgradeSelectedDuration === 'monthly'
                     ? ' per month'
                     : upgradeSelectedDuration === 'half-yearly'
