@@ -112,11 +112,9 @@ export const Subs = () => {
                   marginTop: 10,
                 }}
               >
-                {(subscription === 'Trial' || subscription.toLowerCase() === 'starter')
+                {(subscription.toLowerCase() === 'starter')
                   ? '3 bots included'
-                  : subscription.toLowerCase() === 'professional'
-                    ? '5 bots included'
-                    : '-'}
+                  : '5 bots included'}
               </div>
 
               <div style={{ fontWeight: 600, color: '#394B59', marginBottom: 8 }}>Includes:</div>
