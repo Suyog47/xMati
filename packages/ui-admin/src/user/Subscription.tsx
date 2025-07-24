@@ -651,6 +651,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     }
   }, [savedSubData])
 
+
   // Trigger refund calculation when the confirm cancel dialog is opened
   useEffect(() => {
     // Don't need the refund calculation for trial subscriptions as it is free
@@ -1210,7 +1211,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                       })}
                     </strong>.
                     {' '}
-                    {Number(refundDetails.refundAmount) === 0
+                    {Number(refundDetails.refundAmount) <= 0
                       ? 'No refund will be processed.'
                       : (
                         <>
