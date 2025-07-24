@@ -22,8 +22,8 @@ interface Props {
 }
 
 const Subscription: FC<Props> = ({ isOpen, toggle }) => {
-  const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
-  const savedSubData = JSON.parse(localStorage.getItem('subData') || '{}')
+  let savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
+  let savedSubData = JSON.parse(localStorage.getItem('subData') || '{}')
 
   const [clientSecret, setClientSecret] = useState<string>('')
   const [transactions, setTransactions] = useState<any[]>([])
@@ -69,6 +69,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     setIsLoadingSecret(true)
     setPaymentError('')
     try {
+      savedFormData = JSON.parse(localStorage.getItem('formData') || '{}') // reinitializing to get the latest data
       const result = await fetch('http://localhost:8000/create-payment-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -229,6 +230,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   }
 
   const CheckoutForm = useMemo(() => () => {
+    savedFormData = JSON.parse(localStorage.getItem('formData') || '{}') // reinitializing to get the latest data
     const stripe = useStripe()
     const elements = useElements()
     const [error, setError] = useState('')

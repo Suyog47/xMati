@@ -8,10 +8,6 @@ import CardForm from './CardForm'
 // For development use
 const stripePromise = loadStripe('pk_test_51RLimpPBSMPLjWxm3IUaX63iUb4TqhU5prbUsg7A5RwG2sZsukOa7doAAhPu2RpEkYXZ2dRLNrOA4Pby9IscZOse00unCEcNDG')
 
-//For production use
-//const stripePromise = loadStripe('pk_live_51RPPI0EncrURrNgDF2LNkLrh5Wf53SIe3WjqPqjtzqbJWDGfDFeG4VvzUXuC4nCmrPTNOTeFENuAqRBw1mvbNJg600URDxPnuc')
-
-
 interface Props {
   isOpen: boolean
   toggle: () => void
@@ -40,31 +36,46 @@ const loaderTextStyle: React.CSSProperties = {
 
 const UpdateCardDetails: FC<Props> = props => {
   const [paymentMethodId, setPaymentMethodId] = useState<string>('')
+  const [isSaving, setIsSaving] = useState(false)
   let formData = JSON.parse(localStorage.getItem('formData') || '{}')
 
-  const handleCardValidated = async (paymentMethodId: string) => {
+  const handleCardValidated = (paymentMethodId: string) => {
     setPaymentMethodId(paymentMethodId)
-    console.log('Payment Method ID:', paymentMethodId)
   }
 
   const handleSave = async () => {
+    setIsSaving(true)
     try {
-      const result = await fetch('http://localhost:8000/create-stripe-customer', {
+
+      const updatedFormData = {
+        ...formData,
+        stripePayementId: paymentMethodId
+      }
+
+      console.log('Updated Form Data:', updatedFormData)
+      const result = await fetch('http://localhost:8000/update-card-info', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: formData.email, paymentMethodId }),
+        body: JSON.stringify({ email: formData.email, customerId: formData.stripeCustomerId, paymentMethodId, data: updatedFormData })
       })
 
-      let data = await result.json()
+      const data = await result.json()
 
       if (!data.success) {
         toast.failure('Failed to update card details.')
+        return
       }
 
-      // success alert
+      // Save paymentMethodId to localStorage
+      localStorage.setItem('formData', JSON.stringify(updatedFormData))
+
+      // Success alert
       toast.success('Card details updated successfully!')
-    } catch (error) {
+      props.toggle() // Close the dialog
+    } catch (error: any) {
       toast.failure(`An error occurred while saving card details. ${error.message || 'Please try again later.'}`)
+    } finally {
+      setIsSaving(false)
     }
   }
 
@@ -84,9 +95,15 @@ const UpdateCardDetails: FC<Props> = props => {
       </Elements>
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-          <Button onClick={handleSave} text={lang.tr('save')} intent="primary" />
+          <Button onClick={handleSave} text={lang.tr('save')} intent="primary" disabled={!paymentMethodId || isSaving} />
         </div>
       </div>
+      {isSaving && (
+        <div style={loaderOverlayStyle}>
+          <Spinner size={50} />
+          <div style={loaderTextStyle}>Saving your card details... Please wait...</div>
+        </div>
+      )}
     </Dialog>
   )
 }

@@ -40,7 +40,8 @@ const CardForm: FC<CardFormProps> = ({ onCardValidated }) => {
       })
 
       if (!paymentMethod) {
-        return { success: false, msg: 'Error creating payment method' }
+        setCardErrorMessage(`Issue with card. ${error?.message || 'Please try again.'}`)
+        return
       }
 
       onCardValidated(paymentMethod.id)
@@ -55,9 +56,15 @@ const CardForm: FC<CardFormProps> = ({ onCardValidated }) => {
   return (
     <div>
       <h3 className="stepHeader">Payment Information</h3>
-      {/* <p className="stepSubtitleSmall">
-        We are securely saving your credit card details to simplify future subscription plan purchases. No charges will be made at this time.
-      </p> */}
+
+      {/* Loader displayed above the card form */}
+      {isValidatingCard && (
+        <div style={{ marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <Spinner size={20} intent="primary" />
+          <span style={{ fontSize: '14px', color: '#007BFF' }}>Validating your card... Please wait</span>
+        </div>
+      )}
+
       <div className="card-element-container">
         <div style={{ marginBottom: '5px' }}>
           <label style={{ fontWeight: 500 }}>Credit/Debit Card Details</label>
@@ -91,11 +98,9 @@ const CardForm: FC<CardFormProps> = ({ onCardValidated }) => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '10px',
           }}
           disabled={isValidatingCard || !stripe || !elements}
         >
-          {isValidatingCard && <div className="small-loader"><Spinner size={16} /></div>}
           Verify your Card
         </button>
       </div>
@@ -112,7 +117,17 @@ const CardForm: FC<CardFormProps> = ({ onCardValidated }) => {
       )}
 
       {cardErrorMessage && (
-        <div className="error" style={{ marginTop: '10px', color: 'red' }}>
+        <div
+          className="error"
+          style={{
+            marginTop: '10px',
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            fontWeight: 'bold',
+            color: 'red'
+          }}
+        >
           {cardErrorMessage}
         </div>
       )}
