@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 import logo from './xmati.png' // Make sure this path is correct
 import { auth } from 'botpress/shared'
@@ -8,6 +8,7 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isLoading, setIsLoading] = useState(true)
   const [isMaintenance, setIsMaintenance] = useState(true)
   const location = useLocation()
+  //const isLoggedOutRef = useRef(false)
 
   useEffect(() => {
     const checkMaintenanceStatus = async () => {
@@ -40,6 +41,36 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.clear()
     auth.logout(() => api.getSecured())
   }
+
+  // Excluded routes: if location.pathname starts with one of these, skip the check.
+  const excludedRoutes = [
+    '/botCreation',
+    '/botCreation/admin123',
+    '/login',
+    '/register',
+    '/setToken',
+    '/changePassword',
+    '/noAccess',
+    '/chatAuthResult'
+  ]
+
+  // Check localStorage fields every 2 seconds and logout if any is empty (unless on an excluded route)
+  useEffect(() => {
+    const tokenCheckInterval = setInterval(() => {
+      // Skip check if current pathname starts with any excluded route
+      const skipCheck = excludedRoutes.some(route => location.pathname.startsWith(route))
+      if (skipCheck) {
+        return
+      }
+
+      const formDataRaw = localStorage.getItem('formData')
+      const subDataRaw = localStorage.getItem('subData')
+      if (!formDataRaw || formDataRaw === '{}' || !subDataRaw || subDataRaw === '{}') {
+        handleLogout()
+      }
+    }, 2000)
+    return () => clearInterval(tokenCheckInterval)
+  }, [location.pathname])
 
   if (isLoading) {
     return (
@@ -120,7 +151,7 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
-          background: 'linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%)', // subtle background gradient
+          background: 'linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%)',
           textAlign: 'center',
           padding: 24,
           boxSizing: 'border-box',
@@ -138,9 +169,9 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
             fontWeight: 600,
             color: '#102a43',
             width: '80%',
-            maxWidth: 500, // keeps it from stretching too far on large screens
-            lineHeight: 1.6,         // Line spacing
-            wordSpacing: '2px',      // Word spacing
+            maxWidth: 500,
+            lineHeight: 1.6,
+            wordSpacing: '2px',
           }}
         >
           The xMati platform is currently in Maintenance mode.
