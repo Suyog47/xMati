@@ -1,4 +1,5 @@
-import { Button, Tooltip, Dialog } from '@blueprintjs/core'
+import { Button, Tooltip, Dialog, Tag } from '@blueprintjs/core'
+import { UNDERLINE } from '@blueprintjs/icons/lib/esm/generated/iconContents'
 import React, { useState } from 'react'
 
 function formatDate(dateStr: string) {
@@ -15,12 +16,9 @@ function formatDate(dateStr: string) {
     })
 }
 
-// import and formatDate function stays same
-
 export const Subs = () => {
   const [isDialogOpen, setDialogOpen] = useState(false)
   const savedSubData = JSON.parse(localStorage.getItem('subData') || '{}')
-
   const {
     subscription = '',
     createdAt = '-',
@@ -28,10 +26,79 @@ export const Subs = () => {
     daysRemaining = '-',
     amount = '-',
     duration = '-',
+    isCancelled = false,
     expired = false,
   } = savedSubData
 
-  const days = typeof daysRemaining === 'string' ? parseInt(daysRemaining, 10) : daysRemaining
+  const days =
+    typeof daysRemaining === 'string'
+      ? parseInt(daysRemaining, 10)
+      : daysRemaining
+
+  // Returns a status badge with a color according to the subscription state.
+  const renderStatusBadge = () => {
+    if (isCancelled || expired) {
+      return <Tag intent="danger" round>Cancelled</Tag>
+    } else if (days !== '-' && days <= 5) {
+      return <Tag intent="warning" round>Expiring Soon</Tag>
+    } else {
+      return <Tag intent="success" round>Active</Tag>
+    }
+  }
+
+  // A colored alert banner to catch the user's attention regarding the subscription status.
+  const renderAlertBanner = () => {
+    if (isCancelled || expired) {
+      return (
+        <div
+          style={{
+            background: '#ffcccc',
+            padding: '12px 20px',
+            borderRadius: '4px',
+            marginTop: 5,
+            textAlign: 'center',
+            fontWeight: 700,
+            color: '#721c24',
+          }}
+        >
+          Your subscription has been cancelled.
+        </div>
+      )
+    } else if (days !== '-' && days <= 5) {
+      return (
+        <div
+          style={{
+            background: '#fff3cd',
+            padding: '12px 20px',
+            borderRadius: '4px',
+            marginBottom: 20,
+            textAlign: 'center',
+            fontWeight: 700,
+            color: '#856404',
+          }}
+        >
+          Your subscription expires in {days} day{days > 1 && 's'}.
+        </div>
+      )
+    } else {
+      return (
+        <div
+          style={{
+            background: '#d4edda',
+            padding: '12px 20px',
+            borderRadius: '4px',
+            marginBottom: 20,
+            textAlign: 'center',
+            fontWeight: 700,
+            color: '#155724',
+          }}
+        >
+          Your subscription is active.
+        </div>
+      )
+    }
+  }
+
   return (
     <div id="subscription_dropdown">
       <Tooltip content="View Subscription" position="bottom">
@@ -61,6 +128,7 @@ export const Subs = () => {
         }}
       >
         <div style={{ padding: '10px 28px' }}>
+
           {/* Header */}
           <h2
             style={{
@@ -71,8 +139,13 @@ export const Subs = () => {
               marginBottom: 10,
             }}
           >
-            {subscription ? `${subscription}` : 'No Active Plan'}
+            {subscription ? subscription : 'No Active Plan'}
           </h2>
+
+          {/* Status Badge */}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
+            {renderStatusBadge()}
+          </div>
 
           {/* Two Columns with Divider */}
           <div
@@ -105,14 +178,14 @@ export const Subs = () => {
                   fontSize: 16,
                   color: '#106ba3',
                   backgroundColor: '#e3e3e3',
-                  padding: '6px 14px',              // Internal padding
+                  padding: '6px 14px',
                   borderRadius: '10px',
-                  display: 'inline-block',          // Shrink to fit content
+                  display: 'inline-block',
                   marginBottom: 10,
                   marginTop: 10,
                 }}
               >
-                {(subscription.toLowerCase() === 'starter')
+                {subscription.toLowerCase() === 'starter'
                   ? '3 bots included'
                   : '5 bots included'}
               </div>
@@ -120,7 +193,9 @@ export const Subs = () => {
               <div style={{ fontWeight: 600, color: '#394B59', marginBottom: 8 }}>Includes:</div>
               <ul style={{ paddingLeft: 16, marginBottom: 24 }}>
                 {['LLM Support', 'HITL (Human in the Loop)', 'Bot Analytics'].map((item, idx) => (
-                  <li key={idx} style={{ marginBottom: 6, color: '#106ba3' }}>✓ {item}</li>
+                  <li key={idx} style={{ marginBottom: 6, color: '#106ba3' }}>
+                    ✓ {item}
+                  </li>
                 ))}
               </ul>
 
@@ -129,7 +204,9 @@ export const Subs = () => {
               </div>
               <ul style={{ paddingLeft: 16 }}>
                 {['Web Channel', 'Telegram', 'Slack', 'Facebook Messenger'].map((ch, idx) => (
-                  <li key={idx} style={{ marginBottom: 6, color: '#106ba3' }}>✓ {ch}</li>
+                  <li key={idx} style={{ marginBottom: 6, color: '#106ba3' }}>
+                    ✓ {ch}
+                  </li>
                 ))}
               </ul>
             </div>
@@ -144,7 +221,6 @@ export const Subs = () => {
               }}
               className="divider-desktop"
             />
-
 
             {/* Right - Subscription Details */}
             <div style={{ flex: '1 1 250px', minWidth: 200 }}>
@@ -191,8 +267,6 @@ export const Subs = () => {
                       {value}
                     </span>
                   </div>
-
-                  {/* Divider (skip after last item) */}
                   {idx < arr.length - 1 && (
                     <div
                       style={{
@@ -205,11 +279,10 @@ export const Subs = () => {
                   )}
                 </React.Fragment>
               ))}
-
             </div>
           </div>
 
-          {/* Plan Expiry Message */}
+          {/* Plan Expiry Message
           <div
             style={{
               marginTop: 10,
@@ -217,6 +290,7 @@ export const Subs = () => {
               fontWeight: 700,
               color: '#106BA3',
               fontSize: 18,
+              textDecoration: 'underline'
             }}
           >
             {days === 0
@@ -224,18 +298,13 @@ export const Subs = () => {
               : days !== '-' && days > 0
                 ? `Your plan expires in ${days} day${days > 1 ? 's' : ''}`
                 : 'Your plan has been expired.'}
-          </div>
+          </div> */}
 
-          <hr
-            style={{
-              border: 'none',
-              borderTop: '2px solid #E1E8ED',
-              margin: '10px 0 16px',
-            }}
-          />
+          {/* Alert Banner */}
+          {renderAlertBanner()}
 
           {/* Footer Buttons */}
-          <div
+          {/* <div
             style={{
               display: 'flex',
               flexWrap: 'wrap',
@@ -244,22 +313,6 @@ export const Subs = () => {
               marginTop: 16,
             }}
           >
-            {/* {subscription !== 'Trial' && !expired && (
-              <Button
-                intent="danger"
-                large
-                style={{
-                  minWidth: 280,
-                  height: 52,
-                  fontSize: 16,
-                  fontWeight: 600,
-                  borderRadius: 8,
-                }}
-                onClick={() => alert('Work in progress')}
-              >
-                Cancel Your Subscription
-              </Button>
-            )} */}
             <Button
               intent="primary"
               large
@@ -274,7 +327,7 @@ export const Subs = () => {
             >
               Close
             </Button>
-          </div>
+          </div> */}
         </div>
       </Dialog>
     </div>
