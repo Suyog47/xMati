@@ -144,7 +144,7 @@ const UpdateCardDetails: FC<Props> = props => {
     >
       <Elements stripe={stripePromise}>
         <div className={Classes.DIALOG_BODY}>
-          <h3 className="stepHeader">Your Payment Information</h3>
+          <h3 className="stepHeader" style={{ marginTop: 0 }}>Your Payment Information</h3>
           {/* Loader for card details */}
           {isLoadingCard ? (
             <div
@@ -165,9 +165,9 @@ const UpdateCardDetails: FC<Props> = props => {
             // Credit-card like UI displaying current card details
             !isLoadingCard && cardDetails && (
               <div style={{
-                background: cardDetails.brand === 'Visa'
+                background: cardDetails.brand.toUpperCase() === 'VISA'
                   ? 'linear-gradient(135deg, #ff9900, #ff5e62)'
-                  : cardDetails.brand === 'Mastercard'
+                  : cardDetails.brand.toUpperCase() === 'MASTERCARD'
                     ? 'linear-gradient(135deg, #f7971e, #ffd200)'
                     : 'linear-gradient(135deg, #4361ee, #3a0ca3)',
                 borderRadius: '12px',

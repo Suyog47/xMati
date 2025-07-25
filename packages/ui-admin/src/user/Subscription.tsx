@@ -398,58 +398,134 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
             </div>
           </div>
         )}
-        <div style={{ padding: 10, textAlign: 'center' }}>
-          {/* Display card_data */}
-          {cardData && (
-            <div
-              style={{
-                marginBottom: '20px',
-                padding: '20px',
-                background: '#ffffff',
-                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-                borderRadius: '8px',
-                maxWidth: '400px',
-                marginLeft: 'auto',
-                marginRight: 'auto',
-              }}
-            >
-              <h4
-                style={{
-                  marginBottom: '15px',
-                  fontSize: '1.4em',
-                  color: '#333333',
+
+        {cardData && (
+          <div style={{
+            background: cardData.brand.toUpperCase() === 'VISA'
+              ? 'linear-gradient(135deg, #ff9900, #ff5e62)'
+              : cardData.brand.toUpperCase() === 'MASTERCARD'
+                ? 'linear-gradient(135deg, #f7971e, #ffd200)'
+                : 'linear-gradient(135deg, #4361ee, #3a0ca3)',
+            borderRadius: '12px',
+            margin: '0 auto 20px auto',
+            padding: '16px',
+            color: '#fff',
+            display: 'flex',
+            flexDirection: 'column',
+            height: '190px',
+            width: '330px', // Fixed width
+            boxShadow: '0 8px 16px rgba(0,0,0,0.15)',
+            position: 'relative',
+            overflow: 'hidden',
+            fontFamily: "'Source Sans Pro', sans-serif"
+          }}>
+            {/* Glossy overlay effect */}
+            <div style={{
+              position: 'absolute',
+              top: '-50%',
+              right: '-50%',
+              width: '200%',
+              height: '200%',
+              background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 60%)',
+              transform: 'rotate(20deg)'
+            }} />
+
+            {/* Top section with brand and chip */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              marginBottom: '20px'
+            }}>
+              <div style={{
+                background: 'rgba(255, 255, 255, 0.2)',
+                borderRadius: '4px',
+                padding: '6px 10px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <div style={{
+                  fontSize: '10px',
+                  fontWeight: 'bold',
+                  letterSpacing: '1px',
+                  opacity: 0.8,
                   textAlign: 'center',
-                  borderBottom: '1px solid #f0f0f0',
-                  paddingBottom: '10px',
-                }}
-              >
-                Your Card Details
-              </h4>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-                <span style={{ fontWeight: 600, color: '#555555' }}>Card Brand:</span>
-                <span style={{ color: '#777777' }}>{cardData.brand}</span>
+                }}>
+                  {cardData.funding}
+                </div>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-                <span style={{ fontWeight: 600, color: '#555555' }}>Last 4 Digits:</span>
-                <span style={{ color: '#777777' }}>**** **** **** {cardData.last4}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontWeight: 600, color: '#555555' }}>Expiry:</span>
-                <span style={{ color: '#777777' }}>
-                  {cardData.exp_month}/{cardData.exp_year}
-                </span>
+              <div style={{
+                fontSize: '24px',
+                fontWeight: 'bold',
+                textTransform: 'uppercase',
+                fontStyle: 'italic',
+                textShadow: '0 2px 4px rgba(0,0,0,0.2)'
+              }}>
+                {cardData.brand}
               </div>
             </div>
-          )}
+
+            {/* Card number section */}
+            <div style={{
+              fontSize: '20px',
+              letterSpacing: '3px',
+              marginBottom: '20px',
+              textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+              flexGrow: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <span>•••• •••• •••• {cardData.last4}</span>
+            </div>
+
+            {/* Bottom section */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'flex-end'
+            }}>
+              <div>
+                <div style={{
+                  fontSize: '10px',
+                  opacity: 0.8,
+                  marginBottom: '4px'
+                }}>
+                  USER
+                </div>
+                <div style={{
+                  fontSize: '12px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '1px'
+                }}>
+                  {savedFormData.fullName || 'YOUR NAME'}
+                </div>
+              </div>
+
+              <div style={{ textAlign: 'right' }}>
+                <div style={{
+                  fontSize: '10px',
+                  opacity: 0.8,
+                  marginBottom: '4px'
+                }}>
+                  EXPIRES
+                </div>
+                <div style={{ fontSize: '16px' }}>
+                  {String(cardData.exp_month).padStart(2, '0')}/{String(cardData.exp_year).slice(-2)}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Divider */}
+        <div style={{
+          borderTop: '1px solid #e0e0e0',
+          margin: '20px 0',
+        }}></div>
 
 
-          {/* Divider */}
-          <div style={{
-            borderTop: '1px solid #e0e0e0',
-            margin: '20px 0',
-          }}></div>
-
-
+        <div style={{ padding: '0 10px 10px' }}>
           {/* Payment Form */}
           <form onSubmit={handleSubmit}>
             {/* Radio Buttons for Half-yearly and Yearly Options */}
@@ -501,22 +577,33 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
               </div>
             </div>
 
-            <Button
-              type="submit"
-              intent="primary"
-              disabled={!stripe || isProcessing}
-              loading={isProcessing}
-              fill
-              style={{ marginTop: '20px' }}
-              onSubmit={handleSubmit}
-            >
-              {isProcessing ? 'Processing...' : `Pay $${amount / 100}`}
-            </Button>
+            {error && <div style={{ color: 'red', margin: '7px 0' }}>{error}</div>}
+
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+              <Button
+                type="submit"
+                intent="primary"
+                disabled={!stripe || isProcessing}
+                loading={isProcessing}
+                fill
+                style={{
+                  height: '52px',
+                  minWidth: '190px',
+                  maxWidth: '200px',
+                  fontSize: '1.08em',
+                  borderRadius: 6,
+                  alignSelf: 'center',
+                }}
+                onSubmit={handleSubmit}
+              >
+                {isProcessing ? 'Processing...' : `Pay $${amount / 100}`}
+              </Button>
+            </div>
 
             <p
               style={{
-                marginTop: '10px',
-                fontSize: '0.85em',
+                marginTop: '15px',
+                fontSize: '0.95em',
                 color: '#555',
                 textAlign: 'center',
                 lineHeight: '1.4',
@@ -542,7 +629,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
               <PaymentRequestButtonElement options={{ paymentRequest }} />
             </div>
           )} */}
-            {error && <div style={{ color: 'red', margin: '15px 0' }}>{error}</div>}
+
           </form>
         </div>
       </>
@@ -623,8 +710,9 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       const remainingMonths = totalMonths - usedMonth
 
       // Calculate refund
-      const monthlyAmount = (subs === 'Professional') ? 100 : 18 //totalAmount / totalMonths
+      const monthlyAmount = (subs === 'Professional') ? 100 : 18
       const usedAmount = usedMonth * monthlyAmount
+
       const remainingAmount = totalAmount - usedAmount
       const refundAmount = Math.max(0, remainingAmount)
 
@@ -1070,7 +1158,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         {/* Payment Section */}
         <div style={{ borderTop: '1px solid #e0e0e0', paddingTop: '10px' }}>
           {isLoadingSecret && (
-            <div style={{ padding: '20px', textAlign: 'center' }}>
+            <div style={{ padding: '25px', textAlign: 'center', fontWeight: 'bold' }}>
               Loading payment details...
             </div>
           )}
