@@ -121,8 +121,8 @@ const UpdateCardDetails: FC<Props> = props => {
 
   // Credit-card UI style
   const creditCardStyle: React.CSSProperties = {
-    width: '340px',
-    height: '175px',
+    width: '320px',
+    height: '180px',
     backgroundColor: '#1E1E2F',
     borderRadius: '10px',
     padding: '20px',
@@ -164,65 +164,116 @@ const UpdateCardDetails: FC<Props> = props => {
           ) : (
             // Credit-card like UI displaying current card details
             !isLoadingCard && cardDetails && (
-              <div style={creditCardStyle}>
-                {/* Brand at the top left */}
-                <div
-                  style={{
-                    alignSelf: 'flex-start',
+              <div style={{
+                background: cardDetails.brand === 'Visa'
+                  ? 'linear-gradient(135deg, #ff9900, #ff5e62)'
+                  : cardDetails.brand === 'Mastercard'
+                    ? 'linear-gradient(135deg, #f7971e, #ffd200)'
+                    : 'linear-gradient(135deg, #4361ee, #3a0ca3)',
+                borderRadius: '12px',
+                margin: '0 auto 20px auto',
+                padding: '16px',
+                color: '#fff',
+                display: 'flex',
+                flexDirection: 'column',
+                height: '180px',
+                width: '330px', // Fixed width
+                boxShadow: '0 8px 16px rgba(0,0,0,0.15)',
+                position: 'relative',
+                overflow: 'hidden',
+                fontFamily: "'Source Sans Pro', sans-serif"
+              }}>
+                {/* Glossy overlay effect */}
+                <div style={{
+                  position: 'absolute',
+                  top: '-50%',
+                  right: '-50%',
+                  width: '200%',
+                  height: '200%',
+                  background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 60%)',
+                  transform: 'rotate(20deg)'
+                }} />
+
+                {/* Top section with brand and chip */}
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  marginBottom: '30px'
+                }}>
+                  <div style={{
+                    background: 'rgba(255, 255, 255, 0.2)',
+                    borderRadius: '4px',
+                    padding: '6px 10px'
+                  }}>
+                    <div style={{
+                      fontSize: '10px',
+                      fontWeight: 'bold',
+                      letterSpacing: '1px',
+                      opacity: 0.8
+                    }}>
+                      {cardDetails.funding}
+                    </div>
+                  </div>
+                  <div style={{
                     fontSize: '24px',
-                    color: '#fff',
                     fontWeight: 'bold',
                     textTransform: 'uppercase',
-                    fontStyle: 'italic'
-                  }}
-                >
-                  {cardDetails.brand}
+                    fontStyle: 'italic',
+                    textShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                  }}>
+                    {cardDetails.brand}
+                  </div>
                 </div>
-                {/* Funding type in the middle right (if still needed) */}
-                {cardDetails.funding && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: '50%',
-                      right: '20px',
-                      transform: 'translateY(-50%)',
-                      fontSize: '16px',
-                      color: '#fff'
-                    }}
-                  >
-                    {cardDetails.funding}
-                  </div>
-                )}
-                {/* Bottom area with card number, owner and expiry */}
-              // Inside the credit-card UI block, replace the bottom area with the following:
-                <div style={{ marginTop: 'auto', width: '100%' }}>
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'flex-end',
-                      color: '#fff',
-                      fontSize: '17px'
-                    }}
-                  >
-                    <span>**** **** **** {cardDetails.last4}</span>
-                    <span style={{ fontSize: '16px' }}>
-                      Exp: {cardDetails.exp_month}/{cardDetails.exp_year}
-                    </span>
-                  </div>
-                  {formData.fullName && (
-                    <div
-                      style={{
-                        marginTop: '6px',
-                        textAlign: 'left',
-                        color: '#fff',
-                        fontSize: '14px',
-                        letterSpacing: '1px'
-                      }}
-                    >
-                      {formData.fullName}
+
+                {/* Card number section */}
+                <div style={{
+                  fontSize: '20px',
+                  letterSpacing: '3px',
+                  marginBottom: '25px',
+                  textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                  flexGrow: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <span>•••• •••• •••• {cardDetails.last4}</span>
+                </div>
+
+                {/* Bottom section */}
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-end'
+                }}>
+                  <div>
+                    <div style={{
+                      fontSize: '10px',
+                      opacity: 0.8,
+                      marginBottom: '4px'
+                    }}>
+                      USER
                     </div>
-                  )}
+                    <div style={{
+                      fontSize: '12px',
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px'
+                    }}>
+                      {formData.fullName || 'YOUR NAME'}
+                    </div>
+                  </div>
+
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{
+                      fontSize: '10px',
+                      opacity: 0.8,
+                      marginBottom: '4px'
+                    }}>
+                      EXPIRES
+                    </div>
+                    <div style={{ fontSize: '16px' }}>
+                      {String(cardDetails.exp_month).padStart(2, '0')}/{String(cardDetails.exp_year).slice(-2)}
+                    </div>
+                  </div>
                 </div>
               </div>
             )
