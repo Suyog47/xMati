@@ -55,8 +55,6 @@ const CardForm: FC<CardFormProps> = ({ onCardValidated }) => {
 
   return (
     <div>
-      <h3 className="stepHeader">Payment Information</h3>
-
       {/* Loader displayed above the card form */}
       {isValidatingCard && (
         <div style={{ marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '10px' }}>
