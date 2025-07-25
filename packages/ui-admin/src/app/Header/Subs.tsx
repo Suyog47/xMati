@@ -39,7 +39,7 @@ export const Subs = () => {
   const renderStatusBadge = () => {
     if (isCancelled || expired) {
       return <Tag intent="danger" round>Cancelled</Tag>
-    } else if (days !== '-' && days <= 5) {
+    } else if (days !== '-' && days < 5) {
       return <Tag intent="warning" round>Expiring Soon</Tag>
     } else {
       return <Tag intent="success" round>Active</Tag>
@@ -64,7 +64,7 @@ export const Subs = () => {
           Your subscription has been cancelled.
         </div>
       )
-    } else if (days !== '-' && days <= 5) {
+    } else if (days !== '-' && days < 5) {
       return (
         <div
           style={{
