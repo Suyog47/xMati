@@ -8,6 +8,10 @@ import CardForm from './CardForm'
 // For development use
 const stripePromise = loadStripe('pk_test_51RLimpPBSMPLjWxm3IUaX63iUb4TqhU5prbUsg7A5RwG2sZsukOa7doAAhPu2RpEkYXZ2dRLNrOA4Pby9IscZOse00unCEcNDG')
 
+//For production use
+// const stripePromise = loadStripe('pk_live_51RPPI0EncrURrNgDF2LNkLrh5Wf53SIe3WjqPqjtzqbJWDGfDFeG4VvzUXuC4nCmrPTNOTeFENuAqRBw1mvbNJg600URDxPnuc')
+
+
 interface Props {
   isOpen: boolean
   toggle: () => void
@@ -18,7 +22,7 @@ interface CardDetails {
   last4: string
   exp_month: number
   exp_year: number
-  funding: string
+  funding?: string
 }
 
 const loaderOverlayStyle: React.CSSProperties = {
@@ -118,14 +122,15 @@ const UpdateCardDetails: FC<Props> = props => {
   // Credit-card UI style
   const creditCardStyle: React.CSSProperties = {
     width: '340px',
-    height: '160px',
+    height: '175px',
     backgroundColor: '#1E1E2F',
     borderRadius: '10px',
     padding: '20px',
     boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
     margin: '0 auto 20px auto',
     display: 'flex',
-    flexDirection: 'column'
+    flexDirection: 'column',
+    position: 'relative'
   }
 
   return (
@@ -137,15 +142,15 @@ const UpdateCardDetails: FC<Props> = props => {
       transitionDuration={0}
       canOutsideClickClose={false}
     >
-      <h3 className="stepHeader" style={{ paddingLeft: '20px' }}>Your Payment Information</h3>
       <Elements stripe={stripePromise}>
         <div className={Classes.DIALOG_BODY}>
+          <h3 className="stepHeader">Your Payment Information</h3>
           {/* Loader for card details */}
           {isLoadingCard ? (
             <div
               style={{
-                width: '320px',
-                height: '160px',
+                width: '300px',
+                height: '170px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -158,8 +163,9 @@ const UpdateCardDetails: FC<Props> = props => {
             </div>
           ) : (
             // Credit-card like UI displaying current card details
-            cardDetails && (
+            !isLoadingCard && cardDetails && (
               <div style={creditCardStyle}>
+                {/* Brand at the top left */}
                 <div
                   style={{
                     alignSelf: 'flex-start',
@@ -167,26 +173,56 @@ const UpdateCardDetails: FC<Props> = props => {
                     color: '#fff',
                     fontWeight: 'bold',
                     textTransform: 'uppercase',
-                    fontStyle: 'italic',
+                    fontStyle: 'italic'
                   }}
                 >
                   {cardDetails.brand}
                 </div>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    width: '100%',
-                    marginTop: 'auto'
-                  }}
-                >
-                  <div style={{ fontSize: '17px', color: '#fff' }}>
-                    **** **** **** {cardDetails.last4}
+                {/* Funding type in the middle right (if still needed) */}
+                {cardDetails.funding && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '50%',
+                      right: '20px',
+                      transform: 'translateY(-50%)',
+                      fontSize: '16px',
+                      color: '#fff'
+                    }}
+                  >
+                    {cardDetails.funding}
                   </div>
-                  <div style={{ fontSize: '16px', color: '#fff' }}>
-                    Valid: {cardDetails.exp_month}/{cardDetails.exp_year}
+                )}
+                {/* Bottom area with card number, owner and expiry */}
+              // Inside the credit-card UI block, replace the bottom area with the following:
+                <div style={{ marginTop: 'auto', width: '100%' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'flex-end',
+                      color: '#fff',
+                      fontSize: '17px'
+                    }}
+                  >
+                    <span>**** **** **** {cardDetails.last4}</span>
+                    <span style={{ fontSize: '16px' }}>
+                      Exp: {cardDetails.exp_month}/{cardDetails.exp_year}
+                    </span>
                   </div>
+                  {formData.fullName && (
+                    <div
+                      style={{
+                        marginTop: '6px',
+                        textAlign: 'left',
+                        color: '#fff',
+                        fontSize: '14px',
+                        letterSpacing: '1px'
+                      }}
+                    >
+                      {formData.fullName}
+                    </div>
+                  )}
                 </div>
               </div>
             )

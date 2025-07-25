@@ -105,12 +105,12 @@ const UserDropdownMenu: FC<Props> = props => {
             <MenuItem id="btn-changepass" icon="key" text={lang.tr('admin.changePassword')} onClick={togglePassword} />
           )}
 
-          {!isExpired && (<MenuItem
+          {/* {!isExpired && (<MenuItem
             id="btn-changeLanguage"
             icon="translate"
             text={lang.tr('admin.changeLanguage')}
             onClick={toggleLanguage}
-          />)}
+          />)} */}
 
           <MenuDivider />
           <MenuItem id="btn-logout" icon="log-out" text={lang.tr('admin.logout')} onClick={logout} />
