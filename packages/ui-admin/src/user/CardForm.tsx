@@ -33,19 +33,50 @@ const CardForm: FC<CardFormProps> = ({ onCardValidated }) => {
     }
 
     try {
-      const { paymentMethod, error } = await stripe.createPaymentMethod({
-        type: 'card',
-        card: cardElement,
-        billing_details: { email: formData.email }
+      // const { paymentMethod, error } = await stripe.createPaymentMethod({
+      //   type: 'card',
+      //   card: cardElement,
+      //   billing_details: { email: formData.email }
+      // })
+
+      // if (error) {
+      //   return { success: false, msg: 'Error with card ' + error.message }
+      // }
+
+      // if (!paymentMethod) {
+      //   setCardErrorMessage(`Issue with card. ${error?.message || 'Please try again.'}`)
+      //   return
+      // }
+
+
+      // 1. Create SetupIntent on your backend
+      const setupIntentRes = await fetch('https://www.app.xmati.ai/apis/create-setup-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.email, customerId: { id: formData.stripeCustomerId } }),
       })
 
-      if (!paymentMethod) {
-        setCardErrorMessage(`Issue with card. ${error?.message || 'Please try again.'}`)
+      const { clientSecret } = await setupIntentRes.json()
+
+      // 2. Confirm card setup (handles 3D Secure if needed)
+      const res = await stripe.confirmCardSetup(clientSecret, {
+        payment_method: {
+          card: cardElement,
+          billing_details: { email: formData.email },
+        },
+      })
+
+      if (res.error) {
+        setCardErrorMessage(`Issue with card. ${res.error?.message || 'Please try again.'}`)
         return
       }
 
-      onCardValidated(paymentMethod.id)
-      setCardValidated(true)
+      if (typeof res.setupIntent.payment_method === 'string' && res.setupIntent.payment_method) {
+        onCardValidated(res.setupIntent.payment_method)
+        setCardValidated(true)
+      } else {
+        setCardErrorMessage('Failed to retrieve payment method ID.')
+      }
     } catch (err: any) {
       setCardErrorMessage('An error occurred while verifying the card.')
     } finally {

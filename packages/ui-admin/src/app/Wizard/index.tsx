@@ -116,6 +116,8 @@ const CustomerWizard: React.FC = () => {
   const togglePasswordVisibility = () => {
     setShowPassword(prevState => !prevState)
   }
+  const stripe = useStripe()
+  const elements = useElements()
 
   const countryOptions = [
     { code: '+1', name: 'United States' },
@@ -404,26 +406,57 @@ const CustomerWizard: React.FC = () => {
         return { success: false, msg: 'Card Element not available' }
       }
 
-      const { paymentMethod, error } = await stripe.createPaymentMethod({
-        type: 'card',
-        card: cardElement,
-        billing_details: { email: formData.email }
-      })
+      // const { paymentMethod, error } = await stripe.createPaymentMethod({
+      //   type: 'card',
+      //   card: cardElement,
+      //   billing_details: { email: formData.email }
+      // })
 
-      if (!paymentMethod) {
-        return { success: false, msg: 'Error creating payment method' }
-      }
+      // if (error) {
+      //   return { success: false, msg: 'Error with card ' + error.message }
+      // }
 
-      const result = await fetch('https://www.app.xmati.ai/apis/create-stripe-customer', {
+      // if (!paymentMethod) {
+      //   return { success: false, msg: 'Error creating payment method' }
+      // }
+
+
+      // 1. Create SetupIntent on your backend
+      const setupIntentRes = await fetch('https://www.app.xmati.ai/apis/create-setup-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: formData.email, paymentMethodId: paymentMethod.id || '' }),
+        body: JSON.stringify({ email: formData.email, customerId: '' }),
       })
+
+      const { clientSecret, customerId } = await setupIntentRes.json()
+
+      // 2. Confirm card setup (handles 3D Secure if needed)
+      const res = await stripe.confirmCardSetup(clientSecret, {
+        payment_method: {
+          card: cardElement,
+          billing_details: { email: formData.email },
+        },
+      })
+
+      if (res.error) {
+        return { success: false, msg: res.error.message }
+      }
+
+      let result
+      if (typeof res.setupIntent.payment_method === 'string' && res.setupIntent.payment_method) {
+        result = await fetch('https://www.app.xmati.ai/apis/attach-payment-method', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: formData.email, paymentMethodId: res.setupIntent.payment_method || '', customerId: { id: customerId || '' } }),
+        })
+      } else {
+        return { success: false, msg: 'Payment method ID is not valid' }
+      }
 
       let data = await result.json()
 
       if (!data.success) {
-        return { success: false, msg: data.msg }
+        return { success: false, msg: result.status === 500 ? 'We are unable to validate your card... You can try with another one' : data.msg }
       }
 
       setCustomerId(data.customerId)
@@ -508,9 +541,6 @@ const CustomerWizard: React.FC = () => {
     localStorage.setItem('subData', JSON.stringify(updatedSubData))
   }
 
-  const stripe = useStripe()
-  const elements = useElements()
-
   const verifyCard = async () => {
     setIsValidatingCard(true) // Show small loader
     setCardValidated(false) // Reset card validation state
@@ -544,7 +574,7 @@ const CustomerWizard: React.FC = () => {
         setCardErrorMessage(stripeCustomerResponse.msg)
       }
     } catch (err) {
-      setCardErrorMessage('An error occurred while verifying the card.')
+      setCardErrorMessage(`An error occurred while verifying the card: ${err.message || 'Please try again later.'}`)
     } finally {
       setIsValidatingCard(false) // Hide small loader
     }
