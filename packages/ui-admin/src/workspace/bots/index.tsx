@@ -63,6 +63,7 @@ class Bots extends Component<Props> {
     needApprovalFilter: false,
     isExpired: false,
     isSubscriptionOpen: false,
+    showBotsExceedDialog: false,
     showExpiryPrompt: false,
     expiryMessage: '',
     numberOfBots: this.formData.numberOfBots || 0, // Initialize from localStorage
@@ -70,7 +71,8 @@ class Bots extends Component<Props> {
     showSuggestionsDialog: false,
     upgradeSelectedDuration: 'monthly',
     upgradePrice: 100,
-    upgradeInProgress: false // new state for upgrade loader
+    upgradeInProgress: false, // new state for upgrade loader
+    selectedBotIds: [] as string[] // new state for selected bot ids in the Bots limit exceeded Dialog
   }
 
   // New handler to update upgrade selection and price
@@ -93,17 +95,17 @@ class Bots extends Component<Props> {
     const plan = from === 'upgrade' ? 'Professional' : 'Starter'
 
     try {
-      const response = await fetch('https://www.app.xmati.ai/apis/trial-sub-upgrade', {
+      const response = await fetch('http://localhost:8000/trial-sub-upgrade', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           email,
           plan,
           duration: upgradeSelectedDuration,
           price: upgradePrice
-        }),
+        })
       })
 
       const res = await response.json()
@@ -120,6 +122,48 @@ class Bots extends Component<Props> {
     } finally {
       this.setState({ showSuggestionsDialog: false, upgradeInProgress: false })
     }
+  }
+
+  // New handler to update checkbox selection for each bot
+  handleCheckboxChange = (botId: string) => {
+    this.setState(prevState => {
+      const selectedBotIds = this.state.selectedBotIds.includes(botId)
+        ? this.state.selectedBotIds.filter(id => id !== botId)
+        : [...this.state.selectedBotIds, botId]
+      return { selectedBotIds }
+    })
+  }
+
+  // Revised handler for confirming selected bots
+  handleConfirmSelectedBots = async () => {
+    const botIds = [...this.state.selectedBotIds]
+    if (!botIds.length) {
+      return
+    }
+
+    this.setState({ isLoading: true, showBotsExceedDialog: false, selectedBotIds: [] })
+
+    const successBots: string[] = []
+    const failedBots: string[] = []
+
+    for (const botId of botIds) {
+      try {
+        await this.deleteBot(botId, false) // Disable confirmation for batch deletion
+        successBots.push(botId)
+      } catch (err) {
+        failedBots.push(botId)
+      }
+    }
+
+    this.setState({ isLoading: false })
+
+    if (successBots.length) {
+      toast.success(`${successBots.length} bot(s) deleted successfully.`)
+    }
+    if (failedBots.length) {
+      toast.failure(`Failed to delete: ${failedBots.join(', ')}`)
+    }
+    this.props.fetchBots()
   }
 
   async componentDidMount() {
@@ -156,6 +200,10 @@ class Bots extends Component<Props> {
 
       this.setState({ isExpired: expiry })
 
+      if (subscription === 'Starter' && !expiry && this.state.numberOfBots > 3) {
+        this.setState({ showBotsExceedDialog: true })
+      }
+
       // check for prompt run status and trigger it accordingly
       if (!promptRun) {
         let msg
@@ -165,7 +213,7 @@ class Bots extends Component<Props> {
 
         // This dialog should be shown only for Trial(non - cancelled) users before 1 to 3 days remaining for expiry
         if (daysRemaining <= 3 && daysRemaining > 0 &&
-          this.subData.subscription === 'Trial' &&
+          subscription === 'Trial' &&
           this.formData.nextSubs && this.formData.nextSubs.plan === 'Starter' &&
           this.formData.nextSubs && this.formData.nextSubs.suggested === false &&
           this.state.numberOfBots > 3 &&
@@ -229,27 +277,31 @@ class Bots extends Component<Props> {
     })
   }
 
-  async deleteBot(botId: string) {
+  async deleteBot(botId: string, enableCheck = true) {
     const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
-    if (
-      await confirmDialog(lang.tr('admin.workspace.bots.confirmDelete'), {
+
+    if (enableCheck) {
+      const confirmed = await confirmDialog(lang.tr('admin.workspace.bots.confirmDelete'), {
         acceptLabel: lang.tr('delete')
       })
-    ) {
-      this.setState({ isLoading: true }) // Show the loader
-      try {
-        await api.getSecured().post(`/admin/workspace/bots/${savedFormData.fullName}/${savedFormData.email}/${botId}/delete`)
-        this.props.fetchBots()
-        setTimeout(() => {
-          window.location.reload()    // reloading for the bot creation limit check
-        }, 500)
-        toast.success(lang.tr('The bot has been deleted successfully'))
-      } catch (err) {
-        console.error(err)
-        toast.failure(lang.tr('The bot could not be deleted'))
-      } finally {
-        this.setState({ isLoading: false }) // Hide the loader
+      if (!confirmed) {
+        return
       }
+    }
+
+    this.setState({ isLoading: true }) // Show the loader
+    try {
+      await api.getSecured().post(`/admin/workspace/bots/${savedFormData.fullName}/${savedFormData.email}/${botId}/delete`)
+      this.props.fetchBots()
+      setTimeout(() => {
+        window.location.reload()    // reloading for the bot creation limit check
+      }, 500)
+      toast.success(lang.tr('The bot has been deleted successfully'))
+    } catch (err) {
+      console.error(err)
+      toast.failure(lang.tr('The bot could not be deleted'))
+    } finally {
+      this.setState({ isLoading: false }) // Hide the loader
     }
   }
 
@@ -544,7 +596,7 @@ class Bots extends Component<Props> {
   }
 
   render() {
-    const { showExpiryPrompt, expiryMessage, isLoading, showSuggestionsDialog, upgradeSelectedDuration, upgradePrice, upgradeInProgress } = this.state
+    const { showExpiryPrompt, expiryMessage, isLoading, showSuggestionsDialog, showBotsExceedDialog, upgradeSelectedDuration, upgradePrice, upgradeInProgress, selectedBotIds } = this.state
 
     if (!this.props.bots) {
       return <LoadingSection />
@@ -565,7 +617,7 @@ class Bots extends Component<Props> {
               zIndex: 9999,
               display: 'flex',
               justifyContent: 'center',
-              alignItems: 'center',
+              alignItems: 'center'
             }}
           >
             <Spinner intent="primary" size={50} />
@@ -603,7 +655,7 @@ class Bots extends Component<Props> {
           </div>
         )}
 
-        {/* Subscription suggestion Dialog Professional upgrade UI */}
+        {/* Subscription suggestion Dialog UI */}
         {showSuggestionsDialog && (
           <Dialog
             isOpen={true}
@@ -752,6 +804,132 @@ class Bots extends Component<Props> {
           </Dialog>
         )}
 
+        {/* Bots limit exceeded UI */}
+        {showBotsExceedDialog && (
+          <Dialog
+            isOpen={true}
+            canEscapeKeyClose={false}
+            canOutsideClickClose={false}
+            title={
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <Icon
+                  icon="warning-sign"
+                  iconSize={24}
+                  intent={Intent.WARNING}
+                  style={{ marginRight: '10px' }}
+                />
+                <span style={{ fontSize: '20px', fontWeight: 600 }}>
+                  Bots Limit Exceeded
+                </span>
+              </div>
+            }
+            style={{
+              width: '700px',
+              borderRadius: '8px',
+              boxShadow: '0 10px 30px rgba(0, 0, 0, 0.2)',
+              background: '#f8f9fa'
+            }}
+          >
+            <div style={{ padding: '25px' }}>
+              <div style={{
+                background: '#fffbea',
+                padding: '15px',
+                borderRadius: '6px',
+                borderLeft: '4px solid #ffc107',
+                marginBottom: '20px'
+              }}>
+                <p style={{ margin: '0', color: '#856404', fontWeight: 500 }}>
+                  Your current Starter plan allows a maximum of 3 bots.
+                  Please remove {Math.max(this.formData.filteredBots?.length - 3, 0)} bot(s) to continue.
+                </p>
+              </div>
+
+              <div style={{ margin: '15px 0 5px' }}>
+                <p style={{ fontWeight: 500, marginBottom: '10px' }}>
+                  Select bots to remove (click to select):
+                </p>
+                <div style={{
+                  maxHeight: '300px',
+                  overflowY: 'auto',
+                  padding: '5px',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                  gap: '12px'
+                }}>
+                  {this.formData.filteredBots && this.formData.filteredBots.length ? (
+                    this.formData.filteredBots.map((bot: { id: string; name: string }) => (
+                      <div
+                        key={bot.id}
+                        style={{
+                          padding: '15px',
+                          borderRadius: '8px',
+                          transition: 'all 0.2s',
+                          border: this.state.selectedBotIds.includes(bot.id)
+                            ? '2px solid #1890ff'
+                            : '1px solid #e1e8ed',
+                          background: this.state.selectedBotIds.includes(bot.id)
+                            ? '#e6f7ff'
+                            : '#fff',
+                          boxShadow: this.state.selectedBotIds.includes(bot.id)
+                            ? '0 4px 8px rgba(24, 144, 255, 0.2)'
+                            : '0 2px 4px rgba(0, 0, 0, 0.05)',
+                          cursor: 'pointer',
+                          position: 'relative',
+                          overflow: 'hidden'
+                        }}
+                        onClick={() => this.handleCheckboxChange(bot.id)}
+                      >
+                        {this.state.selectedBotIds.includes(bot.id) && (
+                          <div style={{
+                            position: 'absolute',
+                            top: '0',
+                            right: '0',
+                            background: '#1890ff',
+                            color: 'white',
+                            padding: '2px 8px',
+                            fontSize: '12px',
+                            borderBottomLeftRadius: '6px'
+                          }}>
+                            <Icon icon="tick" iconSize={12} />
+                          </div>
+                        )}
+                        <div style={{ fontWeight: 600, marginBottom: '5px' }}>{bot.name}</div>
+                        <div style={{ fontSize: '13px', color: '#6c757d' }}>ID: {bot.id}</div>
+                      </div>
+                    ))
+                  ) : (
+                    <div style={{
+                      textAlign: 'center',
+                      padding: '20px',
+                      color: '#6c757d',
+                      gridColumn: '1 / -1'
+                    }}>
+                      <Icon icon="info-sign" />
+                      <p style={{ marginTop: '10px' }}>No bots available</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                marginTop: '25px',
+                paddingTop: '15px',
+                borderTop: '1px solid #eee'
+              }}>
+                <Button
+                  intent={Intent.PRIMARY}
+                  text={`Bots Selected (${this.state.selectedBotIds.length})`}
+                  onClick={this.handleConfirmSelectedBots}
+                  disabled={(this.formData.filteredBots.length - this.state.selectedBotIds.length > 3)}
+                  style={{ width: '70%', height: '50px', minWidth: '180px' }}
+                />
+              </div>
+            </div>
+          </Dialog>
+        )}
+
         <SplitPage sideMenu={(this.state.isExpired) ? !this.isPipelineView : !this.isPipelineView && this.renderCreateNewBotButton()}>
           <Fragment>
             <Subscription
@@ -770,7 +948,7 @@ class Bots extends Component<Props> {
                   boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
                   borderRadius: '8px',
                   textAlign: 'center',
-                  backgroundColor: 'white',
+                  backgroundColor: 'white'
                 }}
               >
                 <h3>

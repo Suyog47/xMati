@@ -39,8 +39,10 @@ export const Subs = () => {
   const renderStatusBadge = () => {
     if (isCancelled || expired) {
       return <Tag intent="danger" round>Cancelled</Tag>
-    } else if (days !== '-' && days < 5) {
+    } else if (days !== '-' && days < 5 && days >= 0) {
       return <Tag intent="warning" round>Expiring Soon</Tag>
+    } else if (days !== '-' && days < 0) {
+      return <Tag intent="danger" round>Expired</Tag>
     } else {
       return <Tag intent="success" round>Active</Tag>
     }
@@ -48,7 +50,7 @@ export const Subs = () => {
 
   // A colored alert banner to catch the user's attention regarding the subscription status.
   const renderAlertBanner = () => {
-    if (isCancelled || expired) {
+    if ((isCancelled || expired) && days >= 0) {
       return (
         <div
           style={{
@@ -64,7 +66,7 @@ export const Subs = () => {
           Your subscription has been cancelled.
         </div>
       )
-    } else if (days !== '-' && days < 5) {
+    } else if (days !== '-' && days < 5 && days >= 0) {
       return (
         <div
           style={{
@@ -77,7 +79,23 @@ export const Subs = () => {
             color: '#856404',
           }}
         >
-          Your subscription expires in {days} day{days > 1 && 's'}.
+          {days === 0 ? 'Your subscription expires today.' : `Your subscription expires in ${days} day${days > 1 && 's'}.`}
+        </div>
+      )
+    } else if (days !== '-' && days < 0) {
+      return (
+        <div
+          style={{
+            background: '#fff3cd',
+            padding: '12px 20px',
+            borderRadius: '4px',
+            marginBottom: 20,
+            textAlign: 'center',
+            fontWeight: 700,
+            color: '#856404',
+          }}
+        >
+          Your subscription has been expired.
         </div>
       )
     } else {

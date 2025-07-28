@@ -50,7 +50,7 @@ const CardForm: FC<CardFormProps> = ({ onCardValidated }) => {
 
 
       // 1. Create SetupIntent on your backend
-      const setupIntentRes = await fetch('https://www.app.xmati.ai/apis/create-setup-intent', {
+      const setupIntentRes = await fetch('http://localhost:8000/create-setup-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: formData.email, customerId: { id: formData.stripeCustomerId } }),

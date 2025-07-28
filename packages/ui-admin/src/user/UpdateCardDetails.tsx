@@ -6,10 +6,10 @@ import { lang, toast } from 'botpress/shared'
 import CardForm from './CardForm'
 
 // For development use
-// const stripePromise = loadStripe('pk_test_51RLimpPBSMPLjWxm3IUaX63iUb4TqhU5prbUsg7A5RwG2sZsukOa7doAAhPu2RpEkYXZ2dRLNrOA4Pby9IscZOse00unCEcNDG')
+const stripePromise = loadStripe('pk_test_51RLimpPBSMPLjWxm3IUaX63iUb4TqhU5prbUsg7A5RwG2sZsukOa7doAAhPu2RpEkYXZ2dRLNrOA4Pby9IscZOse00unCEcNDG')
 
 //For production use
-const stripePromise = loadStripe('pk_live_51RPPI0EncrURrNgDF2LNkLrh5Wf53SIe3WjqPqjtzqbJWDGfDFeG4VvzUXuC4nCmrPTNOTeFENuAqRBw1mvbNJg600URDxPnuc')
+// const stripePromise = loadStripe('pk_live_51RPPI0EncrURrNgDF2LNkLrh5Wf53SIe3WjqPqjtzqbJWDGfDFeG4VvzUXuC4nCmrPTNOTeFENuAqRBw1mvbNJg600URDxPnuc')
 
 
 interface Props {
@@ -59,7 +59,7 @@ const UpdateCardDetails: FC<Props> = props => {
       setIsLoadingCard(true)
       const fetchCardDetails = async () => {
         try {
-          const res = await fetch('https://www.app.xmati.ai/apis/get-card-details', {
+          const res = await fetch('http://localhost:8000/get-card-details', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ paymentMethodId: formData.stripePayementId })
@@ -88,7 +88,7 @@ const UpdateCardDetails: FC<Props> = props => {
         stripePayementId: paymentMethodId
       }
 
-      const result = await fetch('https://www.app.xmati.ai/apis/update-card-info', {
+      const result = await fetch('http://localhost:8000/update-card-info', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
