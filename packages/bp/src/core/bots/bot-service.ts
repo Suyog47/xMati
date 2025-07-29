@@ -689,7 +689,7 @@ export class BotService {
 
       for (const item of items) {
         const fullPath = path.join(dir, item.name)
-        if (item.isDirectory()) {
+        if (item.isDirectory() && item.name !== 'models') {
           fileList = fileList.concat(getFiles(fullPath)) // Recursively get files
         } else {
           fileList.push(fullPath)
@@ -930,7 +930,7 @@ export class BotService {
   private _saveData = async (key, data, from = 'user') => {
     try {
       //const compressedData = await this._compressRequest(data);
-      const result = await axios('https://www.app.xmati.ai/apis/save-bot', {
+      const result = await axios('http://localhost:8000/save-bot', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
