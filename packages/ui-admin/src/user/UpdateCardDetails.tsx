@@ -5,11 +5,9 @@ import { loadStripe } from '@stripe/stripe-js'
 import { lang, toast } from 'botpress/shared'
 import CardForm from './CardForm'
 
-// For development use
-const stripePromise = loadStripe('pk_test_51RLimpPBSMPLjWxm3IUaX63iUb4TqhU5prbUsg7A5RwG2sZsukOa7doAAhPu2RpEkYXZ2dRLNrOA4Pby9IscZOse00unCEcNDG')
+const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
-//For production use
-// const stripePromise = loadStripe('pk_live_51RPPI0EncrURrNgDF2LNkLrh5Wf53SIe3WjqPqjtzqbJWDGfDFeG4VvzUXuC4nCmrPTNOTeFENuAqRBw1mvbNJg600URDxPnuc')
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PROMISE || 'pk_live_51RPPI0EncrURrNgDF2LNkLrh5Wf53SIe3WjqPqjtzqbJWDGfDFeG4VvzUXuC4nCmrPTNOTeFENuAqRBw1mvbNJg600URDxPnuc')
 
 
 interface Props {
@@ -45,8 +43,6 @@ const loaderTextStyle: React.CSSProperties = {
   fontWeight: 500,
   color: 'black'
 }
-
-const API_URL = process.env.API_URL || 'https://www.app.xmati.ai/apis'
 
 const UpdateCardDetails: FC<Props> = props => {
   const [paymentMethodId, setPaymentMethodId] = useState<string>('')

@@ -55,7 +55,7 @@ const loaderTextStyle: React.CSSProperties = {
   color: 'black'
 }
 
-const API_URL = process.env.API_URL || 'https://www.app.xmati.ai/apis'
+const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
 const UpdateUserProfile: FC<Props> = props => {
   const [fullName, setFullname] = useState<string>('')

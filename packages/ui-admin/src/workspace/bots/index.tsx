@@ -42,7 +42,7 @@ import ImportBotModal from './ImportBotModal'
 import RollbackBotModal from './RollbackBotModal'
 import style from './style.scss'
 
-const API_URL = process.env.API_URL || 'https://www.app.xmati.ai/apis'
+const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
 const botFilterFields = ['name', 'id', 'description']
 

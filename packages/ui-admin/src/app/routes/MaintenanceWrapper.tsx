@@ -4,7 +4,7 @@ import logo from './xmati.png' // Make sure this path is correct
 import { auth } from 'botpress/shared'
 import api from '~/app/api'
 
-const API_URL = process.env.API_URL || 'https://www.app.xmati.ai/apis'
+const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
 const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true)

@@ -10,7 +10,7 @@ import { auth } from 'botpress/shared'
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { FormGroup } from '@blueprintjs/core'
 
-const API_URL = process.env.API_URL || 'https://www.app.xmati.ai/apis'
+const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
 interface FormData {
   fullName: string

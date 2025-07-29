@@ -27,7 +27,7 @@ export const ChangePasswordForm: FC<Props> = props => {
 
   const otpRefs = useRef<HTMLInputElement[]>([]) // Refs for OTP input fields
 
-  const API_URL = process.env.API_URL || 'https://www.app.xmati.ai/apis'
+  const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
   const validatePassword = (password: string) => {
     const minLength = 8

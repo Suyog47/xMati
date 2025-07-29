@@ -10,18 +10,14 @@ import { loadStripe, PaymentRequest } from '@stripe/stripe-js'
 import { Dialog, Button, FormGroup, Icon, Spinner } from '@blueprintjs/core'
 import BasicAuthentication from '~/auth/basicAuth'
 
-// For development use
-const stripePromise = loadStripe('pk_test_51RLimpPBSMPLjWxm3IUaX63iUb4TqhU5prbUsg7A5RwG2sZsukOa7doAAhPu2RpEkYXZ2dRLNrOA4Pby9IscZOse00unCEcNDG')
-
-//For production use
-// const stripePromise = loadStripe('pk_live_51RPPI0EncrURrNgDF2LNkLrh5Wf53SIe3WjqPqjtzqbJWDGfDFeG4VvzUXuC4nCmrPTNOTeFENuAqRBw1mvbNJg600URDxPnuc')
-
 interface Props {
   isOpen: boolean
   toggle: () => void
 }
 
-const API_URL = process.env.API_URL || 'https://www.app.xmati.ai/apis'
+const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
+
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PROMISE || 'pk_live_51RPPI0EncrURrNgDF2LNkLrh5Wf53SIe3WjqPqjtzqbJWDGfDFeG4VvzUXuC4nCmrPTNOTeFENuAqRBw1mvbNJg600URDxPnuc')
 
 const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   let savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')

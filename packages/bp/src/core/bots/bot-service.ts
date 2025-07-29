@@ -188,7 +188,6 @@ export class BotService {
   }
 
   async getAndLoadUserBots(email: any) {
-    console.log('API_URL inside function: ', API_URL)
     try {
       let result = await axios(`${API_URL}/get-bots`, {
         method: 'POST',

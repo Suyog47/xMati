@@ -14,7 +14,7 @@ const CardForm: FC<CardFormProps> = ({ onCardValidated }) => {
   const [cardValidated, setCardValidated] = useState(false)
   const [cardErrorMessage, setCardErrorMessage] = useState<string | null>(null)
 
-  const API_URL = process.env.API_URL || 'https://www.app.xmati.ai/apis'
+  const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
   const verifyCard = async () => {
     setIsValidatingCard(true)

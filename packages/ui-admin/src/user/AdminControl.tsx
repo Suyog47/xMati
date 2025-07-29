@@ -9,7 +9,7 @@ interface Props {
   toggle: () => void
 }
 
-const API_URL = process.env.API_URL || 'https://www.app.xmati.ai/apis'
+const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
 const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
   const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')

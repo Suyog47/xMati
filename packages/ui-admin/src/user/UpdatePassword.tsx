@@ -64,7 +64,7 @@ const UpdatePassword: FC<Props> = props => {
     localStorage.setItem('formData', JSON.stringify(updatedFormData))
   }
 
-  const API_URL = process.env.API_URL || 'https://www.app.xmati.ai/apis'
+  const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
   const s3Call = async (data) => {
     try {
