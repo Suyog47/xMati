@@ -42,6 +42,8 @@ import ImportBotModal from './ImportBotModal'
 import RollbackBotModal from './RollbackBotModal'
 import style from './style.scss'
 
+const API_URL = process.env.API_URL || 'https://www.app.xmati.ai/apis'
+
 const botFilterFields = ['name', 'id', 'description']
 
 type Props = ConnectedProps<typeof connector> & RouteComponentProps
@@ -95,7 +97,7 @@ class Bots extends Component<Props> {
     const plan = from === 'upgrade' ? 'Professional' : 'Starter'
 
     try {
-      const response = await fetch('http://localhost:8000/trial-sub-upgrade', {
+      const response = await fetch(`${API_URL}/trial-sub-upgrade`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

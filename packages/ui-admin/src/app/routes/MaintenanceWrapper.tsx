@@ -4,6 +4,8 @@ import logo from './xmati.png' // Make sure this path is correct
 import { auth } from 'botpress/shared'
 import api from '~/app/api'
 
+const API_URL = process.env.API_URL || 'https://www.app.xmati.ai/apis'
+
 const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [isMaintenance, setIsMaintenance] = useState(true)
@@ -13,7 +15,7 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     const checkMaintenanceStatus = async () => {
       try {
-        const response = await fetch('https://www.app.xmati.ai/apis/get-maintenance', {
+        const response = await fetch(`${API_URL}/get-maintenance`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
         })

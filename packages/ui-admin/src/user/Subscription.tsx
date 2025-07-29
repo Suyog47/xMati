@@ -21,6 +21,8 @@ interface Props {
   toggle: () => void
 }
 
+const API_URL = process.env.API_URL || 'https://www.app.xmati.ai/apis'
+
 const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   let savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
   let savedSubData = JSON.parse(localStorage.getItem('subData') || '{}')
@@ -70,7 +72,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     setPaymentError('')
     try {
       savedFormData = JSON.parse(localStorage.getItem('formData') || '{}') // reinitializing to get the latest data
-      const result = await fetch('http://localhost:8000/create-payment-intent', {
+      const result = await fetch(`${API_URL}/create-payment-intent`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -134,7 +136,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   const fetchTransactions = async () => {
     setIsLoadingTransactions(true)
     try {
-      const res = await fetch('http://localhost:8000/get-stripe-transactions', {
+      const res = await fetch(`${API_URL}/get-stripe-transactions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: savedFormData.email })
@@ -169,7 +171,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   const downloadCSV = async () => {
     const email = savedFormData.email
 
-    const res = await fetch('http://localhost:8000/download-csv', {
+    const res = await fetch(`${API_URL}/download-csv`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ data: transactions, email }),
@@ -193,7 +195,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     try {
       let res
       if (subscription !== 'Trial') {
-        res = await fetch('http://localhost:8000/cancel-subscription', {
+        res = await fetch(`${API_URL}/cancel-subscription`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -201,7 +203,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
           body: JSON.stringify({ chargeId: savedSubData.transactionId, reason: '', email, fullName, subscription, amount, refundDetails }),
         })
       } else {
-        res = await fetch('http://localhost:8000/trial-cancellation', {
+        res = await fetch(`${API_URL}/trial-cancellation`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -318,7 +320,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       try {
         const { fullName, email } = savedFormData
 
-        const result = await fetch('http://localhost:8000/failed-payment', {
+        const result = await fetch(`${API_URL}/failed-payment`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, name: fullName, subscription: selectedTab, amount: `$${amount / 100}` }),
@@ -336,7 +338,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
         const { fullName, email } = savedFormData
 
-        const result = await fetch('http://localhost:8000/save-subscription', {
+        const result = await fetch(`${API_URL}/save-subscription`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ key: email, name: fullName, subscription: selectedTab, duration: selectedDuration, amount: `$${amount / 100}` }),

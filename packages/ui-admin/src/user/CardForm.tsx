@@ -14,6 +14,8 @@ const CardForm: FC<CardFormProps> = ({ onCardValidated }) => {
   const [cardValidated, setCardValidated] = useState(false)
   const [cardErrorMessage, setCardErrorMessage] = useState<string | null>(null)
 
+  const API_URL = process.env.API_URL || 'https://www.app.xmati.ai/apis'
+
   const verifyCard = async () => {
     setIsValidatingCard(true)
     setCardValidated(false)
@@ -50,7 +52,7 @@ const CardForm: FC<CardFormProps> = ({ onCardValidated }) => {
 
 
       // 1. Create SetupIntent on your backend
-      const setupIntentRes = await fetch('http://localhost:8000/create-setup-intent', {
+      const setupIntentRes = await fetch(`${API_URL}/create-setup-intent`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: formData.email, customerId: { id: formData.stripeCustomerId } }),

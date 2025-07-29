@@ -55,6 +55,9 @@ const DEFAULT_BOT_HEALTH: BotHealth = { status: 'disabled', errorCount: 0, warni
 const getBotStatusKey = (serverId: string) => makeRedisKey(`bp_server_${serverId}_bots`)
 const debug = DEBUG('services:bots')
 
+//production url
+const API_URL = 'https://www.app.xmati.ai/apis'
+
 @injectable()
 export class BotService {
   public mountBot: Function = this._localMount
@@ -98,6 +101,7 @@ export class BotService {
       setInterval(() => this._updateBotHealthDebounce(), STATUS_REFRESH_INTERVAL)
     }
   }
+
 
   async findBotById(botId: string): Promise<BotConfig | undefined> {
     if (!(await this.ghostService.forBot(botId).fileExists('/', 'bot.config.json'))) {
@@ -184,8 +188,9 @@ export class BotService {
   }
 
   async getAndLoadUserBots(email: any) {
+    console.log('API_URL inside function: ', API_URL)
     try {
-      let result = await axios('https://www.app.xmati.ai/apis/get-bots', {
+      let result = await axios(`${API_URL}/get-bots`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -228,7 +233,7 @@ export class BotService {
 
   async getAndLoadAllBots() {
     try {
-      let result = await axios('https://www.app.xmati.ai/apis/get-all-bots', {
+      let result = await axios(`${API_URL}/get-all-bots`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -656,7 +661,7 @@ export class BotService {
 
   async deleteFromS3(key: string, fullName: string) {
     try {
-      const result = await axios('https://www.app.xmati.ai/apis/delete-bot', {
+      const result = await axios(`${API_URL}/delete-bot`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -930,7 +935,7 @@ export class BotService {
   private _saveData = async (key, data, from = 'user') => {
     try {
       //const compressedData = await this._compressRequest(data);
-      const result = await axios('http://localhost:8000/save-bot', {
+      const result = await axios(`${API_URL}/save-bot`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

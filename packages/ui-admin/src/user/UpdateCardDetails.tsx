@@ -46,6 +46,8 @@ const loaderTextStyle: React.CSSProperties = {
   color: 'black'
 }
 
+const API_URL = process.env.API_URL || 'https://www.app.xmati.ai/apis'
+
 const UpdateCardDetails: FC<Props> = props => {
   const [paymentMethodId, setPaymentMethodId] = useState<string>('')
   const [isSaving, setIsSaving] = useState(false)
@@ -59,7 +61,7 @@ const UpdateCardDetails: FC<Props> = props => {
       setIsLoadingCard(true)
       const fetchCardDetails = async () => {
         try {
-          const res = await fetch('http://localhost:8000/get-card-details', {
+          const res = await fetch(`${API_URL}/get-card-details`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ paymentMethodId: formData.stripePayementId })
@@ -88,7 +90,7 @@ const UpdateCardDetails: FC<Props> = props => {
         stripePayementId: paymentMethodId
       }
 
-      const result = await fetch('http://localhost:8000/update-card-info', {
+      const result = await fetch(`${API_URL}/update-card-info`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

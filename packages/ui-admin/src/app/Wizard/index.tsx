@@ -10,6 +10,8 @@ import { auth } from 'botpress/shared'
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { FormGroup } from '@blueprintjs/core'
 
+const API_URL = process.env.API_URL || 'https://www.app.xmati.ai/apis'
+
 interface FormData {
   fullName: string
   email: string
@@ -377,7 +379,7 @@ const CustomerWizard: React.FC = () => {
         }
       }
 
-      const result = await fetch('https://www.app.xmati.ai/apis/user-auth', {
+      const result = await fetch(`${API_URL}/user-auth`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -422,7 +424,7 @@ const CustomerWizard: React.FC = () => {
 
 
       // 1. Create SetupIntent on your backend
-      const setupIntentRes = await fetch('https://www.app.xmati.ai/apis/create-setup-intent', {
+      const setupIntentRes = await fetch(`${API_URL}/create-setup-intent`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: formData.email, customerId: '' }),
@@ -444,7 +446,7 @@ const CustomerWizard: React.FC = () => {
 
       let result
       if (typeof res.setupIntent.payment_method === 'string' && res.setupIntent.payment_method) {
-        result = await fetch('https://www.app.xmati.ai/apis/attach-payment-method', {
+        result = await fetch(`${API_URL}/attach-payment-method`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: formData.email, paymentMethodId: res.setupIntent.payment_method || '', customerId: { id: customerId || '' } }),
@@ -471,7 +473,7 @@ const CustomerWizard: React.FC = () => {
   const checkUser = async () => {
     setIsLoading(true) // Show big loader
     try {
-      const result = await fetch('https://www.app.xmati.ai/apis/check-user', {
+      const result = await fetch(`${API_URL}/check-user`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

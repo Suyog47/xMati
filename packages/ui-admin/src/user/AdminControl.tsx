@@ -9,6 +9,8 @@ interface Props {
   toggle: () => void
 }
 
+const API_URL = process.env.API_URL || 'https://www.app.xmati.ai/apis'
+
 const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
   const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
   const maintenanceStatus = JSON.parse(localStorage.getItem('maintenance') || '{}')
@@ -51,7 +53,7 @@ const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
   const handleMaintenance = async () => {
     setDialogLoading(true) // Show full dialog loader
     try {
-      let response = await fetch('https://www.app.xmati.ai/apis/set-maintenance', {
+      let response = await fetch(`${API_URL}/set-maintenance`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

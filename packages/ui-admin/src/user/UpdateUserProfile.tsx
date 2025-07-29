@@ -55,6 +55,8 @@ const loaderTextStyle: React.CSSProperties = {
   color: 'black'
 }
 
+const API_URL = process.env.API_URL || 'https://www.app.xmati.ai/apis'
+
 const UpdateUserProfile: FC<Props> = props => {
   const [fullName, setFullname] = useState<string>('')
   const [email, setEmail] = useState<string>('')
@@ -150,7 +152,7 @@ const UpdateUserProfile: FC<Props> = props => {
 
   const s3Call = async (data) => {
     try {
-      const result = await fetch('https://www.app.xmati.ai/apis/user-auth', {
+      const result = await fetch(`${API_URL}/user-auth`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

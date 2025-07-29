@@ -27,6 +27,8 @@ export const ChangePasswordForm: FC<Props> = props => {
 
   const otpRefs = useRef<HTMLInputElement[]>([]) // Refs for OTP input fields
 
+  const API_URL = process.env.API_URL || 'https://www.app.xmati.ai/apis'
+
   const validatePassword = (password: string) => {
     const minLength = 8
     const maxLength = 16
@@ -77,7 +79,7 @@ export const ChangePasswordForm: FC<Props> = props => {
     setIsLoading(true)
     setEmailChecked(false)
     try {
-      const result = await fetch('https://www.app.xmati.ai/apis/check-user', {
+      const result = await fetch(`${API_URL}/check-user`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -128,7 +130,7 @@ export const ChangePasswordForm: FC<Props> = props => {
     setIsLoading(true)
     setPassChecked(false)
     try {
-      const result = await fetch('https://www.app.xmati.ai/apis/forgot-pass', {
+      const result = await fetch(`${API_URL}/forgot-pass`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

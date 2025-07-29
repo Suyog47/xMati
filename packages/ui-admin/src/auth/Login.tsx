@@ -28,6 +28,8 @@ interface AuthConfigResponse {
   }
 }
 
+const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
+
 const Login: FC<Props> = props => {
   const maintenanceStatus = JSON.parse(localStorage.getItem('maintenance') || '{}')
   const [isLoading, setLoading] = useState(true)
@@ -161,7 +163,7 @@ const Login: FC<Props> = props => {
 
   const userLogin = async (email, password) => {
     try {
-      const result = await fetch('https://www.app.xmati.ai/apis/user-auth', {
+      const result = await fetch(`${API_URL}/user-auth`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -182,7 +184,7 @@ const Login: FC<Props> = props => {
 
   const userSubscription = async (email) => {
     try {
-      const result = await fetch('https://www.app.xmati.ai/apis/get-subscription', {
+      const result = await fetch(`${API_URL}/get-subscription`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
