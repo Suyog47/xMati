@@ -209,7 +209,7 @@ const UpdateCardDetails: FC<Props> = props => {
                       letterSpacing: '1px',
                       opacity: 0.8
                     }}>
-                      {cardDetails.funding}
+                      {(cardDetails.funding ?? '').toUpperCase()}
                     </div>
                   </div>
                   <div style={{

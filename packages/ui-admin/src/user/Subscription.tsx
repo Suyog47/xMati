@@ -9,6 +9,7 @@ import {
 import { loadStripe, PaymentRequest } from '@stripe/stripe-js'
 import { Dialog, Button, FormGroup, Icon, Spinner } from '@blueprintjs/core'
 import BasicAuthentication from '~/auth/basicAuth'
+import { toast } from 'botpress/shared'
 
 interface Props {
   isOpen: boolean
@@ -118,11 +119,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       ? new Date(savedSubData.till).toLocaleString('en-US', {
         year: 'numeric',
         month: 'long',
-        day: 'numeric',
-        // hour: '2-digit',
-        // minute: '2-digit',
-        // second: '2-digit',
-        // hour12: true, // Use 12-hour format
+        day: 'numeric'
       })
       : ''
     setExpiryTill(formattedExpiryTill)
@@ -229,6 +226,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
 
   const CheckoutForm = useMemo(() => () => {
     savedFormData = JSON.parse(localStorage.getItem('formData') || '{}') // reinitializing to get the latest data
+    savedSubData = JSON.parse(localStorage.getItem('subData') || '{}')
     const stripe = useStripe()
     const elements = useElements()
     const [error, setError] = useState('')
@@ -329,6 +327,62 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       }
     }
 
+    // Upgrade the Trial's next subscription
+    const handleUpgradeNow = async (e: React.FormEvent) => {
+      e.preventDefault()
+
+      setIsProcessing(true)
+      setError('')
+
+      try {
+        const { email } = savedFormData
+        const plan = selectedTab
+        const duration = selectedDuration
+        const price = `$${amount / 100}`
+
+        const response = await fetch(`${API_URL}/trial-nextsub-upgrade`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email,
+            plan,
+            duration,
+            price,
+          }),
+        })
+
+        const res = await response.json()
+
+        if (!response.ok || !res.success) {
+          throw new Error(res.message || 'Failed to upgrade subscription. Please try again later.')
+        }
+
+        // Update local storage or state with the new subscription details
+        localStorage.setItem(
+          'formData',
+          JSON.stringify({
+            ...savedFormData,
+            nextSubs: {
+              ...savedFormData.nextSubs,
+              plan,
+              duration,
+              price
+            }
+          })
+        )
+        await togglePaymentDialog(false)
+        toggle()
+        toast.success('Subscription upgraded successfully!')
+      } catch (err: any) {
+        console.error('Error upgrading subscription:', err.message)
+        setError(err.message || 'An error occurred while upgrading your subscription.')
+      } finally {
+        setIsProcessing(false) // Reset the loading state
+      }
+    }
+
     const setSubscriber = async () => {
       try {
         const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
@@ -392,7 +446,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
               `}
             </style>
             <div style={{ fontSize: 20, color: '#106ba3', fontWeight: 600 }}>
-              Your payment is being processed...
+              {(savedSubData.subscription === 'Trial') ? 'Your Subscription is getting updated...' : 'Your payment is being processed...'}
             </div>
           </div>
         )}
@@ -449,7 +503,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                   opacity: 0.8,
                   textAlign: 'center',
                 }}>
-                  {cardData.funding}
+                  {cardData.funding.toUpperCase()}
                 </div>
               </div>
               <div style={{
@@ -524,16 +578,13 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
 
 
         <div style={{ padding: '0 10px 10px' }}>
-          {/* Payment Form */}
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={(savedSubData.subscription === 'Trial') ? handleUpgradeNow : handleSubmit}>
+
             {/* Radio Buttons for Half-yearly and Yearly Options */}
             <div style={{ marginTop: '20px', textAlign: 'center' }}>
               <h4>Select Subscription Duration</h4>
-              <p style={{ fontSize: '0.85em', color: '#666' }}>
-                If you purchase a Half-Yearly plan, you will get a <strong>3% discount</strong>, and with a Yearly plan, you will get a <strong>5% discount</strong> and no discount for Monthly plan.
-              </p>
-              <div style={{ display: 'flex', justifyContent: 'center', gap: '30px' }}>
-                <label>
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '40px', flexWrap: 'wrap' }}>
+                <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px' }}>
                   <input
                     type="radio"
                     name="subscriptionDuration"
@@ -544,9 +595,9 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                       setSelectedDuration(selectedDuration === 'monthly' ? '' : 'monthly')
                     }
                   />
-                  Monthly
+                  <span>Monthly</span>
                 </label>
-                <label>
+                <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px' }}>
                   <input
                     type="radio"
                     name="subscriptionDuration"
@@ -557,9 +608,10 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                       setSelectedDuration(selectedDuration === 'half-yearly' ? '' : 'half-yearly')
                     }
                   />
-                  Half-yearly
+                  <span>Half-yearly</span>
+                  <small style={{ fontSize: '0.85em', fontWeight: 'bold', color: 'green' }}>(3% discount)</small>
                 </label>
-                <label>
+                <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px' }}>
                   <input
                     type="radio"
                     name="subscriptionDuration"
@@ -570,14 +622,30 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                       setSelectedDuration(selectedDuration === 'yearly' ? '' : 'yearly')
                     }
                   />
-                  Yearly
+                  <span>Yearly</span>
+                  <small style={{ fontSize: '0.85em', fontWeight: 'bold', color: 'green' }}>(5% discount)</small>
                 </label>
               </div>
             </div>
 
             {error && <div style={{ color: 'red', margin: '7px 0' }}>{error}</div>}
 
-            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+            {/* Button Section */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '20px' }}>
+              {/* Amount Display */}
+              <div
+                style={{
+                  fontSize: '1.5em',
+                  fontWeight: 'bold',
+                  color: '#106ba3',
+                  marginBottom: '10px',
+                  textAlign: 'center',
+                }}
+              >
+                Amount:- ${<u>{amount / 100}</u>}
+              </div>
+
+              {/* Payment Button */}
               <Button
                 type="submit"
                 intent="primary"
@@ -586,15 +654,14 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                 fill
                 style={{
                   height: '52px',
-                  minWidth: '190px',
-                  maxWidth: '200px',
+                  minWidth: '200px',
+                  maxWidth: '230px',
                   fontSize: '1.08em',
                   borderRadius: 6,
                   alignSelf: 'center',
                 }}
-                onSubmit={handleSubmit}
               >
-                {isProcessing ? 'Processing...' : `Pay $${amount / 100}`}
+                {isProcessing ? 'Processing...' : (savedSubData.subscription === 'Trial') ? 'Update' : 'Proceed to Pay'}
               </Button>
             </div>
 
@@ -756,6 +823,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
 
   return (
     <>
+      {/* Main Screen dialog */}
       <Dialog
         title="Subscribe & Pay"
         icon="dollar"
@@ -765,11 +833,10 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         style={{
           width: '98vw',
           maxWidth: '100vw',
-          height: '97vh', // Increased height
-          maxHeight: '95vh',
+          height: 'auto', // Adjust height to fit content
+          maxHeight: '97vh',
           margin: 0,
           borderRadius: 0,
-          padding: 0,
         }}
       >
         <div
@@ -787,13 +854,29 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         >
           {/* Left: Subscription Plan Section */}
           <div style={{ flex: 1.5, overflowY: 'auto' }}>
-            <div style={{ marginBottom: '5px', textAlign: 'center', fontSize: '1em', color: '#666' }}>
+            <div
+              style={{
+                marginBottom: '10px',
+                textAlign: 'center',
+                fontSize: '0.95em',
+                color: '#666',
+                lineHeight: '1.4',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'normal',
+                maxHeight: '4.5em', // Limit the height to prevent overflow
+              }}
+            >
               {subscription && expiryTill && (
-                <p>
-                  Your current subscription plan is <strong><u>{subscription}</u></strong> and it {savedSubData.expired === true ? 'was' : 'is'} valid till <strong><u>{expiryTill}</u></strong>.
+                <p style={{ margin: '0' }}>
+                  Your current subscription plan is <strong><u>{subscription}</u></strong>, valid till <strong><u>{expiryTill}</u></strong>.
+                  {subscription === 'Trial' && (
+                    <> You opted for <strong><u>{savedFormData.nextSubs.plan}</u></strong> plan on a <strong><u>{savedFormData.nextSubs.duration}</u></strong> basis after Trial, which you can change anytime.</>
+                  )}
                 </p>
               )}
             </div>
+
             <h1 style={{ marginBottom: '5px', fontSize: '1.2em' }}>
               {(subscription === 'Trial')
                 ? 'Choose Your Subscription Plan'
@@ -920,7 +1003,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                 }}
                 onClick={() => togglePaymentDialog(true)}
               >
-                Subscribe Now
+                Update your Subscription
               </Button>
 
               {savedSubData.canCancel === true &&

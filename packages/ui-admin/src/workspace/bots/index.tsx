@@ -97,7 +97,7 @@ class Bots extends Component<Props> {
     const plan = from === 'upgrade' ? 'Professional' : 'Starter'
 
     try {
-      const response = await fetch(`${API_URL}/trial-sub-upgrade`, {
+      const response = await fetch(`${API_URL}/pro-suggestion-update`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

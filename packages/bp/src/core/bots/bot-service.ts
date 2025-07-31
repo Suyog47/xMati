@@ -55,8 +55,11 @@ const DEFAULT_BOT_HEALTH: BotHealth = { status: 'disabled', errorCount: 0, warni
 const getBotStatusKey = (serverId: string) => makeRedisKey(`bp_server_${serverId}_bots`)
 const debug = DEBUG('services:bots')
 
-//production url
-const API_URL = 'https://www.app.xmati.ai/apis'
+// Localhost url
+const API_URL = 'http://localhost:8000'
+
+// Production url
+// const API_URL = 'https://www.app.xmati.ai/apis'
 
 @injectable()
 export class BotService {
