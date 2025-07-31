@@ -19,6 +19,7 @@ function formatDate(dateStr: string) {
 export const Subs = () => {
   const [isDialogOpen, setDialogOpen] = useState(false)
   const savedSubData = JSON.parse(localStorage.getItem('subData') || '{}')
+  const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
   const {
     subscription = '',
     createdAt = '-',
@@ -57,7 +58,8 @@ export const Subs = () => {
             background: '#ffcccc',
             padding: '12px 20px',
             borderRadius: '4px',
-            marginTop: 5,
+            marginTop: 10,
+            marginBottom: 5,
             textAlign: 'center',
             fontWeight: 700,
             color: '#721c24',
@@ -73,7 +75,8 @@ export const Subs = () => {
             background: '#fff3cd',
             padding: '12px 20px',
             borderRadius: '4px',
-            marginBottom: 20,
+            marginTop: 10,
+            marginBottom: 5,
             textAlign: 'center',
             fontWeight: 700,
             color: '#856404',
@@ -89,7 +92,8 @@ export const Subs = () => {
             background: '#fff3cd',
             padding: '12px 20px',
             borderRadius: '4px',
-            marginBottom: 20,
+            marginTop: 10,
+            marginBottom: 5,
             textAlign: 'center',
             fontWeight: 700,
             color: '#856404',
@@ -119,7 +123,7 @@ export const Subs = () => {
 
   return (
     <div id="subscription_dropdown">
-      <Tooltip content="View Subscription" position="bottom">
+      <Tooltip content="View Subscription" position="left">
         <Button
           minimal
           intent="primary"
@@ -140,12 +144,12 @@ export const Subs = () => {
         style={{
           width: '90%',
           maxWidth: 700,
+          height: 'auto',
           maxHeight: '97vh',
-          minHeight: 400,
-          overflow: 'auto',
+          overflow: 'visible',
         }}
       >
-        <div style={{ padding: '10px 28px' }}>
+        <div style={{ padding: '10px 10px' }}>
 
           {/* Header */}
           <h2
@@ -303,7 +307,7 @@ export const Subs = () => {
           {/* Plan Expiry Message
           <div
             style={{
-              marginTop: 10,
+              marginTop: 8,
               textAlign: 'center',
               fontWeight: 700,
               color: '#106BA3',
@@ -318,7 +322,25 @@ export const Subs = () => {
                 : 'Your plan has been expired.'}
           </div> */}
 
-          {/* Alert Banner */}
+          {/* Trial Plan Notification */}
+          {subscription === 'Trial' && savedFormData.nextSubs && (
+            <div
+              style={{
+                marginBottom: 5,
+                padding: '12px 16px',
+                background: '#f3f4f6',
+                borderRadius: 8,
+                fontSize: 14,
+                color: '#394B59',
+                lineHeight: 1.5,
+                textAlign: 'center',
+              }}
+            >
+              You opted for <strong><u>{savedFormData.nextSubs.plan}</u></strong> plan on a <strong><u>{savedFormData.nextSubs.duration}</u></strong> basis after Trial, which you can change anytime.
+            </div>
+          )}
+
+          {/* Render the subscription status banner */}
           {renderAlertBanner()}
 
           {/* Footer Buttons */}
