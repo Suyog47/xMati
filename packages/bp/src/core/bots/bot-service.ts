@@ -359,10 +359,10 @@ export class BotService {
   }
 
   async importBot(botData: any, archive: Buffer, workspaceId: string, allowOverwrite?: boolean): Promise<void> {
+    const fullName = botData.fullName;
     const botId = botData.oldBotId;
     const newBotId = botData.newBotId;
     const email = botData.email;
-
 
     const startTime = Date.now()
     if (!isValidBotId(newBotId)) {         // newBotId
@@ -454,7 +454,7 @@ export class BotService {
           BotService.setBotStatus(newBotId, 'disabled')        // newBotId
         }
 
-
+        BotService.fullName = fullName
         await this._convertBot(`${(email === '-') ? originalConfig.owner : email}_${newBotId}`, newBotId)
         this.logger.forBot(botId).info(`Import of bot ${newBotId} successful`)       // newBotId
       } else {

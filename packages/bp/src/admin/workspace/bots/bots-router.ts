@@ -322,13 +322,14 @@ class BotsRouter extends CustomAdminRouter {
     )
 
     router.post(
-      '/:botId/:newBotId/:email/import',
+      '/:fullName/:botId/:newBotId/:email/import',
       this.needPermissions('write', `${this.resource}.archive`),
       this.asyncMiddleware(async (req, res) => {
         if (!req.is('application/tar+gzip')) {
           return res.status(400).send('Bot should be imported from archive')
         }
 
+        const fullName = req.params.fullName;
         const oldBotId = req.params.botId;
         const newBotId = req.params.newBotId;
         const email = req.params.email;
@@ -345,6 +346,7 @@ class BotsRouter extends CustomAdminRouter {
         await Promise.fromCallback(cb => req.on('end', cb))
 
         const dataObj = {
+          fullName,
           oldBotId,
           newBotId,
           email,

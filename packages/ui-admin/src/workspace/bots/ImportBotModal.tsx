@@ -78,7 +78,7 @@ class ImportBotModal extends Component<Props, State> {
       await api
         .getSecured({ timeout: ms('20m') })
         .post(
-          `/admin/workspace/bots/${oldBotId}/${newBotId}/${email}/import?overwrite=${this.state.overwrite}`,
+          `/admin/workspace/bots/${this.savedFormData.fullName}/${oldBotId}/${newBotId}/${email}/import?overwrite=${this.state.overwrite}`,
           this.state.fileContent,
           {
             headers: { 'Content-Type': 'application/tar+gzip' },
