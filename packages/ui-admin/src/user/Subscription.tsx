@@ -56,11 +56,15 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
 
   const amount = useMemo(() => {
     if (selectedDuration === 'half-yearly') {
-      return selectedTab === 'Starter' ? 1800 * 6 * 0.97 : 10000 * 6 * 0.97 // 3% discount
+      return selectedTab === 'Starter'
+        ? Math.round(1800 * 6 * 0.95)    // Starter: 5% discount for half-yearly
+        : Math.round(2500 * 6 * 0.95)    // Professional: 5% discount for half-yearly
     } else if (selectedDuration === 'yearly') {
-      return selectedTab === 'Starter' ? 1800 * 12 * 0.95 : 10000 * 12 * 0.95 // 5% discount
+      return selectedTab === 'Starter'
+        ? Math.round(1800 * 12 * 0.85)   // Starter: 15% discount for yearly
+        : Math.round(2500 * 12 * 0.85)   // Professional: 15% discount for yearly
     }
-    return selectedTab === 'Starter' ? 1800 : 10000 // Default monthly price
+    return selectedTab === 'Starter' ? 1800 : 2500 // Monthly prices: $18 and $25 respectively
   }, [selectedTab, selectedDuration])
 
 
@@ -609,7 +613,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                     }
                   />
                   <span>Half-yearly</span>
-                  <small style={{ fontSize: '0.85em', fontWeight: 'bold', color: 'green' }}>(3% discount)</small>
+                  <small style={{ fontSize: '0.85em', fontWeight: 'bold', color: 'green' }}>(5% discount)</small>
                 </label>
                 <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px' }}>
                   <input
@@ -623,7 +627,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                     }
                   />
                   <span>Yearly</span>
-                  <small style={{ fontSize: '0.85em', fontWeight: 'bold', color: 'green' }}>(5% discount)</small>
+                  <small style={{ fontSize: '0.85em', fontWeight: 'bold', color: 'green' }}>(15% discount)</small>
                 </label>
               </div>
             </div>
@@ -642,7 +646,12 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                   textAlign: 'center',
                 }}
               >
-                Amount:- ${<u>{amount / 100}</u>}
+                Amount:- ${<u>{amount / 100}</u>}{'  '}
+                {selectedDuration === 'monthly'
+                  ? 'per month'
+                  : selectedDuration === 'half-yearly'
+                    ? ` ($${((amount / 6) / 100).toFixed(2)}/month )`
+                    : ` ($${((amount / 12) / 100).toFixed(2)}/month )`}
               </div>
 
               {/* Payment Button */}

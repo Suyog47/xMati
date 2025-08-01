@@ -153,15 +153,15 @@ const CustomerWizard: React.FC = () => {
 
 
   useEffect(() => {
+    const basePrice = selectedPlan === 'Starter' ? 18 : 25
     let finalPrice = 0
+
     if (selectedDuration === 'monthly') {
-      finalPrice = selectedPlan === 'Starter' ? 18 : 100
+      finalPrice = basePrice
     } else if (selectedDuration === 'half-yearly') {
-      const raw = selectedPlan === 'Starter' ? 18 * 6 * 0.97 : 100 * 6 * 0.97
-      finalPrice = Math.round(raw * 100) / 100
+      finalPrice = Math.round(basePrice * 6 * 0.95 * 100) / 100
     } else if (selectedDuration === 'yearly') {
-      const raw = selectedPlan === 'Starter' ? 18 * 12 * 0.95 : 100 * 12 * 0.95
-      finalPrice = Math.round(raw * 100) / 100
+      finalPrice = Math.round(basePrice * 12 * 0.85 * 100) / 100
     }
     setPrice(finalPrice)
   }, [selectedPlan, selectedDuration])
@@ -846,56 +846,68 @@ const CustomerWizard: React.FC = () => {
                       marginBottom: '20px',
                     }}
                   >
-                    {['Starter', 'Professional'].map((plan) => (
-                      <div
-                        key={plan}
-                        onClick={() => setSelectedPlan(plan)}
-                        style={{
-                          flex: 1,
-                          margin: '0 10px',
-                          border: `2px solid ${selectedPlan === plan ? '#2196f3' : '#e0e0e0'
-                            }`,
-                          borderRadius: '8px',
-                          padding: '20px',
-                          cursor: 'pointer',
-                          backgroundColor: selectedPlan === plan ? '#f8fbff' : '#fff',
-                          transition: 'all 0.2s ease',
-                        }}
-                      >
-                        <h3 style={{ margin: '0 0 10px 0', fontSize: '1.2em' }}>
-                          {plan}
-                        </h3>
-                        <h4 style={{ margin: '0 0 10px 0', fontSize: '1.1em', color: '#555' }}>
-                          {plan === 'Starter' ? '$18/month' : '$100/month'}
-                        </h4>
-                        <p style={{ margin: '0 0 5px 0', fontSize: '0.95em', color: '#777' }}>
-                          {plan === 'Starter' ? '3 bots included' : '5 bots included'}
-                        </p>
+                    {['Starter', 'Professional'].map((plan) => {
+                      // calculate base price for the plan
+                      const basePrice = plan === 'Starter' ? 18 : 25
+                      // calculate the monthly price after discount
+                      const monthlyPrice =
+                        selectedDuration === 'monthly'
+                          ? basePrice
+                          : selectedDuration === 'half-yearly'
+                            ? (basePrice * 0.95).toFixed(2)
+                            : (basePrice * 0.85).toFixed(2)
+                      return (
                         <div
+                          key={plan}
+                          onClick={() => setSelectedPlan(plan)}
                           style={{
-                            marginTop: '10px',
-                            textAlign: 'left',
-                            fontSize: '0.9em',
-                            color: '#555',
+                            flex: 1,
+                            margin: '0 10px',
+                            border: `2px solid ${selectedPlan === plan ? '#2196f3' : '#e0e0e0'
+                              }`,
+                            borderRadius: '8px',
+                            padding: '20px',
+                            cursor: 'pointer',
+                            backgroundColor: selectedPlan === plan ? '#f8fbff' : '#fff',
+                            transition: 'all 0.2s ease',
                           }}
                         >
-                          <strong>Includes:</strong>
-                          <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
-                            <li>LLM Support</li>
-                            <li>HITL Enabled</li>
-                            <li>Bot Analytics</li>
-                          </ul>
-                          <strong>Supported Channels:</strong>
-                          <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
-                            <li>WhatsApp</li>
-                            <li>Web Chat</li>
-                            <li>Telegram</li>
-                            <li>Slack</li>
-                            <li>Facebook Messenger</li>
-                          </ul>
+                          <h3 style={{ margin: '0 0 10px 0', fontSize: '1.2em' }}>
+                            {plan}
+                          </h3>
+                          <h4 style={{ margin: '0 0 10px 0', fontSize: '1.1em', color: '#555' }}>
+                            ${monthlyPrice}/month
+                          </h4>
+                          <p style={{ margin: '0 0 5px 0', fontSize: '0.95em', color: '#777' }}>
+                            {plan === 'Starter' ? '3 bots included' : '5 bots included'}
+                          </p>
+                          <div
+                            style={{
+                              marginTop: '10px',
+                              textAlign: 'left',
+                              fontSize: '0.9em',
+                              color: '#555',
+                            }}
+                          >
+                            <strong>Includes:</strong>
+                            <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
+                              <li>LLM Support</li>
+                              <li>HITL Enabled</li>
+                              <li>Bot Analytics</li>
+                            </ul>
+                            <strong>Supported Channels:</strong>
+                            <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
+                              <li>WhatsApp</li>
+                              <li>Web Chat</li>
+                              <li>Telegram</li>
+                              <li>Slack</li>
+                              <li>Facebook Messenger</li>
+                            </ul>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      )
+                    })
+                    }
                   </div>
                 </div>
 
@@ -934,7 +946,7 @@ const CustomerWizard: React.FC = () => {
                         onChange={() => setSelectedDuration('half-yearly')}
                         style={{ marginRight: '10px' }}
                       />
-                      Half-Yearly
+                      Half-Yearly<span style={{ color: 'green', fontWeight: 'bold' }}>  (5% discount)</span>
                     </label>
                     <label style={{ fontSize: '1em', color: '#555' }}>
                       <input
@@ -945,7 +957,7 @@ const CustomerWizard: React.FC = () => {
                         onChange={() => setSelectedDuration('yearly')}
                         style={{ marginRight: '10px' }}
                       />
-                      Yearly
+                      Yearly<span style={{ color: 'green', fontWeight: 'bold' }}>  (15% discount)</span>
                     </label>
                   </div>
                   <div style={{ marginTop: '20px', fontSize: '0.95em', color: '#666' }}>
@@ -958,11 +970,6 @@ const CustomerWizard: React.FC = () => {
                   <div style={{ marginTop: '20px', textAlign: 'center' }}>
                     <p style={{ fontSize: '1.1em', fontWeight: 'bold', color: '#333' }}>
                       Price after 30-day free trial: ${price}
-                      {selectedDuration === 'monthly'
-                        ? ' per month'
-                        : selectedDuration === 'half-yearly'
-                          ? ' every 6 months (3% discount)'
-                          : ' every year (5% discount)'}
                     </p>
                   </div>
                 </div>
