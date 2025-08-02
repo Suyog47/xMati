@@ -880,7 +880,11 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                 <p style={{ margin: '0' }}>
                   Your current subscription plan is <strong><u>{subscription}</u></strong>, valid till <strong><u>{expiryTill}</u></strong>.
                   {subscription === 'Trial' && (
-                    <> You opted for <strong><u>{savedFormData.nextSubs.plan}</u></strong> plan on a <strong><u>{savedFormData.nextSubs.duration}</u></strong> basis after Trial, which you can change anytime.</>
+                    savedFormData.nextSubs ? (
+                      <> You opted for <strong><u>{savedFormData.nextSubs.plan}</u></strong> plan on a <strong><u>{savedFormData.nextSubs.duration}</u></strong> basis after Trial, which you can change anytime.</>
+                    ) : (
+                      <> You have cancelled your subscription.</>
+                    )
                   )}
                 </p>
               )}

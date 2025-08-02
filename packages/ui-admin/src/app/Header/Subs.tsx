@@ -149,7 +149,7 @@ export const Subs = () => {
           overflow: 'visible',
         }}
       >
-        <div style={{ padding: '10px 10px' }}>
+        <div style={{ padding: '10px 18px' }}>
 
           {/* Header */}
           <h2
