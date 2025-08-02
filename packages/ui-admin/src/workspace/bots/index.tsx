@@ -80,11 +80,11 @@ class Bots extends Component<Props> {
   // New handler to update upgrade selection and price
   handleUpgradeDurationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const duration = e.target.value
-    let price = 100
+    let price = 25
     if (duration === 'half-yearly') {
-      price = Math.round(100 * 6 * 0.97 * 100) / 100
+      price = Math.round(25 * 6 * 0.95 * 100) / 100   // 5% discount for half-yearly
     } else if (duration === 'yearly') {
-      price = Math.round(100 * 12 * 0.95 * 100) / 100
+      price = Math.round(25 * 12 * 0.85 * 100) / 100 // 15% discount for yearly
     }
     this.setState({ upgradeSelectedDuration: duration, upgradePrice: price })
   }
@@ -673,6 +673,7 @@ class Bots extends Component<Props> {
               </p>
               <p>However, we have noticed that you are using more than 3 bots, so we suggest you to upgrade the plan from Starter to Professional, as Starter plan supports maximum 3 bots.</p>
 
+              <br />
               <div style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
                 {/* Professional Plan Container - 60% width */}
                 <div style={{
@@ -684,7 +685,15 @@ class Bots extends Component<Props> {
                   boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
                 }}>
                   <h2 style={{ color: '#333', marginBottom: '10px', textDecoration: 'underline' }}>Professional</h2>
-                  <h3 style={{ color: '#555', margin: '0 0 10px 0' }}>$100/month</h3>
+                  <h3 style={{ color: '#555', margin: '0 0 10px 0' }}>
+                    $
+                    {upgradeSelectedDuration === 'monthly'
+                      ? upgradePrice
+                      : upgradeSelectedDuration === 'half-yearly'
+                        ? (upgradePrice / 6).toFixed(2)
+                        : (upgradePrice / 12).toFixed(2)}
+                    /month
+                  </h3>
                   <p style={{ color: 'black', fontWeight: 'bold', fontSize: '1.1em' }}>5 bots included</p>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '25px' }}>
                     <div style={{ textAlign: 'left', fontSize: '0.9em', color: '#555' }}>
@@ -740,7 +749,7 @@ class Bots extends Component<Props> {
                         onChange={this.handleUpgradeDurationChange}
                         style={{ marginRight: '10px' }}
                       />
-                      <span style={{ fontWeight: 500 }}>Half-Yearly</span> <span style={{ fontSize: '0.9em', color: 'green' }}>(3% discount)</span>
+                      <span style={{ fontWeight: 500 }}>Half-Yearly</span> <span style={{ fontSize: '0.9em', color: 'green' }}>(5% discount)</span>
                     </label>
                     <label style={{ fontSize: '1em', color: '#555' }}>
                       <input
@@ -751,7 +760,7 @@ class Bots extends Component<Props> {
                         onChange={this.handleUpgradeDurationChange}
                         style={{ marginRight: '10px' }}
                       />
-                      <span style={{ fontWeight: 500 }}>Yearly</span> <span style={{ fontSize: '0.9em', color: 'green' }}>(5% discount)</span>
+                      <span style={{ fontWeight: 500 }}>Yearly</span> <span style={{ fontSize: '0.9em', color: 'green' }}>(15% discount)</span>
                     </label>
                   </div>
                 </div>
@@ -759,7 +768,7 @@ class Bots extends Component<Props> {
 
               <div style={{ marginTop: '20px', textAlign: 'center' }}>
                 <p style={{ fontSize: '1.4em', fontWeight: 'bold', color: '#333' }}>
-                  Amount:  ${upgradePrice}
+                  Amount:  <span style={{ textDecoration: 'underline' }}>${upgradePrice}</span>
                   {upgradeSelectedDuration === 'monthly'
                     ? ' per month'
                     : upgradeSelectedDuration === 'half-yearly'
