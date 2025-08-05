@@ -1,12 +1,20 @@
-import React, { FC, useState } from 'react'
+import React, { FC, useEffect, useState } from 'react'
 import { Dialog, Button, FormGroup, Spinner, Card, Elevation } from '@blueprintjs/core'
 import api from '~/app/api'
 import ms from 'ms'
+import UserCard from './UserCard'
+import { toast } from 'botpress/shared'
 
 interface Props {
   isOpen: boolean
   toggle: () => void
 }
+
+interface UserData {
+  email: string
+  [key: string]: any // Add more fields as needed
+}
+
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
@@ -15,8 +23,36 @@ const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
   const maintenanceStatus = JSON.parse(localStorage.getItem('maintenance') || '{}')
   const [isDialogLoading, setDialogLoading] = useState(false)
   const [isMaintenanceActive, setMaintenanceActive] = useState(maintenanceStatus.status)
-
+  const [userList, setUserList] = useState<UserData[]>([])
   const toggleMaintenance = () => setMaintenanceActive(prev => !prev)
+
+  const getAllUsers = async () => {
+    setDialogLoading(true)
+    try {
+      const response = await fetch(`${API_URL}/get-all-users-subscriptions`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      })
+      const result = await response.json()
+
+      if (result.success) {
+        setUserList(result.data)
+        toast.success('User list fetched successfully!')
+      } else {
+        toast.failure(`Failed to fetch user list: ${result.message}`)
+      }
+    } catch (error) {
+      toast.failure('Failed to fetch user list.')
+    } finally {
+      setDialogLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if (isOpen) {
+      void getAllUsers()
+    }
+  }, [isOpen])
 
   const handleBackup = async () => {
     setDialogLoading(true)
@@ -251,31 +287,20 @@ const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
                 padding: '0 24px',
                 alignSelf: 'flex-start',
               }}
-              onClick={() => alert('Fetching user list...')}
+              onClick={() => getAllUsers()}
             >
               Load All Users
             </Button>
           </div>
 
-          {/* Sample user card */}
-          <Card
-            interactive
-            elevation={Elevation.TWO}
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              padding: '16px 24px',
-              borderRadius: '8px',
-              boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
-            }}
-          >
-            <div>
-              <div style={{ fontWeight: 600, fontSize: '16px' }}>John Doe</div>
-              <div style={{ color: '#5C7080' }}>john.doe@example.com</div>
-            </div>
-            <Button small icon="more" minimal />
-          </Card>
+          {userList.map((u, idx) => (
+            <UserCard
+              key={idx}
+              email={u.email}
+              userData={u.userData}
+              subscriptionData={u.subscriptionData}
+            />
+          ))}
         </div>
 
       </div>
@@ -284,3 +309,5 @@ const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
 }
 
 export default AdminControl
+
+
