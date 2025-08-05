@@ -845,7 +845,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
           height: 'auto', // Adjust height to fit content
           maxHeight: '97vh',
           margin: 0,
-          borderRadius: 0,
+          borderRadius: 10,
         }}
       >
         <div
@@ -929,7 +929,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                     marginBottom: '12px',
                     fontSize: '1.2em'
                   }}>
-                    {plan === 'Starter' ? '$18/month' : '$100/month'}
+                    {plan === 'Starter' ? '$18/month' : '$25/month'}
                   </h3>
                   <div style={{
                     marginBottom: '12px',

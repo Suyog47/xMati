@@ -1,8 +1,7 @@
 import React, { FC, useState } from 'react'
-import { Dialog, Button, FormGroup, Spinner } from '@blueprintjs/core'
+import { Dialog, Button, FormGroup, Spinner, Card, Elevation } from '@blueprintjs/core'
 import api from '~/app/api'
 import ms from 'ms'
-
 
 interface Props {
   isOpen: boolean
@@ -14,64 +13,59 @@ const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
   const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
   const maintenanceStatus = JSON.parse(localStorage.getItem('maintenance') || '{}')
-  const [isDialogLoading, setDialogLoading] = useState(false) // Full dialog loader state
-  const [isMaintenanceActive, setMaintenanceActive] = useState(maintenanceStatus.status) // State for maintenance status
+  const [isDialogLoading, setDialogLoading] = useState(false)
+  const [isMaintenanceActive, setMaintenanceActive] = useState(maintenanceStatus.status)
 
   const toggleMaintenance = () => setMaintenanceActive(prev => !prev)
 
   const handleBackup = async () => {
-    setDialogLoading(true) // Show full dialog loader
+    setDialogLoading(true)
     try {
       const ids = savedFormData.botIdList
-      console.log('Bot IDs for backup:', ids)
       await api.getSecured({ timeout: ms('8m') }).post('/admin/workspace/bots/saveAllBots', { ids })
       alert('Backup to S3 completed successfully!')
     } catch (error) {
       console.error('Error during backup:', error)
       alert('Failed to backup to S3.')
     } finally {
-      setDialogLoading(false) // Hide full dialog loader
+      setDialogLoading(false)
     }
   }
 
   const handleRetrieval = async () => {
-    setDialogLoading(true) // Show full dialog loader
+    setDialogLoading(true)
     try {
       await api.getSecured({ timeout: ms('8m') }).post('/admin/workspace/bots/getAllBots')
       alert('Retrieval from S3 completed successfully!')
       setTimeout(() => {
-        window.location.reload()    // reloading for the bot creation limit check
+        window.location.reload()
       }, 500)
     } catch (error) {
       console.error('Error during retrieval:', error)
       alert('Failed to retrieve from S3.')
     } finally {
-      setDialogLoading(false) // Hide full dialog loader
+      setDialogLoading(false)
     }
   }
 
   const handleMaintenance = async () => {
-    setDialogLoading(true) // Show full dialog loader
+    setDialogLoading(true)
     try {
-      let response = await fetch(`${API_URL}/set-maintenance`, {
+      const response = await fetch(`${API_URL}/set-maintenance`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          status: !isMaintenanceActive,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: !isMaintenanceActive }),
       })
       const result = await response.json()
       if (result.status) {
-        toggleMaintenance() // Toggle maintenance status
+        toggleMaintenance()
         alert(`${result.msg}, ${!result.data ? 'active' : 'inactive'}`)
         localStorage.setItem('maintenance', JSON.stringify({ status: !isMaintenanceActive }))
       } else {
         alert(`Failed to toggle maintenance mode: ${result.msg}`)
       }
     } finally {
-      setDialogLoading(false) // Hide full dialog loader
+      setDialogLoading(false)
     }
   }
 
@@ -79,10 +73,20 @@ const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
     <Dialog
       isOpen={isOpen}
       onClose={toggle}
-      title="Admin Control"
-      canOutsideClickClose={false} // Disable outside click
+      title="Admin Control Panel"
+      canOutsideClickClose={false}
+      style={{
+        width: '98vw',
+        maxWidth: '100vw',
+        height: '95vh', // Adjust height to fit content
+        maxHeight: '97vh',
+        padding: 0,
+        borderTopLeftRadius: 10,
+        borderTopRightRadius: 10,
+        borderBottomLeftRadius: 10,
+        borderBottomRightRadius: 10,
+      }}
     >
-      {/* Full dialog loader overlay */}
       {isDialogLoading && (
         <div
           style={{
@@ -91,7 +95,7 @@ const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
             left: 0,
             width: '100%',
             height: '100%',
-            backgroundColor: 'rgba(255, 255, 255, 0.8)',
+            backgroundColor: 'rgba(255, 255, 255, 0.7)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -102,57 +106,178 @@ const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
         </div>
       )}
 
-      <div
-        className="bp4-dialog-body"
-        style={{
-          display: 'flex',
-          flexDirection: 'column', // Change to column for vertical alignment
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
-          <FormGroup label="Bot Backup to S3">
+      <div style={{ display: 'flex', height: '100%' }}>
+        {/* Left Panel - Admin Actions */}
+        <div
+          style={{
+            width: '30%',
+            padding: '24px',
+            paddingTop: 0,
+            borderRight: '1px solid #eee',
+            background: '#f9f9f9',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '18px',
+          }}
+        >
+          <h2 style={{ fontSize: '22px', marginBottom: '8px', fontWeight: 600 }}>Actions</h2>
+
+          {/* Backup */}
+          <Card elevation={Elevation.TWO}
+            style={{
+              padding: '20px',
+              paddingTop: '5px',
+              borderRadius: '10px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center'
+            }}>
+            <h4 style={{ marginBottom: '12px' }}>Backup Bots to S3</h4>
             <Button
+              large
+              fill
+              icon="cloud-upload"
               intent="primary"
               onClick={handleBackup}
-              disabled={isDialogLoading} // Disable button when dialog loader is active
-              style={{ width: '150px' }} // Increased button width
+              disabled={isDialogLoading}
+              style={{
+                height: '52px',
+                fontSize: '16px',
+                fontWeight: 600,
+                borderRadius: '8px',
+              }}
             >
-              Backup
+              Backup All Bots
             </Button>
-          </FormGroup>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '3px' }}>
-          <FormGroup label="Bot Retrieval from S3">
+          </Card>
+
+          {/* Retrieve */}
+          <Card elevation={Elevation.TWO}
+            style={{
+              padding: '20px',
+              paddingTop: '5px',
+              borderRadius: '10px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center'
+            }}>
+            <h4 style={{ marginBottom: '12px' }}>Restore Bots from S3</h4>
             <Button
+              large
+              fill
+              icon="cloud-download"
               intent="success"
               onClick={handleRetrieval}
-              disabled={isDialogLoading} // Disable button when dialog loader is active
-              style={{ width: '150px' }} // Increased button width
+              disabled={isDialogLoading}
+              style={{
+                height: '52px',
+                fontSize: '16px',
+                fontWeight: 600,
+                borderRadius: '8px',
+              }}
             >
-              Retrieve
+              Retrieve Bots
             </Button>
-          </FormGroup>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
-          <FormGroup label="Maintenance">
+          </Card>
+
+          {/* Maintenance */}
+          <Card elevation={Elevation.TWO}
+            style={{
+              padding: '20px',
+              paddingTop: '5px',
+              borderRadius: '10px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center'
+            }}>
+            <h4 style={{ marginBottom: '12px' }}>Toggle Maintenance Mode</h4>
             <Button
+              large
+              fill
+              icon="wrench"
               intent="warning"
               onClick={handleMaintenance}
-              disabled={isDialogLoading} // Disable button when dialog loader is active
-              style={{ width: '150px' }} // Increased button width
+              disabled={isDialogLoading}
+              style={{
+                height: '52px',
+                fontSize: '16px',
+                fontWeight: 600,
+                borderRadius: '8px',
+              }}
             >
-              Toggle Maintenance
+              {isMaintenanceActive ? 'Disable Maintenance' : 'Enable Maintenance'}
             </Button>
-          </FormGroup>
+
+            <div
+              style={{
+                marginTop: '12px',
+                textAlign: 'center',
+                fontWeight: 500,
+                color: isMaintenanceActive ? 'green' : 'red',
+              }}
+            >
+              Status: {isMaintenanceActive ? 'Active' : 'Inactive'}
+            </div>
+          </Card>
         </div>
-        <div style={{ marginTop: '16px', textAlign: 'center' }}>
-          <strong>Maintenance Status:</strong>{' '}
-          <span style={{ color: isMaintenanceActive ? 'green' : 'red' }}>
-            {isMaintenanceActive ? 'Active' : 'Inactive'}
-          </span>
+
+
+        {/* Right Panel - User Data */}
+        <div
+          style={{
+            flex: 1,
+            padding: '32px',
+            paddingTop: 10,
+            overflowY: 'auto',
+            backgroundColor: '#ffffff',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '24px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'space-between', gap: '16px', marginBottom: '10px' }}>
+            <h2 style={{ fontSize: '24px', fontWeight: 600, marginTop: 0 }}>
+              User Management
+            </h2>
+            <Button
+              icon="user"
+              large
+              intent="primary"
+              style={{
+                height: '40px',
+                fontSize: '15px',
+                fontWeight: 600,
+                borderRadius: '8px',
+                padding: '0 24px',
+                alignSelf: 'flex-start',
+              }}
+              onClick={() => alert('Fetching user list...')}
+            >
+              Load All Users
+            </Button>
+          </div>
+
+          {/* Sample user card */}
+          <Card
+            interactive
+            elevation={Elevation.TWO}
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '16px 24px',
+              borderRadius: '8px',
+              boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
+            }}
+          >
+            <div>
+              <div style={{ fontWeight: 600, fontSize: '16px' }}>John Doe</div>
+              <div style={{ color: '#5C7080' }}>john.doe@example.com</div>
+            </div>
+            <Button small icon="more" minimal />
+          </Card>
         </div>
+
       </div>
     </Dialog>
   )
