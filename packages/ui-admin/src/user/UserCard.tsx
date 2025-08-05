@@ -37,6 +37,33 @@ const UserCard: React.FC<UserCardProps> = ({ email, userData, subscriptionData }
   const handleOpenDialog = () => setIsDialogOpen(true)
   const handleCloseDialog = () => setIsDialogOpen(false)
 
+  function formatDate(dateStr: string) {
+    if (!dateStr || dateStr === '-') {
+      return '-'
+    }
+    const date = new Date(dateStr)
+    return isNaN(date.getTime())
+      ? dateStr
+      : date.toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      })
+  }
+
+  // Calculate isExpired by comparing only dates (ignoring time)
+  const getIsExpired = () => {
+    if (!subscriptionData.till) {
+      return false
+    }
+    const tillDate = new Date(subscriptionData.till)
+    tillDate.setHours(0, 0, 0, 0)
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    return tillDate < today
+  }
+  const isExpired = getIsExpired()
+
   return (
     <>
       <Card
@@ -52,27 +79,32 @@ const UserCard: React.FC<UserCardProps> = ({ email, userData, subscriptionData }
           backgroundColor: '#ffffff',
           boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
           position: 'relative',
-          border: `2px solid ${subscriptionData.isCancelled ? 'red' : 'green'}`,
-          cursor: 'pointer'
+          border: `2px solid ${isExpired ? 'red' : '#04A9E1'}`,
+          cursor: 'pointer',
         }}
       >
-        {subscriptionData.isCancelled !== undefined && (
-          <div
-            style={{
-              position: 'absolute',
-              top: '10px',
-              right: '10px',
-              backgroundColor: subscriptionData.isCancelled ? '#FFCDD2' : '#C8E6C9',
-              padding: '4px 8px',
-              borderRadius: '4px',
-              fontSize: '12px',
-              fontWeight: 'bold',
-              color: subscriptionData.isCancelled ? '#C62828' : '#2E7D32',
-            }}
-          >
-            {subscriptionData.isCancelled ? 'Cancelled' : 'Active'}
-          </div>
-        )}
+        {subscriptionData.till && (() => {
+          // We already calculated isExpired above, so just use it
+          return (
+            isExpired && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '10px',
+                  right: '10px',
+                  backgroundColor: '#FFE0B2',
+                  padding: '4px 8px',
+                  borderRadius: '4px',
+                  fontSize: '12px',
+                  fontWeight: 'bold',
+                  color: '#EF6C00',
+                }}
+              >
+                Expired Account
+              </div>
+            )
+          )
+        })()}
         <div style={{ fontSize: '18px', fontWeight: 600, color: '#182026' }}>
           <Icon icon="user" style={{ marginRight: '8px' }} />
           {userData.fullName}
@@ -101,65 +133,107 @@ const UserCard: React.FC<UserCardProps> = ({ email, userData, subscriptionData }
       <Dialog
         isOpen={isDialogOpen}
         onClose={handleCloseDialog}
-        title="User Details"
-        style={{ width: '400px' }}
+        title="User Overview"
+        style={{ width: '600px', height: 'auto', maxHeight: '95vh', overflowY: 'auto' }}
       >
-        <div style={{ padding: '20px' }}>
-          <h3>User Information</h3>
-          <p>
-            <strong>Full Name:</strong> {userData.fullName}
-          </p>
-          <p>
-            <strong>Email:</strong> {userData.email}
-          </p>
-          <p>
-            <strong>Phone Number:</strong> {userData.phoneNumber}
-          </p>
-          <p>
-            <strong>Organisation:</strong> {userData.organisationName}
-          </p>
-          <p>
-            <strong>Industry:</strong> {userData.industryType} | {userData.subIndustryType}
-          </p>
-          <p>
-            <strong>Card:</strong> {userData.stripeCustomerId}
-          </p>
-          <p>
-            <strong>Card Expiry:</strong> {userData.stripePayementId}
-          </p>
-          <p>
-            <strong>Number of Bots:</strong> {userData.numberOfBots}
-          </p>
-          <hr />
-          <h3>Subscription Details</h3>
-          <p>
-            <strong>Plan:</strong> {subscriptionData.subscription}
-          </p>
-          <p>
-            <strong>Created At:</strong> {new Date(subscriptionData.createdAt).toLocaleString()}
-          </p>
-          <p>
-            <strong>Valid Till:</strong> {new Date(subscriptionData.till).toLocaleString()}
-          </p>
-          <p>
-            <strong>Duration:</strong> {subscriptionData.duration}
-          </p>
-          <p>
-            <strong>Amount:</strong> {subscriptionData.amount}
-          </p>
-          {subscriptionData.isCancelled !== undefined && (
-            <p>
-              <strong>Status:</strong>{' '}
-              <span style={{ color: subscriptionData.isCancelled ? 'red' : 'green' }}>
-                {subscriptionData.isCancelled ? 'Cancelled' : 'Active'}
-              </span>
-            </p>
-          )}
-          <div style={{ textAlign: 'right', marginTop: '20px' }}>
-            <Button intent="primary" onClick={handleCloseDialog}>
-              Close
-            </Button>
+        <div style={{ padding: '24px' }}>
+          {/* User Information Section */}
+          <h3 style={{ borderBottom: '1px solid #eee', paddingBottom: '8px', marginBottom: '16px' }}>
+            👤 User Information
+          </h3>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 24px' }}>
+            <div>
+              <strong>Full Name:</strong>
+              <br />
+              {userData.fullName || 'N/A'}
+            </div>
+            <div>
+              <strong>Email:</strong>
+              <br />
+              {userData.email || 'N/A'}
+            </div>
+            <div>
+              <strong>Phone Number:</strong>
+              <br />
+              {userData.phoneNumber || 'N/A'}
+            </div>
+            <div>
+              <strong>Organisation:</strong>
+              <br />
+              {userData.organisationName || 'N/A'}
+            </div>
+            <div>
+              <strong>Industry:</strong>
+              <br />
+              {userData.industryType} | {userData.subIndustryType || 'N/A'}
+            </div>
+            <div>
+              <strong>No. of Bots:</strong>
+              <br />
+              {userData.numberOfBots ?? '0'}
+            </div>
+            <div>
+              <strong>Stripe Customer ID:</strong>
+              <br />
+              {userData.stripeCustomerId || 'N/A'}
+            </div>
+            <div>
+              <strong>Stripe Payment ID:</strong>
+              <br />
+              {userData.stripePayementId || 'N/A'}
+            </div>
           </div>
+
+          <hr style={{ margin: '32px 0', border: 'none', borderTop: '2px solid grey' }} />
+
+          {/* Subscription Section */}
+          <h3 style={{ borderBottom: '1px solid #eee', paddingBottom: '8px', margin: '32px 0 16px' }}>
+            💳 Subscription Details
+          </h3>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 24px' }}>
+            <div>
+              <strong>Plan:</strong>
+              <br />
+              {subscriptionData.subscription || 'N/A'}
+            </div>
+            <div>
+              <strong>Created At:</strong>
+              <br />
+              {subscriptionData.createdAt ? formatDate(subscriptionData.createdAt) : 'N/A'}
+            </div>
+            <div>
+              <strong>Valid Till:</strong>
+              <br />
+              {subscriptionData.till ? formatDate(subscriptionData.till) : 'N/A'}
+            </div>
+            <div>
+              <strong>Duration:</strong>
+              <br />
+              {subscriptionData.duration || 'N/A'}
+            </div>
+            <div>
+              <strong>Amount:</strong>
+              <br />
+              {subscriptionData.amount || 'N/A'}
+            </div>
+          </div>
+
+          {/* Cancellation Message */}
+          {subscriptionData.isCancelled && (
+            <div
+              style={{
+                marginTop: '24px',
+                padding: '12px',
+                backgroundColor: '#fef2f2',
+                color: '#b91c1c',
+                borderRadius: '6px',
+                fontWeight: 'bold',
+                textAlign: 'center',
+              }}
+            >
+              {userData.fullName} has cancelled the subscription.
+            </div>
+          )}
         </div>
       </Dialog>
     </>

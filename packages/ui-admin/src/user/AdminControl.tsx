@@ -37,7 +37,6 @@ const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
 
       if (result.success) {
         setUserList(result.data)
-        toast.success('User list fetched successfully!')
       } else {
         toast.failure(`Failed to fetch user list: ${result.message}`)
       }
@@ -114,8 +113,8 @@ const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
       style={{
         width: '98vw',
         maxWidth: '100vw',
-        height: '95vh', // Adjust height to fit content
-        maxHeight: '97vh',
+        height: '93vh',
+        maxHeight: '93vh',
         padding: 0,
         borderTopLeftRadius: 10,
         borderTopRightRadius: 10,
@@ -258,25 +257,24 @@ const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
         </div>
 
 
-        {/* Right Panel - User Data */}
+        {/* Right Panel - User List */}
         <div
           style={{
             flex: 1,
             padding: '32px',
             paddingTop: 10,
-            overflowY: 'auto',
             backgroundColor: '#ffffff',
             display: 'flex',
             flexDirection: 'column',
             gap: '24px',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'space-between', gap: '16px', marginBottom: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
             <h2 style={{ fontSize: '24px', fontWeight: 600, marginTop: 0 }}>
               User Management
             </h2>
             <Button
-              icon="user"
+              icon="refresh"
               large
               intent="primary"
               style={{
@@ -284,23 +282,23 @@ const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
                 fontSize: '15px',
                 fontWeight: 600,
                 borderRadius: '8px',
-                padding: '0 24px',
-                alignSelf: 'flex-start',
+                padding: '0 24px'
               }}
               onClick={() => getAllUsers()}
-            >
-              Load All Users
-            </Button>
+            />
           </div>
 
-          {userList.map((u, idx) => (
-            <UserCard
-              key={idx}
-              email={u.email}
-              userData={u.userData}
-              subscriptionData={u.subscriptionData}
-            />
-          ))}
+          {/* Scrollable User List */}
+          <div style={{ overflowY: 'auto', flex: 1 }}>
+            {userList.map((u, idx) => (
+              <UserCard
+                key={idx}
+                email={u.email}
+                userData={u.userData}
+                subscriptionData={u.subscriptionData}
+              />
+            ))}
+          </div>
         </div>
 
       </div>
