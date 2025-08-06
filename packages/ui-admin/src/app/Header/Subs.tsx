@@ -82,7 +82,7 @@ export const Subs = () => {
             color: '#856404',
           }}
         >
-          {days === 0 ? 'Your subscription expires today.' : `Your subscription expires in ${days} day${days > 1 && 's'}.`}
+          {days === 0 ? 'Your subscription expires today.' : `Your subscription expires in ${days} day${(days > 1) ? 's' : ''}.`}
         </div>
       )
     } else if (days !== '-' && days < 0) {

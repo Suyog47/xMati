@@ -38,12 +38,13 @@ interface Errors {
   cardNumber?: string
   cardCVC?: string
   cardExpiry?: string
+  otp?: string  // <-- added for OTP validation
 }
-
 
 const CustomerWizard: React.FC = () => {
   const steps = [
     'Personal Info',
+    'Email verification',
     'Industry Type',
     'Subscriptions',
     'Payment'
@@ -115,6 +116,11 @@ const CustomerWizard: React.FC = () => {
   const [selectedPlan, setSelectedPlan] = useState<string>('Starter')
   const [selectedDuration, setSelectedDuration] = useState<string>('monthly')
   const [price, setPrice] = useState(18)
+  // New state variables for OTP
+  const [generatedOTP, setGeneratedOTP] = useState<string>('')
+  const [enteredOTP, setEnteredOTP] = useState<string>('')
+  const [otpVerified, setOtpVerified] = useState<boolean>(false) // New state variable
+
   const togglePasswordVisibility = () => {
     setShowPassword(prevState => !prevState)
   }
@@ -194,45 +200,15 @@ const CustomerWizard: React.FC = () => {
     }
   }
 
-  // const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const rawValue = e.target.value.replace(/-/g, '').replace(/\D/g, '') // Remove '-' and non-digit characters
-  //   const formattedValue = rawValue
-  //     .match(/.{1,4}/g) // Group digits in chunks of 4
-  //     ?.join('-') || '' // Join with '-' if there are groups
-
-  //   setFormData({
-  //     ...formData,
-  //     cardNumber: formattedValue,
-  //   })
-
-  //   if (errors.cardNumber) {
-  //     setErrors({
-  //       ...errors,
-  //       cardNumber: '',
-  //     })
-  //   }
-  // }
-
-  // const handleExpiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const rawValue = e.target.value.replace(/\D/g, '') // Remove non-digit characters
-  //   let formattedValue = rawValue
-
-  //   if (rawValue.length > 2) {
-  //     formattedValue = `${rawValue.slice(0, 2)}/${rawValue.slice(2, 4)}` // Add '/' after the first 2 digits
-  //   }
-
-  //   setFormData({
-  //     ...formData,
-  //     cardExpiry: formattedValue,
-  //   })
-
-  //   if (errors.cardExpiry) {
-  //     setErrors({
-  //       ...errors,
-  //       cardExpiry: '',
-  //     })
-  //   }
-  // }
+  const handleOTPVerification = () => {
+    if (enteredOTP.trim() === generatedOTP) {
+      setOtpVerified(true)
+      setErrors((prevErrors) => ({ ...prevErrors, otp: '' }))
+    } else {
+      setOtpVerified(false)
+      setErrors((prevErrors) => ({ ...prevErrors, otp: 'Invalid OTP. Please try again' }))
+    }
+  }
 
   const validateStep = async (): Promise<boolean> => {
     const newErrors: Errors = {}
@@ -248,11 +224,11 @@ const CustomerWizard: React.FC = () => {
       } else {
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
         if (!emailRegex.test(formData.email.trim())) {
-          newErrors.email = newErrors.email = 'Please enter valid email id'
+          newErrors.email = 'Please enter valid email id'
         }
 
         if (await checkUser()) {
-          newErrors.email = newErrors.email = 'This email already exists, please try another one'
+          newErrors.email = 'This email already exists, please try another one'
         }
       }
       if (!formData.phoneNumber.trim()) {
@@ -260,7 +236,7 @@ const CustomerWizard: React.FC = () => {
       } else {
         const phoneRegex = /^(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?$/
         if (!phoneRegex.test(formData.phoneNumber.trim())) {
-          newErrors.phoneNumber = newErrors.phoneNumber = 'Please enter valid phone number with no special characters or spaces'
+          newErrors.phoneNumber = 'Please enter valid phone number with no special characters or spaces'
         }
       }
       if (!formData.password || !formData.password.trim()) {
@@ -268,7 +244,7 @@ const CustomerWizard: React.FC = () => {
       } else {
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,16}$/
         if (!passwordRegex.test(formData.password.trim())) {
-          newErrors.password = newErrors.password = 'Password must be 8-16 character with 1 uppercase, 1 lowercase, 1 number & 1 special character'
+          newErrors.password = 'Password must be 8-16 character with 1 uppercase, 1 lowercase, 1 number & 1 special character'
         }
       }
       if (!formData.organisationName.trim()) {
@@ -276,9 +252,15 @@ const CustomerWizard: React.FC = () => {
       } else if (formData.organisationName.trim().length > 50) {
         newErrors.organisationName = 'Organization Name cannot exceed 50 characters'
       }
-
-
     } else if (step === 2) {
+      if (!enteredOTP.trim()) {
+        newErrors.otp = 'OTP is required'
+      } else if (enteredOTP.trim().length !== 6) {
+        newErrors.otp = 'OTP must be 6 digits'
+      } else if (!otpVerified) {
+        newErrors.otp = 'Please verify OTP'
+      }
+    } else if (step === 3) {
       if (!formData.industryType.trim()) {
         newErrors.industryType = 'Industry Type is required'
       }
@@ -292,7 +274,22 @@ const CustomerWizard: React.FC = () => {
   }
 
   const nextStep = async () => {
+    // For step 2: if OTP not verified, show an alert and do not proceed
+    if (step === 2 && !otpVerified) {
+      console.log('alert called')
+      alert('Please verify the otp')
+      return
+    }
+
     if (await validateStep()) {
+      if (step === 1) {
+        setOtpVerified(false) // Reset OTP verification state
+        // Generate a random 6-digit OTP and save it
+        const otp = Math.floor(100000 + Math.random() * 900000).toString()
+        setGeneratedOTP(otp)
+        console.log('Generated OTP:', otp)
+      }
+
       setStep(step + 1)
     }
   }
@@ -408,22 +405,6 @@ const CustomerWizard: React.FC = () => {
         return { success: false, msg: 'Card Element not available' }
       }
 
-      // const { paymentMethod, error } = await stripe.createPaymentMethod({
-      //   type: 'card',
-      //   card: cardElement,
-      //   billing_details: { email: formData.email }
-      // })
-
-      // if (error) {
-      //   return { success: false, msg: 'Error with card ' + error.message }
-      // }
-
-      // if (!paymentMethod) {
-      //   return { success: false, msg: 'Error creating payment method' }
-      // }
-
-
-      // 1. Create SetupIntent on your backend
       const setupIntentRes = await fetch(`${API_URL}/create-setup-intent`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -432,7 +413,6 @@ const CustomerWizard: React.FC = () => {
 
       const { clientSecret, customerId } = await setupIntentRes.json()
 
-      // 2. Confirm card setup (handles 3D Secure if needed)
       const res = await stripe.confirmCardSetup(clientSecret, {
         payment_method: {
           card: cardElement,
@@ -557,7 +537,7 @@ const CustomerWizard: React.FC = () => {
     const cardElement = elements.getElement(CardElement)
     if (!cardElement) {
       setIsValidatingCard(false)
-      setCardErrorMessage('Card Element is not available.')
+      setCardErrorMessage('Card Element not available.')
       return
     }
 
@@ -760,8 +740,65 @@ const CustomerWizard: React.FC = () => {
             </>
           )}
 
-
           {step === 2 && (
+            <>
+              <div className='step'>
+                <p className='stepHeader'>Email Verification</p>
+                <p className='stepDescription'>
+                  A 6-digit OTP has been generated and sent to {formData.email}. Please enter it below to verify your email.
+                </p>
+                <div className='input-container otp-input-container'>
+                  <input
+                    type='text'
+                    name='otp'
+                    placeholder='Enter OTP'
+                    value={enteredOTP}
+                    onChange={(e) => {
+                      setEnteredOTP(e.target.value)
+                      if (errors.otp) {
+                        setErrors({ ...errors, otp: '' })
+                      }
+                      setOtpVerified(false) // Reset verification if OTP changes
+                    }}
+                    disabled={otpVerified}
+                    className='custom-input'
+                    maxLength={6}
+                    style={{ fontSize: '2em', textAlign: 'center', letterSpacing: '0.5em', padding: '10px' }}
+                  />
+                </div>
+                {errors.otp && <span className='error'>{errors.otp}</span>}
+                <div style={{ marginTop: '10px', textAlign: 'center' }}>
+                  <button onClick={handleOTPVerification}
+                    disabled={otpVerified}
+                    style={{
+                      padding: '8px 16px',
+                      backgroundColor: '#28a745',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                    }}>
+                    Verify OTP
+                  </button>
+                </div>
+                {otpVerified && (
+                  <p style={{ marginTop: '10px', color: 'green', textAlign: 'center' }}>
+                    OTP Verified!
+                  </p>
+                )}
+              </div>
+              <div className='button-container'>
+                <div className='buttons'>
+                  <button onClick={prevStep}>Back</button>
+                  <button onClick={nextStep}>
+                    Next
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+
+          {step === 3 && (
             <>
               <div className='step'>
                 <p className='stepHeader'>Industry Type</p>
@@ -815,7 +852,7 @@ const CustomerWizard: React.FC = () => {
             </>
           )}
 
-          {step === 3 && (
+          {step === 4 && (
             <>
               <div
                 style={{
@@ -847,9 +884,7 @@ const CustomerWizard: React.FC = () => {
                     }}
                   >
                     {['Starter', 'Professional'].map((plan) => {
-                      // calculate base price for the plan
                       const basePrice = plan === 'Starter' ? 18 : 25
-                      // calculate the monthly price after discount
                       const monthlyPrice =
                         selectedDuration === 'monthly'
                           ? basePrice
@@ -863,8 +898,7 @@ const CustomerWizard: React.FC = () => {
                           style={{
                             flex: 1,
                             margin: '0 10px',
-                            border: `2px solid ${selectedPlan === plan ? '#2196f3' : '#e0e0e0'
-                              }`,
+                            border: `2px solid ${selectedPlan === plan ? '#2196f3' : '#e0e0e0'}`,
                             borderRadius: '8px',
                             padding: '20px',
                             cursor: 'pointer',
@@ -966,7 +1000,6 @@ const CustomerWizard: React.FC = () => {
                     </p>
                   </div>
 
-                  {/* Computed Price Display (moved below the two sections) */}
                   <div style={{ marginTop: '20px', textAlign: 'center' }}>
                     <p style={{ fontSize: '1.1em', fontWeight: 'bold', color: '#333' }}>
                       Price after 30-day free trial: ${price}
@@ -983,7 +1016,7 @@ const CustomerWizard: React.FC = () => {
             </>
           )}
 
-          {step === 4 && (
+          {step === 5 && (
             <>
               <div className='step'>
                 <p className='stepHeader'>Payment Information</p>
@@ -1024,20 +1057,16 @@ const CustomerWizard: React.FC = () => {
                     </button>
                   </FormGroup>
 
-                  {/* Success Message */}
                   {cardValidated && (
                     <div className='success-message'>
                       <img
-                        src='https://cdn-icons-png.flaticon.com/512/845/845646.png' // Tick icon URL
+                        src='https://cdn-icons-png.flaticon.com/512/845/845646.png'
                         alt='Success'
                         className='success-icon'
                       />
                       <span>Your card has been successfully verified.</span>
                     </div>
                   )}
-
-                  {/* Error Message */}
-                  {/* {errorMessage && <span className='error'>{errorMessage}</span>} */}
                 </div>
               </div>
 
@@ -1065,7 +1094,7 @@ const CustomerWizard: React.FC = () => {
                       {isValidatingCard ? (
                         <>
                           <div className='loader'></div>
-                          <p>You card is being validated... Please wait...</p>
+                          <p>Your card is being validated... Please wait...</p>
                         </>
                       ) : (
                         <>
@@ -1082,7 +1111,7 @@ const CustomerWizard: React.FC = () => {
 
         </div>
       </div>
-    </div>
+    </div >
   )
 }
 
