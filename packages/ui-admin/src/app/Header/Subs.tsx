@@ -323,7 +323,7 @@ export const Subs = () => {
           </div> */}
 
           {/* Trial Plan Notification */}
-          {subscription === 'Trial' && savedFormData.nextSubs && (
+          {subscription === 'Trial' && !savedSubData.expired && savedFormData.nextSubs && (
             <div
               style={{
                 marginBottom: 5,

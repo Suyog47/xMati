@@ -582,7 +582,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
 
 
         <div style={{ padding: '0 10px 10px' }}>
-          <form onSubmit={(savedSubData.subscription === 'Trial') ? handleUpgradeNow : handleSubmit}>
+          <form onSubmit={(savedSubData.subscription === 'Trial' && !savedSubData.expired) ? handleUpgradeNow : handleSubmit}>
 
             {/* Radio Buttons for Half-yearly and Yearly Options */}
             <div style={{ marginTop: '20px', textAlign: 'center' }}>
@@ -670,7 +670,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                   alignSelf: 'center',
                 }}
               >
-                {isProcessing ? 'Processing...' : (savedSubData.subscription === 'Trial') ? 'Update' : 'Proceed to Pay'}
+                {isProcessing ? 'Processing...' : (savedSubData.subscription === 'Trial' && !savedSubData.expired) ? 'Update' : 'Proceed to Pay'}
               </Button>
             </div>
 
@@ -879,7 +879,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
               {subscription && expiryTill && (
                 <p style={{ margin: '0' }}>
                   Your current subscription plan is <strong><u>{subscription}</u></strong>, valid till <strong><u>{expiryTill}</u></strong>.
-                  {subscription === 'Trial' && (
+                  {subscription === 'Trial' && !savedSubData.expired && (
                     savedFormData.nextSubs ? (
                       <> You opted for <strong><u>{savedFormData.nextSubs.plan}</u></strong> plan on a <strong><u>{savedFormData.nextSubs.duration}</u></strong> basis after Trial, which you can change anytime.</>
                     ) : (
@@ -891,7 +891,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
             </div>
 
             <h1 style={{ marginBottom: '5px', fontSize: '1.2em' }}>
-              {(subscription === 'Trial')
+              {(subscription === 'Trial' && !savedSubData.expired)
                 ? 'Choose Your Subscription Plan'
                 : 'Change Your Subscription Plan'}
             </h1>
@@ -992,8 +992,6 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                 </div>
               ))}
             </div>
-
-            {/* {(subscription === 'Trial' || savedSubData.expired === true) && (<br />)} */}
 
             <div
               style={{
