@@ -296,6 +296,7 @@ const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
                 email={u.email}
                 userData={u.userData}
                 subscriptionData={u.subscriptionData}
+                botsData={u.botsData}
               />
             ))}
           </div>
