@@ -120,6 +120,10 @@ const CustomerWizard: React.FC = () => {
   const [generatedOTP, setGeneratedOTP] = useState<string>('')
   const [enteredOTP, setEnteredOTP] = useState<string>('')
   const [otpVerified, setOtpVerified] = useState<boolean>(false) // New state variable
+  // New state variables for OTP loaders
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState<boolean>(false)
+  const [isResendingOtp, setIsResendingOtp] = useState<boolean>(false)
+  const [otpResentMessage, setOtpResentMessage] = useState<string>('')
 
   const togglePasswordVisibility = () => {
     setShowPassword(prevState => !prevState)
@@ -200,14 +204,18 @@ const CustomerWizard: React.FC = () => {
     }
   }
 
-  const handleOTPVerification = () => {
+  const handleOTPVerification = async () => {
+    setIsVerifyingOtp(true)
+    // Simulate async verification process if needed
     if (enteredOTP.trim() === generatedOTP) {
       setOtpVerified(true)
+      setOtpResentMessage('')
       setErrors((prevErrors) => ({ ...prevErrors, otp: '' }))
     } else {
       setOtpVerified(false)
       setErrors((prevErrors) => ({ ...prevErrors, otp: 'Invalid OTP. Please try again' }))
     }
+    setIsVerifyingOtp(false)
   }
 
   const validateStep = async (): Promise<boolean> => {
@@ -276,18 +284,15 @@ const CustomerWizard: React.FC = () => {
   const nextStep = async () => {
     // For step 2: if OTP not verified, show an alert and do not proceed
     if (step === 2 && !otpVerified) {
-      console.log('alert called')
       alert('Please verify the otp')
       return
     }
 
     if (await validateStep()) {
       if (step === 1) {
+        setEnteredOTP('')
+        setOtpResentMessage('') // Reset OTP resend message
         setOtpVerified(false) // Reset OTP verification state
-        // Generate a random 6-digit OTP and save it
-        const otp = Math.floor(100000 + Math.random() * 900000).toString()
-        setGeneratedOTP(otp)
-        console.log('Generated OTP:', otp)
       }
 
       setStep(step + 1)
@@ -459,13 +464,14 @@ const CustomerWizard: React.FC = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email: formData.email,
+          email: formData.email
         }),
       })
 
       if (result.status === 200) {
         return true // Email already registered
       } else if (result.status === 400) {
+        void sendOtp()
         return false // Email available to register
       } else {
         return false // Something went wrong
@@ -474,6 +480,37 @@ const CustomerWizard: React.FC = () => {
       return false
     } finally {
       setIsLoading(false) // Hide big loader
+    }
+  }
+
+  // Send an otp to the user's email
+  const sendOtp = async (resent = false) => {
+    setIsResendingOtp(true)
+    try {
+      // Generate a random 6-digit OTP and save it
+      const otp = Math.floor(100000 + Math.random() * 900000).toString()
+      setGeneratedOTP(otp)
+      await fetch(`${API_URL}/send-email-otp`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fullName: formData.fullName,
+          email: formData.email,
+          otp
+        }),
+      })
+
+
+      if (resent) {
+        // Set OTP resend notification
+        setOtpResentMessage('OTP has been resent successfully')
+      }
+    } catch (error) {
+      console.log('Error sending OTP:', error)
+    } finally {
+      setIsResendingOtp(false)
     }
   }
 
@@ -766,10 +803,15 @@ const CustomerWizard: React.FC = () => {
                     style={{ fontSize: '2em', textAlign: 'center', letterSpacing: '0.5em', padding: '10px' }}
                   />
                 </div>
-                {errors.otp && <span className='error'>{errors.otp}</span>}
-                <div style={{ marginTop: '10px', textAlign: 'center' }}>
-                  <button onClick={handleOTPVerification}
-                    disabled={otpVerified}
+                {errors.otp && (
+                  <p style={{ marginTop: '10px', color: 'red', textAlign: 'center' }}>
+                    {errors.otp}
+                  </p>
+                )}
+                <div style={{ marginTop: '10px', textAlign: 'center', display: 'flex', gap: '10px', justifyContent: 'center' }}>
+                  <button
+                    onClick={handleOTPVerification}
+                    disabled={otpVerified || isVerifyingOtp}
                     style={{
                       padding: '8px 16px',
                       backgroundColor: '#28a745',
@@ -777,13 +819,41 @@ const CustomerWizard: React.FC = () => {
                       border: 'none',
                       borderRadius: '4px',
                       cursor: 'pointer',
-                    }}>
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}
+                  >
+                    {isVerifyingOtp && <div className='small-loader'></div>}
                     Verify OTP
+                  </button>
+                  <button
+                    onClick={() => sendOtp(true)}
+                    disabled={otpVerified || isResendingOtp}
+                    style={{
+                      padding: '8px 16px',
+                      backgroundColor: '#ffc107',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}
+                  >
+                    {isResendingOtp && <div className='small-loader'></div>}
+                    Resend OTP
                   </button>
                 </div>
                 {otpVerified && (
                   <p style={{ marginTop: '10px', color: 'green', textAlign: 'center' }}>
                     OTP Verified!
+                  </p>
+                )}
+                {otpResentMessage && (
+                  <p style={{ marginTop: '10px', color: '#007bff', textAlign: 'center' }}>
+                    {otpResentMessage}
                   </p>
                 )}
               </div>
