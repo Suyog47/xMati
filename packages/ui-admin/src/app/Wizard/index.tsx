@@ -808,44 +808,46 @@ const CustomerWizard: React.FC = () => {
                     {errors.otp}
                   </p>
                 )}
-                <div style={{ marginTop: '10px', textAlign: 'center', display: 'flex', gap: '10px', justifyContent: 'center' }}>
-                  <button
-                    onClick={handleOTPVerification}
-                    disabled={otpVerified || isVerifyingOtp}
-                    style={{
-                      padding: '8px 16px',
-                      backgroundColor: '#28a745',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px'
-                    }}
-                  >
-                    {isVerifyingOtp && <div className='small-loader'></div>}
-                    Verify OTP
-                  </button>
-                  <button
-                    onClick={() => sendOtp(true)}
-                    disabled={otpVerified || isResendingOtp}
-                    style={{
-                      padding: '8px 16px',
-                      backgroundColor: '#ffc107',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px'
-                    }}
-                  >
-                    {isResendingOtp && <div className='small-loader'></div>}
-                    Resend OTP
-                  </button>
-                </div>
+                {!otpVerified && (
+                  <div style={{ marginTop: '10px', textAlign: 'center', display: 'flex', gap: '10px', justifyContent: 'center' }}>
+                    <button
+                      onClick={handleOTPVerification}
+                      disabled={otpVerified || isVerifyingOtp}
+                      style={{
+                        padding: '8px 16px',
+                        backgroundColor: '#28a745',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                      }}
+                    >
+                      {isVerifyingOtp && <div className='small-loader'></div>}
+                      Verify OTP
+                    </button>
+                    <button
+                      onClick={() => sendOtp(true)}
+                      disabled={otpVerified || isResendingOtp}
+                      style={{
+                        padding: '8px 16px',
+                        backgroundColor: '#ffc107',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                      }}
+                    >
+                      {isResendingOtp && <div className='small-loader'></div>}
+                      Resend OTP
+                    </button>
+                  </div>
+                )}
                 {otpVerified && (
                   <p style={{ marginTop: '10px', color: 'green', textAlign: 'center' }}>
                     OTP Verified!
@@ -980,7 +982,7 @@ const CustomerWizard: React.FC = () => {
                             {plan}
                           </h3>
                           <h4 style={{ margin: '0 0 10px 0', fontSize: '1.1em', color: '#555' }}>
-                            ${monthlyPrice}/month
+                            ${monthlyPrice}/month &nbsp;&nbsp; <span style={{ fontSize: '0.8em', color: '#666' }}> (Introductory price)</span>
                           </h4>
                           <p style={{ margin: '0 0 5px 0', fontSize: '0.95em', color: '#777' }}>
                             {plan === 'Starter' ? '3 bots included' : '5 bots included'}

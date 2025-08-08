@@ -929,7 +929,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                     marginBottom: '12px',
                     fontSize: '1.2em'
                   }}>
-                    {plan === 'Starter' ? '$18/month' : '$25/month'}
+                    {plan === 'Starter' ? '$18/month' : '$25/month'} &nbsp;&nbsp; <span style={{ fontSize: '0.75em', color: '#666' }}>(Introductory price)</span>
                   </h3>
                   <div style={{
                     marginBottom: '12px',

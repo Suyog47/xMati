@@ -38,11 +38,11 @@ export const Subs = () => {
 
   // Returns a status badge with a color according to the subscription state.
   const renderStatusBadge = () => {
-    if (isCancelled || expired) {
+    if (isCancelled) {
       return <Tag intent="danger" round>Cancelled</Tag>
     } else if (days !== '-' && days < 5 && days >= 0) {
       return <Tag intent="warning" round>Expiring Soon</Tag>
-    } else if (days !== '-' && days < 0) {
+    } else if (expired) {
       return <Tag intent="danger" round>Expired</Tag>
     } else {
       return <Tag intent="success" round>Active</Tag>
