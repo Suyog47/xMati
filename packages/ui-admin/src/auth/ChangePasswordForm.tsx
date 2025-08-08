@@ -86,6 +86,7 @@ export const ChangePasswordForm: FC<Props> = props => {
         },
         body: JSON.stringify({
           email: email.trim(),
+          from: 'forgot-pass',
         }),
       })
 

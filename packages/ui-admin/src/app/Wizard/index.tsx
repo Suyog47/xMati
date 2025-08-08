@@ -45,7 +45,7 @@ const CustomerWizard: React.FC = () => {
   const steps = [
     'Personal Info',
     'Email verification',
-    'Industry Type',
+    'Company Info',
     'Subscriptions',
     'Payment'
   ]
@@ -234,10 +234,6 @@ const CustomerWizard: React.FC = () => {
         if (!emailRegex.test(formData.email.trim())) {
           newErrors.email = 'Please enter valid email id'
         }
-
-        if (await checkUser()) {
-          newErrors.email = 'This email already exists, please try another one'
-        }
       }
       if (!formData.phoneNumber.trim()) {
         newErrors.phoneNumber = 'Phone Number is required'
@@ -255,10 +251,12 @@ const CustomerWizard: React.FC = () => {
           newErrors.password = 'Password must be 8-16 character with 1 uppercase, 1 lowercase, 1 number & 1 special character'
         }
       }
-      if (!formData.organisationName.trim()) {
-        newErrors.organisationName = 'Organisation Name is required'
-      } else if (formData.organisationName.trim().length > 50) {
-        newErrors.organisationName = 'Organization Name cannot exceed 50 characters'
+
+      // Call checkUser only if no other errors exist
+      if (Object.keys(newErrors).length === 0) {
+        if (await checkUser()) {
+          newErrors.email = 'This email already exists, please try another one'
+        }
       }
     } else if (step === 2) {
       if (!enteredOTP.trim()) {
@@ -269,6 +267,12 @@ const CustomerWizard: React.FC = () => {
         newErrors.otp = 'Please verify OTP'
       }
     } else if (step === 3) {
+      if (!formData.organisationName.trim()) {
+        newErrors.organisationName = 'Organisation Name is required'
+      } else if (formData.organisationName.trim().length > 50) {
+        newErrors.organisationName = 'Organization Name cannot exceed 50 characters'
+      }
+
       if (!formData.industryType.trim()) {
         newErrors.industryType = 'Industry Type is required'
       }
@@ -464,7 +468,8 @@ const CustomerWizard: React.FC = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email: formData.email
+          email: formData.email,
+          from: 'register'
         }),
       })
 
@@ -608,9 +613,42 @@ const CustomerWizard: React.FC = () => {
       width: '100%',
       minHeight: '100vh',
     }}>
-      <div className='wizard-header-container'>
+      <div
+        className='wizard-header-container'
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '10px 20px',
+          whiteSpace: 'nowrap'
+        }}
+      >
         <img src={logo} alt='logo' className='wizard-header-logo' />
-        <h3 style={{ textAlign: 'center', width: '100%', color: 'white' }}>Register Wizard</h3>
+        <h3 style={{
+          flex: 1,
+          textAlign: 'center',
+          color: 'white',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap'
+        }}>
+          Register Wizard
+        </h3>
+        <button
+          onClick={() => history.push('/login/:strategy?/:workspace?')}
+          style={{
+            marginLeft: '10px',
+            padding: '8px 8px',
+            background: '#fff',
+            color: '#333',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontWeight: 600
+          }}
+        >
+          Back to Login
+        </button>
       </div>
       <div className='wizard-container'>
         <div className='stepper'>
@@ -643,6 +681,7 @@ const CustomerWizard: React.FC = () => {
           </div>
         </div>
         <div className='wizard-body'>
+
           {step === 1 && (
             <>
               <div className='step'>
@@ -735,21 +774,6 @@ const CustomerWizard: React.FC = () => {
                 </div>
                 {errors.password && <span className='error'>{errors.password}</span>}
 
-                <div className='input-container'>
-                  <IoMdBusiness className='input-icon' />
-                  <input
-                    type='text'
-                    name='organisationName'
-                    placeholder='Organisation Name'
-                    value={formData.organisationName}
-                    onChange={handleChange}
-                    className='custom-input'
-                  />
-                </div>
-                {errors.organisationName && (
-                  <span className='error'>{errors.organisationName}</span>
-                )}
-
               </div>
               <div className='button-container'>
                 <button className='nextButton' onClick={nextStep} disabled={isLoading}>
@@ -825,7 +849,7 @@ const CustomerWizard: React.FC = () => {
                         gap: '8px'
                       }}
                     >
-                      {isVerifyingOtp && <div className='small-loader'></div>}
+                      {isVerifyingOtp && <div className='small-loader' style={{ background: 'black' }}></div>}
                       Verify OTP
                     </button>
                     <button
@@ -843,7 +867,7 @@ const CustomerWizard: React.FC = () => {
                         gap: '8px'
                       }}
                     >
-                      {isResendingOtp && <div className='small-loader'></div>}
+                      {isResendingOtp && <div className='small-loader' style={{ background: 'black' }}></div>}
                       Resend OTP
                     </button>
                   </div>
@@ -873,6 +897,23 @@ const CustomerWizard: React.FC = () => {
           {step === 3 && (
             <>
               <div className='step'>
+
+                <p className='stepHeader'>Organization Name</p>
+                <div className='input-container'>
+                  <IoMdBusiness className='input-icon' />
+                  <input
+                    type='text'
+                    name='organisationName'
+                    placeholder='Organisation Name'
+                    value={formData.organisationName}
+                    onChange={handleChange}
+                    className='custom-input'
+                  />
+                </div>
+                {errors.organisationName && (
+                  <span className='error'>{errors.organisationName}</span>
+                )}
+
                 <p className='stepHeader'>Industry Type</p>
                 <div className='selectbox-container'>
                   <select
