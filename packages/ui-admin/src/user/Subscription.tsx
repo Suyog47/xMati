@@ -257,6 +257,154 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       })()
     }, [stripe, amount])
 
+    function calculateUpgradeAmount(startDate, expiryDate, subs, currentAmount, newAmount,) {
+      try {
+        const currentDate = new Date()
+        const start = new Date(formatToISODate(startDate))
+        const expiry = new Date(formatToISODate(expiryDate))
+
+        // Validate dates
+        if (isNaN(start.getTime()) || isNaN(expiry.getTime())) {
+          throw new Error('Invalid date format')
+        }
+
+        // Total number of months in the subscription
+        let totalMonths = getMonthDifference(start, expiry)
+
+        // Find current cycle number (0-based)
+        let currentCycleStart = new Date(start)
+        let cycleNumber = 0
+
+        while (currentCycleStart <= currentDate) {
+          const nextCycleStart = new Date(currentCycleStart)
+          nextCycleStart.setMonth(nextCycleStart.getMonth() + 1)
+
+          if (currentDate < nextCycleStart) {
+            break
+          }
+          currentCycleStart = nextCycleStart
+          cycleNumber++
+        }
+
+        // Calculate current cycle end
+        const tentativeCycleEnd = new Date(currentCycleStart)
+        tentativeCycleEnd.setMonth(tentativeCycleEnd.getMonth() + 1)
+        const currentCycleEnd = tentativeCycleEnd > expiry ? expiry : tentativeCycleEnd
+
+        // Calculate remaining days
+        const msInDay = 1000 * 60 * 60 * 24
+        const totalCycleDays = Math.ceil((currentCycleEnd.getTime() - currentCycleStart.getTime()) / msInDay)
+
+        // Calculate remaining full months
+        const usedMonth = cycleNumber
+        console.log('Total month used:', usedMonth)
+
+        // Calculate refund
+        const monthlyAmount = (subs === 'Professional') ? 25 : 18
+        const usedAmount = usedMonth * monthlyAmount
+        console.log('Total Amount for months:', usedAmount)
+        console.log(' ')
+
+        // Calculate the days used so far in the current cycle
+        const daysUsed = Math.ceil((currentDate.getTime() - currentCycleStart.getTime()) / msInDay)
+        const dailyAmount = (monthlyAmount / totalCycleDays).toFixed(2)
+        console.log('Total days used:', daysUsed)
+        console.log('per day cost:', dailyAmount)
+
+        const amountUsedInDays = (parseFloat(dailyAmount) * daysUsed)
+        console.log(`Total Amount for ${daysUsed} days:`, amountUsedInDays.toFixed(2))
+
+        console.log(' ')
+        const remainingAmount = (usedAmount + amountUsedInDays).toFixed(2)
+        const numericRemainingAmount = parseFloat(remainingAmount)
+        const totalUsedAmount = Math.max(0, (numericRemainingAmount === Infinity) ? newAmount : numericRemainingAmount)
+        console.log('Total amount used:', totalUsedAmount)
+
+        const totalLeftAmount = Math.max(0, currentAmount - totalUsedAmount).toFixed(2)
+        console.log('Total amount left:', totalLeftAmount)
+
+        const numericTotalLeftAmount = typeof totalLeftAmount === 'string' ? parseFloat(totalLeftAmount) : totalLeftAmount
+        const amountToChargeRefund = (Number(newAmount) - numericTotalLeftAmount).toFixed(2)
+
+        return {
+          status: true,
+          refund: (parseFloat(amountToChargeRefund) < 0) ? true : false,
+          amount: Math.abs(parseFloat(amountToChargeRefund)),
+        }
+      } catch (error) {
+        console.error('Error calculating refund details:', error.message)
+        return { status: false, message: 'Failed to calculate refund details', error: error.message }
+      }
+    }
+
+    function calculateDowngradeDetails(startDate, expiryDate, subs, currentAmount, newAmount) {
+      try {
+        const currentDate = new Date()
+        const start = new Date(formatToISODate(startDate))
+        const expiry = new Date(formatToISODate(expiryDate))
+
+        // Validate dates
+        if (isNaN(start.getTime()) || isNaN(expiry.getTime())) {
+          throw new Error('Invalid date format')
+        }
+
+        // Total number of months in the subscription
+        let totalMonths = getMonthDifference(start, expiry)
+
+        // Find current cycle number (0-based)
+        let currentCycleStart = new Date(start)
+        let cycleNumber = 0
+
+        while (currentCycleStart <= currentDate) {
+          const nextCycleStart = new Date(currentCycleStart)
+          nextCycleStart.setMonth(nextCycleStart.getMonth() + 1)
+
+          if (currentDate < nextCycleStart) {
+            break
+          }
+          currentCycleStart = nextCycleStart
+          cycleNumber++
+        }
+
+        // Calculate current cycle end
+        const tentativeCycleEnd = new Date(currentCycleStart)
+        tentativeCycleEnd.setMonth(tentativeCycleEnd.getMonth() + 1)
+        const currentCycleEnd = tentativeCycleEnd > expiry ? expiry : tentativeCycleEnd
+
+        // Calculate remaining full months
+        const usedMonth = cycleNumber + 1 // 0-based cycle number, so add 1 for used months
+        const remainingMonths = totalMonths - usedMonth
+        console.log('Total month used:', usedMonth)
+
+        // Calculate refund
+        const monthlyAmount = (subs === 'Professional') ? 25 : 18
+        const usedAmount = usedMonth * monthlyAmount
+        console.log(`Total Amount used for ${usedMonth} months:`, usedAmount)
+        console.log(' ')
+
+        // Calculate remaining days
+        const msInDay = 1000 * 60 * 60 * 24
+        const daysRemaining = Math.ceil((currentCycleEnd.getTime() - currentDate.getTime()) / msInDay)
+        console.log('Days remaining for this month:', daysRemaining)
+
+        const remainingAmount = currentAmount - usedAmount
+        const totalLeftAmount = Math.max(0, remainingAmount)
+        console.log('Total amount left:', totalLeftAmount)
+        console.log(' ')
+
+        const amountToChargeRefund = (newAmount - totalLeftAmount).toFixed(2)
+
+        return {
+          status: true,
+          refund: (parseFloat(amountToChargeRefund) < 0) ? true : false,
+          amount: Math.abs(parseFloat(amountToChargeRefund)),
+        }
+      } catch (error) {
+        console.error('Error calculating refund details:', error.message)
+        return { status: false, message: 'Failed to calculate refund details', error: error.message }
+      }
+    }
+
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault()
 
@@ -779,12 +927,13 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       const msInDay = 1000 * 60 * 60 * 24
       const daysRemaining = Math.ceil((currentCycleEnd.getTime() - currentDate.getTime()) / msInDay)
 
+
       // Calculate remaining full months
       const usedMonth = cycleNumber + 1 // 0-based cycle number, so add 1 for used months
       const remainingMonths = totalMonths - usedMonth
 
       // Calculate refund
-      const monthlyAmount = (subs === 'Professional') ? 100 : 18
+      const monthlyAmount = (subs === 'Professional') ? 25 : 18
       const usedAmount = usedMonth * monthlyAmount
 
       const remainingAmount = totalAmount - usedAmount
@@ -1247,6 +1396,60 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         icon="dollar"
         canOutsideClickClose={false}
       >
+        {/* Upgrade/Downgrade Info */}
+        {(() => {
+          const durationOrder: { [key: string]: number } = {
+            'monthly': 1,
+            'half-yearly': 2,
+            'yearly': 3,
+          }
+
+          // Only show for non-Trial subscriptions
+          if (subscription !== 'Trial') {
+            const currentPlan = savedSubData.subscription
+            const newPlan = selectedTab
+            let upgradeType = ''
+
+            // Check for upgrade
+            if (currentPlan === 'Starter' && newPlan === 'Professional') {
+              upgradeType = 'upgrade'
+            }
+            if (durationOrder[selectedDuration] > durationOrder[savedSubData.duration]) {
+              upgradeType = 'upgrade'
+            }
+
+            if (currentPlan === 'Professional' && newPlan === 'Starter') {
+              upgradeType = 'downgrade'
+            }
+
+            // If not, check if the new duration is "bigger" than the current one.
+            if (durationOrder[selectedDuration] < durationOrder[savedSubData.duration]) {
+              upgradeType = 'downgrade'
+            }
+
+            if (upgradeType) {
+              return (
+                <div style={{
+                  marginBottom: 16,
+                  padding: '10px 16px',
+                  alignItems: 'center',
+                  background: upgradeType === 'upgrade' ? '#e3fcef' : '#fff3e0',
+                  color: upgradeType === 'upgrade' ? '#137cbd' : '#d9822b',
+                  borderRadius: 6,
+                  fontWeight: 500,
+                  fontSize: 16,
+                }}>
+                  {upgradeType === 'upgrade'
+                    ? 'You are upgrading your subscription plan.'
+                    : 'You are downgrading your subscription plan.'}
+                </div>
+              )
+            }
+          }
+          return null
+        })()}
+
+
         {/* Payment Section */}
         <div style={{ borderTop: '1px solid #e0e0e0', paddingTop: '10px' }}>
           {isLoadingSecret && (
