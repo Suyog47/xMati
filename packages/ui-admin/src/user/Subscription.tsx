@@ -43,6 +43,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   interface CalculatedData {
     status: boolean
     refund: boolean
+    action: 'upgrade' | 'downgrade'
     totalMonths?: number
     usedMonth?: number
     usedAmount: number
@@ -91,7 +92,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         : Math.round(2500 * 12 * 0.85)   // Professional: 15% discount for yearly
     }
 
-    if (subscription !== 'Trial') {
+    if (subscription !== 'Trial' && !savedSubData.expired) {
       const durationOrder: { [key: string]: number } = {
         monthly: 1,
         'half-yearly': 2,
@@ -379,7 +380,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         status: true,
         action: 'upgrade',
         refund: (parseFloat(amountToChargeRefund) < 0) ? true : false,
-        totalMonths: usedMonth,
+        usedMonth,
         usedAmount,
         daysUsed,
         dailyAmount,
@@ -642,303 +643,302 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
 
     return (
       <>
-        {/* Fullscreen loader while payment is processing */}
+        {/* Fullscreen loader */}
         {isProcessing && (
-          <div
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              width: '100vw',
-              height: '100vh',
-              background: 'rgba(255,255,255,0.85)',
-              zIndex: 99999,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-
-            {/* Simple CSS spinner */}
-            <div
-              style={{
-                border: '8px solid #f3f3f3',
-                borderTop: '8px solid #106ba3',
-                borderRadius: '50%',
-                width: 60,
-                height: 60,
-                animation: 'spin 1s linear infinite',
-                marginBottom: 24,
-              }}
-            />
+          <div style={{
+            position: 'fixed', top: 0, left: 0,
+            width: '100vw', height: '100vh',
+            background: 'rgba(255,255,255,0.85)',
+            zIndex: 99999, display: 'flex',
+            flexDirection: 'column', alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <div style={{
+              border: '8px solid #f3f3f3',
+              borderTop: '8px solid #106ba3',
+              borderRadius: '50%', width: 60, height: 60,
+              animation: 'spin 1s linear infinite',
+              marginBottom: 24
+            }} />
             <style>
-              {`
-                @keyframes spin {
-                  0% { transform: rotate(0deg); }
-                  100% { transform: rotate(360deg); }
-                }
-              `}
+              {'@keyframes spin {0% {transform: rotate(0deg);} 100% {transform: rotate(360deg);}}'}
             </style>
             <div style={{ fontSize: 20, color: '#106ba3', fontWeight: 600 }}>
-              {(savedSubData.subscription === 'Trial') ? 'Your Subscription is getting updated...' : 'Your payment is being processed...'}
+              {savedSubData.subscription === 'Trial'
+                ? 'Your Subscription is getting updated...'
+                : 'Your payment is being processed...'}
             </div>
           </div>
         )}
 
-        {cardData && (
-          <div style={{
-            background: cardData.brand.toUpperCase() === 'VISA'
-              ? 'linear-gradient(135deg, #ff9900, #ff5e62)'
-              : cardData.brand.toUpperCase() === 'MASTERCARD'
-                ? 'linear-gradient(135deg, #f7971e, #ffd200)'
-                : 'linear-gradient(135deg, #4361ee, #3a0ca3)',
-            borderRadius: '12px',
-            margin: '0 auto 20px auto',
-            padding: '16px',
-            color: '#fff',
+        {/* Main container */}
+        <div
+          style={{
             display: 'flex',
-            flexDirection: 'column',
-            height: '190px',
-            width: '330px', // Fixed width
-            boxShadow: '0 8px 16px rgba(0,0,0,0.15)',
-            position: 'relative',
-            overflow: 'hidden',
-            fontFamily: "'Source Sans Pro', sans-serif"
+            gap: '24px',
+            alignItems: 'flex-start',
+            flexWrap: 'nowrap', // Ensure left and right columns stay side by side
+            justifyContent: 'space-between', // Add spacing between columns
+            marginTop: '20px',
+          }}
+        >
+          {/* LEFT COLUMN */}
+          <div style={{
+            flex: '1 1 380px',
+            background: '#fff',
+            borderRadius: '8px',
+            padding: '20px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
           }}>
-            {/* Glossy overlay effect */}
-            <div style={{
-              position: 'absolute',
-              top: '-50%',
-              right: '-50%',
-              width: '200%',
-              height: '200%',
-              background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 60%)',
-              transform: 'rotate(20deg)'
-            }} />
-
-            {/* Top section with brand and chip */}
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              marginBottom: '20px'
-            }}>
+            {cardData && (
               <div style={{
-                background: 'rgba(255, 255, 255, 0.2)',
-                borderRadius: '4px',
-                padding: '6px 10px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
+                background: cardData.brand.toUpperCase() === 'VISA'
+                  ? 'linear-gradient(135deg, #ff9900, #ff5e62)'
+                  : cardData.brand.toUpperCase() === 'MASTERCARD'
+                    ? 'linear-gradient(135deg, #f7971e, #ffd200)'
+                    : 'linear-gradient(135deg, #4361ee, #3a0ca3)',
+                borderRadius: '12px',
+                margin: '0 auto 20px auto',
+                padding: '16px',
+                color: '#fff',
+                height: '190px', width: '330px',
+                boxShadow: '0 8px 16px rgba(0,0,0,0.15)',
+                position: 'relative',
+                overflow: 'hidden',
+                fontFamily: "'Source Sans Pro', sans-serif"
               }}>
                 <div style={{
-                  fontSize: '10px',
-                  fontWeight: 'bold',
-                  letterSpacing: '1px',
-                  opacity: 0.8,
-                  textAlign: 'center',
+                  position: 'absolute', top: '-50%', right: '-50%',
+                  width: '200%', height: '200%',
+                  background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%)',
+                  transform: 'rotate(20deg)'
+                }} />
+                <div style={{
+                  display: 'flex', justifyContent: 'space-between',
+                  marginBottom: '20px'
                 }}>
-                  {cardData.funding.toUpperCase()}
+                  <div style={{
+                    background: 'rgba(255, 255, 255, 0.2)',
+                    borderRadius: '4px', padding: '6px 10px'
+                  }}>
+                    <div style={{
+                      fontSize: '10px', fontWeight: 'bold',
+                      letterSpacing: '1px', opacity: 0.8
+                    }}>
+                      {cardData.funding.toUpperCase()}
+                    </div>
+                  </div>
+                  <div style={{
+                    fontSize: '24px', fontWeight: 'bold',
+                    textTransform: 'uppercase', fontStyle: 'italic',
+                    textShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                  }}>
+                    {cardData.brand}
+                  </div>
+                </div>
+                <div style={{
+                  fontSize: '20px', letterSpacing: '3px',
+                  marginBottom: '20px',
+                  textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}>
+                  •••• •••• •••• {cardData.last4}
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <div>
+                    <div style={{ fontSize: '10px', opacity: 0.8 }}>USER</div>
+                    <div style={{
+                      fontSize: '12px', textTransform: 'uppercase',
+                      letterSpacing: '1px'
+                    }}>
+                      {savedFormData.fullName || 'YOUR NAME'}
+                    </div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: '10px', opacity: 0.8 }}>EXPIRES</div>
+                    <div style={{ fontSize: '16px' }}>
+                      {String(cardData.exp_month).padStart(2, '0')}/{String(cardData.exp_year).slice(-2)}
+                    </div>
+                  </div>
                 </div>
               </div>
+            )}
+
+            {/* Subscription Options */}
+            <form
+              onSubmit={(savedSubData.subscription === 'Trial' && !savedSubData.expired) ? handleUpgradeNow : handleSubmit}
+            >
+              <h4 style={{ textAlign: 'center', marginBottom: '10px' }}>Select Subscription Duration</h4>
               <div style={{
-                fontSize: '24px',
-                fontWeight: 'bold',
-                textTransform: 'uppercase',
-                fontStyle: 'italic',
-                textShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                display: 'flex', justifyContent: 'center',
+                gap: '40px', flexWrap: 'wrap'
               }}>
-                {cardData.brand}
-              </div>
-            </div>
-
-            {/* Card number section */}
-            <div style={{
-              fontSize: '20px',
-              letterSpacing: '3px',
-              marginBottom: '20px',
-              textShadow: '0 2px 4px rgba(0,0,0,0.3)',
-              flexGrow: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <span>•••• •••• •••• {cardData.last4}</span>
-            </div>
-
-            {/* Bottom section */}
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'flex-end'
-            }}>
-              <div>
-                <div style={{
-                  fontSize: '10px',
-                  opacity: 0.8,
-                  marginBottom: '4px'
-                }}>
-                  USER
-                </div>
-                <div style={{
-                  fontSize: '12px',
-                  textTransform: 'uppercase',
-                  letterSpacing: '1px'
-                }}>
-                  {savedFormData.fullName || 'YOUR NAME'}
-                </div>
+                {[
+                  { value: 'monthly', label: 'Monthly' },
+                  { value: 'half-yearly', label: 'Half-yearly', discount: '5% discount' },
+                  { value: 'yearly', label: 'Yearly', discount: '15% discount' }
+                ].map(opt => (
+                  <label key={opt.value} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px' }}>
+                    <input
+                      type="radio" name="subscriptionDuration"
+                      value={opt.value}
+                      checked={selectedDuration === opt.value}
+                      disabled={isProcessing}
+                      onChange={() => setSelectedDuration(selectedDuration === opt.value ? '' : opt.value)}
+                    />
+                    <span>{opt.label}</span>
+                    {opt.discount && <small style={{ fontSize: '0.85em', fontWeight: 'bold', color: 'green' }}>({opt.discount})</small>}
+                  </label>
+                ))}
               </div>
 
-              <div style={{ textAlign: 'right' }}>
-                <div style={{
-                  fontSize: '10px',
-                  opacity: 0.8,
-                  marginBottom: '4px'
-                }}>
-                  EXPIRES
-                </div>
-                <div style={{ fontSize: '16px' }}>
-                  {String(cardData.exp_month).padStart(2, '0')}/{String(cardData.exp_year).slice(-2)}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+              {error && <div style={{ color: 'red', margin: '7px 0', textAlign: 'center' }}>{error}</div>}
 
-        {/* Divider */}
-        <div style={{
-          borderTop: '1px solid #e0e0e0',
-          margin: '20px 0',
-        }}></div>
-
-
-        <div style={{ padding: '0 10px 10px' }}>
-          <form onSubmit={(savedSubData.subscription === 'Trial' && !savedSubData.expired) ? handleUpgradeNow : handleSubmit}>
-
-            {/* Radio Buttons for Half-yearly and Yearly Options */}
-            <div style={{ marginTop: '20px', textAlign: 'center' }}>
-              <h4>Select Subscription Duration</h4>
-              <div style={{ display: 'flex', justifyContent: 'center', gap: '40px', flexWrap: 'wrap' }}>
-                <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px' }}>
-                  <input
-                    type="radio"
-                    name="subscriptionDuration"
-                    value="monthly"
-                    checked={selectedDuration === 'monthly'}
-                    disabled={isProcessing} // Disable radio buttons when processing
-                    onChange={() =>
-                      setSelectedDuration(selectedDuration === 'monthly' ? '' : 'monthly')
-                    }
-                  />
-                  <span>Monthly</span>
-                </label>
-                <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px' }}>
-                  <input
-                    type="radio"
-                    name="subscriptionDuration"
-                    value="half-yearly"
-                    checked={selectedDuration === 'half-yearly'}
-                    disabled={isProcessing} // Disable radio buttons when processing
-                    onChange={() =>
-                      setSelectedDuration(selectedDuration === 'half-yearly' ? '' : 'half-yearly')
-                    }
-                  />
-                  <span>Half-yearly</span>
-                  <small style={{ fontSize: '0.85em', fontWeight: 'bold', color: 'green' }}>(5% discount)</small>
-                </label>
-                <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px' }}>
-                  <input
-                    type="radio"
-                    name="subscriptionDuration"
-                    value="yearly"
-                    checked={selectedDuration === 'yearly'}
-                    disabled={isProcessing} // Disable radio buttons when processing
-                    onChange={() =>
-                      setSelectedDuration(selectedDuration === 'yearly' ? '' : 'yearly')
-                    }
-                  />
-                  <span>Yearly</span>
-                  <small style={{ fontSize: '0.85em', fontWeight: 'bold', color: 'green' }}>(15% discount)</small>
-                </label>
-              </div>
-            </div>
-
-            {error && <div style={{ color: 'red', margin: '7px 0' }}>{error}</div>}
-
-            {/* Button Section */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '20px' }}>
-              {/* Amount Display */}
-              <div
-                style={{
-                  fontSize: '1.5em',
-                  fontWeight: 'bold',
-                  color: '#106ba3',
-                  marginBottom: '10px',
-                  textAlign: 'center',
-                }}
-              >
-                Amount:- ${<u>{amount / 100}</u>}{'  '}
-                {selectedDuration === 'monthly'
+              {/* Amount */}
+              <div style={{
+                fontSize: '1.5em', fontWeight: 'bold',
+                color: '#106ba3', margin: '20px 0 10px',
+                textAlign: 'center'
+              }}>
+                {calculatedData?.refund ? 'Refund Amount: ' : ' Pay Amount: '} ${<u>{amount / 100}</u>}{' '}
+                {(selectedDuration === 'monthly')
                   ? 'per month'
                   : selectedDuration === 'half-yearly'
-                    ? ` ($${((amount / 6) / 100).toFixed(2)}/month )`
-                    : ` ($${((amount / 12) / 100).toFixed(2)}/month )`}
+                    ? `($${((amount / 6) / 100).toFixed(2)}/month)`
+                    : `($${((amount / 12) / 100).toFixed(2)}/month)`}
               </div>
 
               {/* Payment Button */}
-              <Button
-                type="submit"
-                intent="primary"
-                disabled={!stripe || isProcessing}
-                loading={isProcessing}
-                fill
-                style={{
-                  height: '52px',
-                  minWidth: '200px',
-                  maxWidth: '230px',
-                  fontSize: '1.08em',
-                  borderRadius: 6,
-                  alignSelf: 'center',
-                }}
-              >
-                {isProcessing ? 'Processing...' : (savedSubData.subscription === 'Trial' && !savedSubData.expired) ? 'Update' : 'Proceed to Pay'}
-              </Button>
-            </div>
+              {(subscription !== 'Trial' && !savedSubData.expired) && (
+                <Button
+                  type="submit"
+                  intent="primary"
+                  disabled={!stripe || isProcessing}
+                  loading={isProcessing}
+                  fill
+                  style={{
+                    height: '52px',
+                    minWidth: '200px',
+                    maxWidth: '230px',
+                    fontSize: '1.08em',
+                    borderRadius: 6,
+                    margin: '20px auto 0',
+                    display: 'flex',
+                    alignItems: 'center', // Vertically center text
+                    justifyContent: 'center', // Horizontally center text
+                    textAlign: 'center', // Center-align text
+                  }}
+                >
+                  {isProcessing
+                    ? 'Processing...'
+                    : calculatedData?.refund
+                      ? 'Refund and Proceed'
+                      : 'Proceed to Pay'}
+                </Button>
+              )}
 
-            <p
-              style={{
+              <p style={{
                 marginTop: '15px',
                 fontSize: '0.95em',
                 color: '#555',
                 textAlign: 'center',
-                lineHeight: '1.4',
-              }}
-            >
-              Once a plan has been purchased, the subscription will auto-renew based on the selected duration.
-            </p>
-            {/* <FormGroup label="Credit/Debit Card Details">
-              <CardElement
-                options={{
-                  style: {
-                    base: { fontSize: '16px', color: '#424770' },
-                    invalid: { color: '#9e2146' },
-                  },
-                  hidePostalCode: true,
-                }}
-              />
-            </FormGroup> */}
+                lineHeight: '1.4'
+              }}>
+                Once a plan has been purchased, the subscription will auto-renew based on the selected duration.
+              </p>
+            </form>
+          </div>
 
-            {/* Apple/Google Pay Section
-          {paymentRequest && (
-            <div style={{ marginTop: 30 }}>
-              <PaymentRequestButtonElement options={{ paymentRequest }} />
+          {/* RIGHT COLUMN — Calculations */}
+          {(calculatedData && (calculatedData.action === 'upgrade' || calculatedData.action === 'downgrade')) && (
+            <div style={{
+              flex: '1 1 340px',
+              background: '#fff',
+              borderRadius: '10px',
+              padding: '20px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+              border: '1px solid #e8e8e8'
+            }}>
+              <h3 style={{
+                marginBottom: '12px',
+                fontSize: '1.2em',
+                color: calculatedData.action === 'upgrade' ? '#106ba3' : '#d97706'
+              }}>
+                {calculatedData.action === 'upgrade' ? 'Plan Upgrade Cost Breakdown' : 'Plan Downgrade Adjustment'}
+              </h3>
+
+              {/* Step 1: Current Plan Info */}
+              <div style={{ marginBottom: '14px' }}>
+                <strong>Current Plan:</strong> {subscription}
+                <br />
+                <strong>Duration:</strong> {savedSubData.duration || 'N/A'}
+              </div>
+
+              {/* Step 2: Usage Summary */}
+              <div style={{ marginBottom: '14px' }}>
+                <h4 style={{ marginBottom: '6px', fontSize: '1.05em', color: '#444' }}>Usage So Far</h4>
+                <ul style={{ paddingLeft: '18px', margin: 0, color: '#555' }}>
+                  <li>Amount you have paid initially: <strong>{savedSubData.amount}</strong></li>
+                  <li>Total months used: <strong>{calculatedData.usedMonth}</strong></li>
+                  <li>Amount per month (discount excluded): <strong>${subscription === 'Starter' ? '18' : '25'}</strong></li>
+                  <li>Amount used so far: <strong>${calculatedData.usedAmount}</strong></li>
+                  {calculatedData.daysUsed !== undefined && (
+                    <li>Days used in current billing cycle: <strong>{calculatedData.daysUsed}</strong></li>
+                  )}
+                  {calculatedData.dailyAmount !== undefined && (
+                    <li>Daily rate: <strong>${calculatedData.dailyAmount}</strong></li>
+                  )}
+                  {calculatedData.amountUsedInDays !== undefined && (
+                    <li>Cost for days used: <strong>${calculatedData.amountUsedInDays}</strong></li>
+                  )}
+                </ul>
+              </div>
+
+              {/* Step 3: Remaining Credit / Additional Charge */}
+              <div style={{ marginBottom: '14px' }}>
+                <h4 style={{ marginBottom: '6px', fontSize: '1.05em', color: '#444' }}>Remaining Value</h4>
+                <ul style={{ paddingLeft: '18px', margin: 0, color: '#555' }}>
+                  <li>Total unused amount ({`${savedSubData.amount} - ${(amount / 100)}`}):  <strong>${calculatedData.totalLeftAmount}</strong></li>
+                  {calculatedData.action === 'downgrade' && (
+                    <>
+                      <li>Plan will remain active until: <strong>
+                        {new Date(new Date().setDate(new Date().getDate() + (calculatedData.daysRemaining ?? 0)))
+                          .toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                      </strong></li>
+                      <li>New plan starts in <strong>{calculatedData.daysRemaining} days</strong></li>
+                    </>
+                  )}
+                </ul>
+              </div>
+
+              {/* Step 4: Final Amount */}
+              <div style={{
+                marginTop: '20px',
+                paddingTop: '12px',
+                borderTop: '2px solid #eee'
+              }}>
+                <div style={{
+                  display: 'flex', justifyContent: 'space-between',
+                  fontSize: '1.1em', fontWeight: 'bold'
+                }}>
+                  <span>{calculatedData.refund ? 'Refund Amount:' : 'Amount to Pay:'}</span>
+                  <span style={{
+                    color: calculatedData.refund ? 'green' : '#106ba3'
+                  }}>
+                    ${calculatedData.amount}
+                  </span>
+                </div>
+                {calculatedData.refund
+                  ? <p style={{ fontSize: '0.9em', color: '#444', marginTop: '6px' }}>This amount will be credited back to your payment method.</p>
+                  : <p style={{ fontSize: '0.9em', color: '#444', marginTop: '6px' }}>This amount will be charged to your selected payment method.</p>}
+              </div>
             </div>
-          )} */}
+          )}
 
-          </form>
         </div>
       </>
     )
+
   }, [clientSecret, amount, cardData, toggle])
 
 
@@ -1478,10 +1478,11 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         title="Payment"
         icon="dollar"
         canOutsideClickClose={false}
+        style={{ width: '60vw', maxWidth: '90vw' }}
       >
 
         {/* Payment Section */}
-        <div style={{ borderTop: '1px solid #e0e0e0', paddingTop: '10px' }}>
+        <div style={{ borderTop: '1px solid #e0e0e0', paddingLeft: '15px', paddingRight: '12px', paddingTop: '12px' }}>
           {isLoadingSecret && (
             <div style={{ padding: '25px', textAlign: 'center', fontWeight: 'bold' }}>
               Loading payment details...
