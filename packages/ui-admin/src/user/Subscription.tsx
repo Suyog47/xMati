@@ -10,8 +10,6 @@ import { loadStripe, PaymentRequest } from '@stripe/stripe-js'
 import { Dialog, Button, FormGroup, Icon, Spinner } from '@blueprintjs/core'
 import BasicAuthentication from '~/auth/basicAuth'
 import { toast } from 'botpress/shared'
-import { set } from 'lodash'
-import { applyMiddleware } from 'redux'
 
 interface Props {
   isOpen: boolean
@@ -26,6 +24,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   let savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
   let savedSubData = JSON.parse(localStorage.getItem('subData') || '{}')
 
+  const [actualAmount, setActualAmount] = useState<any>(null)
   const [clientSecret, setClientSecret] = useState<string>('')
   const [transactions, setTransactions] = useState<any[]>([])
   const [selectedTab, setSelectedTab] = useState<string>('Starter')
@@ -39,6 +38,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false)
   const [isCancelProcessing, setIsCancelProcessing] = useState(false)
   const [selectedDuration, setSelectedDuration] = useState<string>('monthly')
+
 
   interface CalculatedData {
     status: boolean
@@ -86,13 +86,14 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         ? Math.round(1800 * 6 * 0.95)    // Starter: 5% discount for half-yearly
         : Math.round(2500 * 6 * 0.95)    // Professional: 5% discount for half-yearly
     } else if (selectedDuration === 'yearly') {
-      console.log('yearly')
       price = selectedTab === 'Starter'
         ? Math.round(1800 * 12 * 0.85)   // Starter: 15% discount for yearly
         : Math.round(2500 * 12 * 0.85)   // Professional: 15% discount for yearly
     }
 
-    if (subscription !== 'Trial' && !savedSubData.expired) {
+    setActualAmount(price / 100)
+
+    if (subscription !== 'Trial' && !savedSubData.expired && !savedSubData.isCancelled) {
       const durationOrder: { [key: string]: number } = {
         monthly: 1,
         'half-yearly': 2,
@@ -148,7 +149,6 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       }
 
       if (data) {
-        console.log('Calculated Data:', data)
         setCalculatedData(data) // Update state here
         price = (data.amount) * 100 // Convert to cents for Stripe
       }
@@ -157,7 +157,6 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   }, [selectedTab, selectedDuration])
 
   const getClientSecret = useCallback(async () => {
-    console.log('Fetching client secret for payment intent...', amount)
     setIsLoadingSecret(true)
     setPaymentError('')
     try {
@@ -675,89 +674,131 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         <div
           style={{
             display: 'flex',
-            gap: '24px',
+            gap: '16px',
             alignItems: 'flex-start',
             flexWrap: 'nowrap', // Ensure left and right columns stay side by side
             justifyContent: 'space-between', // Add spacing between columns
-            marginTop: '20px',
+            marginTop: '10px',
           }}
         >
           {/* LEFT COLUMN */}
-          <div style={{
-            flex: '1 1 380px',
-            background: '#fff',
-            borderRadius: '8px',
-            padding: '20px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
-          }}>
+          <div
+            style={{
+              flex: '1 1 380px',
+              background: '#fff',
+              borderRadius: '8px',
+              padding: '20px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+            }}
+          >
             {cardData && (
-              <div style={{
-                background: cardData.brand.toUpperCase() === 'VISA'
-                  ? 'linear-gradient(135deg, #ff9900, #ff5e62)'
-                  : cardData.brand.toUpperCase() === 'MASTERCARD'
-                    ? 'linear-gradient(135deg, #f7971e, #ffd200)'
-                    : 'linear-gradient(135deg, #4361ee, #3a0ca3)',
-                borderRadius: '12px',
-                margin: '0 auto 20px auto',
-                padding: '16px',
-                color: '#fff',
-                height: '190px', width: '330px',
-                boxShadow: '0 8px 16px rgba(0,0,0,0.15)',
-                position: 'relative',
-                overflow: 'hidden',
-                fontFamily: "'Source Sans Pro', sans-serif"
-              }}>
-                <div style={{
-                  position: 'absolute', top: '-50%', right: '-50%',
-                  width: '200%', height: '200%',
-                  background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%)',
-                  transform: 'rotate(20deg)'
-                }} />
-                <div style={{
-                  display: 'flex', justifyContent: 'space-between',
-                  marginBottom: '20px'
-                }}>
-                  <div style={{
-                    background: 'rgba(255, 255, 255, 0.2)',
-                    borderRadius: '4px', padding: '6px 10px'
-                  }}>
-                    <div style={{
-                      fontSize: '10px', fontWeight: 'bold',
-                      letterSpacing: '1px', opacity: 0.8
-                    }}>
+              <div
+                style={{
+                  background:
+                    cardData.brand.toUpperCase() === 'VISA'
+                      ? 'linear-gradient(135deg, #ff9900, #ff5e62)'
+                      : cardData.brand.toUpperCase() === 'MASTERCARD'
+                        ? 'linear-gradient(135deg, #f7971e, #ffd200)'
+                        : 'linear-gradient(135deg, #4361ee, #3a0ca3)',
+                  borderRadius: '12px',
+                  margin: '0 auto 20px auto',
+                  padding: '16px',
+                  color: '#fff',
+                  height: '180px',
+                  width: '330px',
+                  boxShadow: '0 8px 16px rgba(0,0,0,0.15)',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  fontFamily: "'Source Sans Pro', sans-serif",
+                }}
+              >
+                {/* Decorative Glow */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '-50%',
+                    right: '-50%',
+                    width: '200%',
+                    height: '200%',
+                    background:
+                      'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%)',
+                    transform: 'rotate(20deg)',
+                  }}
+                />
+
+                {/* Card Header */}
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    marginBottom: '20px',
+                  }}
+                >
+                  <div
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.2)',
+                      borderRadius: '4px',
+                      padding: '6px 10px',
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: '10px',
+                        fontWeight: 'bold',
+                        letterSpacing: '1px',
+                        opacity: 0.8,
+                      }}
+                    >
                       {cardData.funding.toUpperCase()}
                     </div>
                   </div>
-                  <div style={{
-                    fontSize: '24px', fontWeight: 'bold',
-                    textTransform: 'uppercase', fontStyle: 'italic',
-                    textShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                  }}>
+                  <div
+                    style={{
+                      fontSize: '24px',
+                      fontWeight: 'bold',
+                      textTransform: 'uppercase',
+                      fontStyle: 'italic',
+                      textShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                    }}
+                  >
                     {cardData.brand}
                   </div>
                 </div>
-                <div style={{
-                  fontSize: '20px', letterSpacing: '3px',
-                  marginBottom: '20px',
-                  textShadow: '0 2px 4px rgba(0,0,0,0.3)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center'
-                }}>
+
+                {/* Card Number */}
+                <div
+                  style={{
+                    fontSize: '20px',
+                    letterSpacing: '3px',
+                    marginBottom: '20px',
+                    textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
                   •••• •••• •••• {cardData.last4}
                 </div>
+
+                {/* Card Footer */}
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <div>
                     <div style={{ fontSize: '10px', opacity: 0.8 }}>USER</div>
-                    <div style={{
-                      fontSize: '12px', textTransform: 'uppercase',
-                      letterSpacing: '1px'
-                    }}>
+                    <div
+                      style={{
+                        fontSize: '12px',
+                        textTransform: 'uppercase',
+                        letterSpacing: '1px',
+                      }}
+                    >
                       {savedFormData.fullName || 'YOUR NAME'}
                     </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <div style={{ fontSize: '10px', opacity: 0.8 }}>EXPIRES</div>
                     <div style={{ fontSize: '16px' }}>
-                      {String(cardData.exp_month).padStart(2, '0')}/{String(cardData.exp_year).slice(-2)}
+                      {String(cardData.exp_month).padStart(2, '0')}/
+                      {String(cardData.exp_year).slice(-2)}
                     </div>
                   </div>
                 </div>
@@ -766,91 +807,182 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
 
             {/* Subscription Options */}
             <form
-              onSubmit={(savedSubData.subscription === 'Trial' && !savedSubData.expired) ? handleUpgradeNow : handleSubmit}
+              onSubmit={
+                savedSubData.subscription === 'Trial' && !savedSubData.expired && !savedSubData.isCancelled
+                  ? handleUpgradeNow
+                  : handleSubmit
+              }
             >
-              <h4 style={{ textAlign: 'center', marginBottom: '10px' }}>Select Subscription Duration</h4>
-              <div style={{
-                display: 'flex', justifyContent: 'center',
-                gap: '40px', flexWrap: 'wrap'
-              }}>
+
+              <h4 style={{ textAlign: 'center', marginBottom: '12px', fontWeight: 600 }}>
+                Choose Your plan billing duration
+              </h4>
+              <p
+                style={{
+                  fontSize: '0.9em',
+                  color: '#555',
+                  textAlign: 'center',
+                  marginBottom: '16px',
+                  lineHeight: '1.4',
+                }}
+              >
+                Select the duration that best suits your needs. Discounts are applied
+                automatically for longer commitments.
+              </p>
+
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  gap: '40px',
+                  flexWrap: 'wrap',
+                }}
+              >
                 {[
                   { value: 'monthly', label: 'Monthly' },
                   { value: 'half-yearly', label: 'Half-yearly', discount: '5% discount' },
-                  { value: 'yearly', label: 'Yearly', discount: '15% discount' }
-                ].map(opt => (
-                  <label key={opt.value} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px' }}>
+                  { value: 'yearly', label: 'Yearly', discount: '15% discount' },
+                ].map((opt) => (
+                  <label
+                    key={opt.value}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '5px',
+                      cursor: 'pointer',
+                    }}
+                  >
                     <input
-                      type="radio" name="subscriptionDuration"
+                      type="radio"
+                      name="subscriptionDuration"
                       value={opt.value}
                       checked={selectedDuration === opt.value}
                       disabled={isProcessing}
-                      onChange={() => setSelectedDuration(selectedDuration === opt.value ? '' : opt.value)}
+                      onChange={() =>
+                        setSelectedDuration(
+                          selectedDuration === opt.value ? '' : opt.value
+                        )
+                      }
                     />
                     <span>{opt.label}</span>
-                    {opt.discount && <small style={{ fontSize: '0.85em', fontWeight: 'bold', color: 'green' }}>({opt.discount})</small>}
+                    {opt.discount && (
+                      <small
+                        style={{
+                          fontSize: '0.85em',
+                          fontWeight: 'bold',
+                          color: 'green',
+                        }}
+                      >
+                        ({opt.discount})
+                      </small>
+                    )}
                   </label>
                 ))}
               </div>
 
-              {error && <div style={{ color: 'red', margin: '7px 0', textAlign: 'center' }}>{error}</div>}
-
-              {/* Amount */}
-              <div style={{
-                fontSize: '1.5em', fontWeight: 'bold',
-                color: '#106ba3', margin: '20px 0 10px',
-                textAlign: 'center'
-              }}>
-                {calculatedData?.refund ? 'Refund Amount: ' : ' Pay Amount: '} ${<u>{amount / 100}</u>}{' '}
-                {(selectedDuration === 'monthly')
-                  ? 'per month'
-                  : selectedDuration === 'half-yearly'
-                    ? `($${((amount / 6) / 100).toFixed(2)}/month)`
-                    : `($${((amount / 12) / 100).toFixed(2)}/month)`}
-              </div>
-
-              {/* Payment Button */}
-              {(subscription !== 'Trial' && !savedSubData.expired) && (
-                <Button
-                  type="submit"
-                  intent="primary"
-                  disabled={!stripe || isProcessing}
-                  loading={isProcessing}
-                  fill
-                  style={{
-                    height: '52px',
-                    minWidth: '200px',
-                    maxWidth: '230px',
-                    fontSize: '1.08em',
-                    borderRadius: 6,
-                    margin: '20px auto 0',
-                    display: 'flex',
-                    alignItems: 'center', // Vertically center text
-                    justifyContent: 'center', // Horizontally center text
-                    textAlign: 'center', // Center-align text
-                  }}
-                >
-                  {isProcessing
-                    ? 'Processing...'
-                    : calculatedData?.refund
-                      ? 'Refund and Proceed'
-                      : 'Proceed to Pay'}
-                </Button>
+              {error && (
+                <div style={{ color: 'red', margin: '7px 0', textAlign: 'center' }}>
+                  {error}
+                </div>
               )}
 
-              <p style={{
-                marginTop: '15px',
-                fontSize: '0.95em',
-                color: '#555',
-                textAlign: 'center',
-                lineHeight: '1.4'
-              }}>
-                Once a plan has been purchased, the subscription will auto-renew based on the selected duration.
+              {/* Amount Display */}
+              <div
+                style={{
+                  fontSize: '1.2em',
+                  fontWeight: 600,
+                  color: calculatedData?.refund ? '#2a7' : '#106ba3',
+                  margin: '16px 0 12px',
+                  textAlign: 'center',
+                  lineHeight: '1.4',
+                }}
+              >
+                {/* Title */}
+                <div style={{ fontSize: '0.9em', marginBottom: '4px', color: '#555' }}>
+                  {calculatedData?.refund ? 'Refund Amount' : 'Payable Amount'}
+                </div>
+
+                {/* Price Display */}
+                <div>
+                  {/* Show original price if discount applies */}
+                  {!calculatedData?.refund && (actualAmount !== amount / 100) && (
+                    <span
+                      style={{
+                        textDecoration: 'line-through',
+                        color: '#888',
+                        fontSize: '0.85em',
+                        marginRight: '8px',
+                      }}
+                    >
+                      ${actualAmount}
+                    </span>
+                  )}
+
+                  {/* Final Amount */}
+                  <span style={{ fontSize: '1.3em', fontWeight: 700 }}>
+                    ${amount / 100}
+                  </span>
+                </div>
+
+                {/* Per month / refund breakdown */}
+                {!calculatedData?.refund && (
+                  <div style={{ fontSize: '0.85em', color: '#777', marginTop: '2px' }}>
+                    {selectedDuration === 'monthly'
+                      ? 'per month'
+                      : selectedDuration === 'half-yearly'
+                        ? `(${((amount / 6) / 100).toFixed(2)}/month)`
+                        : `(${((amount / 12) / 100).toFixed(2)}/month)`}
+                  </div>
+                )}
+              </div>
+
+
+              {/* Payment Button */}
+              <Button
+                type="submit"
+                intent="primary"
+                disabled={!stripe || isProcessing}
+                loading={isProcessing}
+                fill
+                style={{
+                  height: '52px',
+                  minWidth: '200px',
+                  maxWidth: '230px',
+                  fontSize: '1.08em',
+                  borderRadius: 6,
+                  margin: '20px auto 0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  textAlign: 'center',
+                }}
+              >
+                {isProcessing
+                  ? 'Processing...'
+                  : calculatedData && calculatedData?.refund
+                    ? 'Refund and Proceed'
+                    : 'Proceed to Pay'}
+              </Button>
+
+              <p
+                style={{
+                  marginTop: '15px',
+                  fontSize: '0.95em',
+                  color: '#555',
+                  textAlign: 'center',
+                  lineHeight: '1.4',
+                }}
+              >
+                Once purchased, your subscription will automatically renew at the end of
+                each selected billing cycle unless cancelled beforehand.
               </p>
             </form>
           </div>
 
+
           {/* RIGHT COLUMN — Calculations */}
-          {(calculatedData && (calculatedData.action === 'upgrade' || calculatedData.action === 'downgrade')) && (
+          {(savedSubData.subscription !== 'Trial' && !savedSubData.expired && !savedSubData.isCancelled) && (calculatedData && (calculatedData.action === 'upgrade' || calculatedData.action === 'downgrade')) && (
             <div style={{
               flex: '1 1 340px',
               background: '#fff',
@@ -864,7 +996,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                 fontSize: '1.2em',
                 color: calculatedData.action === 'upgrade' ? '#106ba3' : '#d97706'
               }}>
-                {calculatedData.action === 'upgrade' ? 'Plan Upgrade Cost Breakdown' : 'Plan Downgrade Adjustment'}
+                {calculatedData.action === 'upgrade' ? 'Plan Upgrade cost Adjustment' : 'Plan Downgrade cost Adjustment'}
               </h3>
 
               {/* Step 1: Current Plan Info */}
@@ -879,17 +1011,20 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                 <h4 style={{ marginBottom: '6px', fontSize: '1.05em', color: '#444' }}>Usage So Far</h4>
                 <ul style={{ paddingLeft: '18px', margin: 0, color: '#555' }}>
                   <li>Amount you have paid initially: <strong>{savedSubData.amount}</strong></li>
-                  <li>Total months used: <strong>{calculatedData.usedMonth}</strong></li>
-                  <li>Amount per month (discount excluded): <strong>${subscription === 'Starter' ? '18' : '25'}</strong></li>
-                  <li>Amount used so far: <strong>${calculatedData.usedAmount}</strong></li>
+                  <li>Total months used ({calculatedData.action === 'upgrade' ? 'excluding' : 'including'} current month): <strong>{calculatedData.usedMonth}</strong></li>
+                  <li>Cost per month (discount excluded): <strong>${subscription === 'Starter' ? '18' : '25'}</strong></li>
+                  <li>Cost used for {calculatedData.usedMonth} months: <strong>${calculatedData.usedAmount}</strong></li>
                   {calculatedData.daysUsed !== undefined && (
-                    <li>Days used in current billing cycle: <strong>{calculatedData.daysUsed}</strong></li>
+                    <li>Days used in current month cycle: <strong>{calculatedData.daysUsed}</strong></li>
                   )}
                   {calculatedData.dailyAmount !== undefined && (
                     <li>Daily rate: <strong>${calculatedData.dailyAmount}</strong></li>
                   )}
                   {calculatedData.amountUsedInDays !== undefined && (
-                    <li>Cost for days used: <strong>${calculatedData.amountUsedInDays}</strong></li>
+                    <li>Cost for {calculatedData.daysUsed} days used: <strong>${calculatedData.amountUsedInDays}</strong></li>
+                  )}
+                  {calculatedData.totalUsedAmount !== undefined && (
+                    <li>Amount used till now (months + days): <strong>${calculatedData.totalUsedAmount}</strong></li>
                   )}
                 </ul>
               </div>
@@ -898,14 +1033,14 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
               <div style={{ marginBottom: '14px' }}>
                 <h4 style={{ marginBottom: '6px', fontSize: '1.05em', color: '#444' }}>Remaining Value</h4>
                 <ul style={{ paddingLeft: '18px', margin: 0, color: '#555' }}>
-                  <li>Total unused amount ({`${savedSubData.amount} - ${(amount / 100)}`}):  <strong>${calculatedData.totalLeftAmount}</strong></li>
+                  <li>Total unused amount ({`${savedSubData.amount} - ${(calculatedData.action === 'upgrade') ? calculatedData.totalUsedAmount : calculatedData.usedAmount}`}):  <strong>${calculatedData.totalLeftAmount}</strong></li>
                   {calculatedData.action === 'downgrade' && (
                     <>
-                      <li>Plan will remain active until: <strong>
+                      <li>Current plan will remain active until: <strong>
                         {new Date(new Date().setDate(new Date().getDate() + (calculatedData.daysRemaining ?? 0)))
                           .toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                       </strong></li>
-                      <li>New plan starts in <strong>{calculatedData.daysRemaining} days</strong></li>
+                      <li>New plan starts after <strong>{calculatedData.daysRemaining} days</strong></li>
                     </>
                   )}
                 </ul>
@@ -1475,14 +1610,14 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       <Dialog
         isOpen={isPaymentDialogOpen}
         onClose={() => togglePaymentDialog(false)}
-        title="Payment"
+        title={` ${selectedTab} Payment`}
         icon="dollar"
         canOutsideClickClose={false}
-        style={{ width: '60vw', maxWidth: '90vw' }}
+        style={{ width: (savedSubData.subscription !== 'Trial' && !savedSubData.expired && !savedSubData.cancelled) ? '60vw' : '40vw', maxWidth: '90vw' }}
       >
 
         {/* Payment Section */}
-        <div style={{ borderTop: '1px solid #e0e0e0', paddingLeft: '15px', paddingRight: '12px', paddingTop: '12px' }}>
+        <div style={{ borderTop: '1px solid #e0e0e0', paddingLeft: '15px', paddingRight: '14px', paddingTop: '14px' }}>
           {isLoadingSecret && (
             <div style={{ padding: '25px', textAlign: 'center', fontWeight: 'bold' }}>
               Loading payment details...
