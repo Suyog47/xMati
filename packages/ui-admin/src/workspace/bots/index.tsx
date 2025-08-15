@@ -187,6 +187,7 @@ class Bots extends Component<Props> {
 
       this.state.numberOfBots = this.formData.numberOfBots || 0 // Initialize from localStorage
       console.log(this.formData)
+      console.log(this.subData)
 
       // Check subscription expiry from localStorage
       let expiry
