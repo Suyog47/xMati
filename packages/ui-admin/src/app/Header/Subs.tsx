@@ -323,7 +323,7 @@ export const Subs = () => {
           </div> */}
 
           {/* Trial Plan Notification */}
-          {subscription === 'Trial' && !savedSubData.expired && savedFormData.nextSubs && (
+          {!savedSubData.expired && savedFormData.nextSubs && (
             <div
               style={{
                 marginBottom: 5,
@@ -336,9 +336,18 @@ export const Subs = () => {
                 textAlign: 'center',
               }}
             >
-              You opted for <strong><u>{savedFormData.nextSubs.plan}</u></strong> plan on a <strong><u>{savedFormData.nextSubs.duration}</u></strong> basis after Trial, which you can change anytime.
+              {subscription === 'Trial' ? (
+                <span>
+                  You opted for <strong><u>{savedFormData.nextSubs.plan}</u></strong> plan on a <strong><u>{savedFormData.nextSubs.duration}</u></strong> basis after Trial, which you can change anytime.
+                </span>
+              ) : (
+                <span>
+                  You have downgraded your plan to <strong><u>{savedFormData.nextSubs.plan}</u></strong> for the <strong><u>{savedFormData.nextSubs.duration}</u></strong> duration.
+                </span>
+              )}
             </div>
           )}
+
 
           {/* Render the subscription status banner */}
           {renderAlertBanner()}

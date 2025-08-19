@@ -41,6 +41,8 @@ import EditStageModal from './EditStageModal'
 import ImportBotModal from './ImportBotModal'
 import RollbackBotModal from './RollbackBotModal'
 import style from './style.scss'
+import { is } from 'bluebird'
+import { isDarkTheme } from '@blueprintjs/core/lib/esm/common/utils'
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
@@ -106,7 +108,8 @@ class Bots extends Component<Props> {
           email,
           plan,
           duration: upgradeSelectedDuration,
-          price: upgradePrice
+          price: upgradePrice,
+          isDowngrade: false // Default to false
         })
       })
 

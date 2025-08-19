@@ -93,7 +93,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
 
     setActualAmount(price / 100)
 
-    if (subscription !== 'Trial' && !savedSubData.expired && !savedSubData.isCancelled) {
+    if (subscription !== 'Trial' && !savedSubData.expired && !savedSubData.isCancelled && !savedFormData.nextSubs) {
       const durationOrder: { [key: string]: number } = {
         monthly: 1,
         'half-yearly': 2,
@@ -148,16 +148,25 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         )
       }
 
+      console.log('data ', data)
       if (data) {
         setCalculatedData(data) // Update state here
         price = (data.amount) * 100 // Convert to cents for Stripe
       }
     }
+
     return parseFloat(price.toFixed(2))// Return as string with two decimal places
   }, [selectedTab, selectedDuration])
 
 
   const getClientSecret = useCallback(async () => {
+
+    let amt = amount
+    if (!amt || amt <= 0) {
+      amt = 100 //If the 'amount' is zero, default to $1.00 
+    }
+
+    console.log(amt)
     setIsLoadingSecret(true)
     setPaymentError('')
     try {
@@ -166,7 +175,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          amount, currency: 'usd',
+          amount: amt, currency: 'usd',
           customerId: { id: savedFormData.stripeCustomerId },
           paymentMethodId: savedFormData.stripePayementId,
           email: savedFormData.email,
@@ -175,6 +184,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         }),
       })
 
+      console.log(result)
       if (!result.ok) {
         throw new Error('Payment setup failed')
       }
@@ -441,17 +451,15 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       const remainingAmount = currentAmount - usedAmount
       const totalLeftAmount = Math.max(0, remainingAmount)
 
-      const amountToChargeRefund = (newAmount - totalLeftAmount).toFixed(2)
-
       return {
         status: true,
         action: 'downgrade',
-        refund: (parseFloat(amountToChargeRefund) < 0) ? true : false,
+        refund: true,
         usedMonth,
         usedAmount,
         daysRemaining,
         totalLeftAmount,
-        amount: Math.abs(parseFloat(amountToChargeRefund)).toFixed(2), // Ensure amount is a string with two decimal places
+        amount: totalLeftAmount.toFixed(2), // Ensure amount is a string with two decimal places
       }
     } catch (error) {
       console.error('Error calculating refund details:', error.message)
@@ -511,7 +519,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       setError('')
 
       try {
-        if (calculatedData?.refund) {
+        if (calculatedData?.refund && amount > 0) {
           const result = await fetch(`${API_URL}/refund-amount`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -524,7 +532,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
             throw new Error(data.message || 'Failed to process refund. Please try again later.')
           }
 
-        } else {
+        } else if (!calculatedData?.refund && amount > 0) {
           const { error: paymentError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
             payment_method: savedFormData.stripePayementId,
           })
@@ -547,15 +555,20 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
 
         let price = calculatedData?.refund ? `$${actualAmount}` : `$${amount / 100}`
         if (calculatedData?.action === 'upgrade') {
-          await setSubscriber(price)
+          void removeNextSub()
+
+          void setSubscriber(price)
+
         } else if (calculatedData?.action === 'downgrade') {
           // Reduce the duration of current subscription until daysRemaining
           void downgradeSub(e, price)
 
           // Handle next new subscription
-          void handleNextSubNow(e, `$${actualAmount}`)
+          void handleNextSubNow(e, `$${actualAmount}`, true)
         } else {
-          await setSubscriber(`$${amount / 100}`)
+          void removeNextSub()
+
+          void setSubscriber(`$${amount / 100}`)
         }
 
         setIsSuccessDialogOpen(true)
@@ -586,7 +599,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     }
 
     // Upgrade the Trial's next subscription
-    const handleNextSubNow = async (e: React.FormEvent, price) => {
+    const handleNextSubNow = async (e: React.FormEvent, price, isDowngrade = false) => {
       e.preventDefault()
 
       setIsProcessing(true)
@@ -607,6 +620,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
             plan,
             duration,
             price,
+            isDowngrade
           }),
         })
 
@@ -654,7 +668,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
             fullName: savedFormData.fullName,
             currentSub: savedSubData.subscription,
             daysRemaining: calculatedData?.daysRemaining,
-            amount: price,
+            amount: savedSubData.amount,
           }),
         })
 
@@ -678,6 +692,29 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ key: email, name: fullName, subscription: selectedTab, duration: selectedDuration, amount }),
+        })
+
+        const data = await result.json()
+
+        if (data.status !== true) {
+          throw new Error(data.msg)
+        }
+
+        localStorage.setItem('subData', JSON.stringify({ ...savedSubData, subscription: selectedTab, duration: selectedDuration, amount: `$${amount / 100}`, expired: false, canCancel: true, subsChanged: true }))
+      } catch (err: any) {
+        throw new Error('Something went wrong while saving subscription data: ' + err.message)
+      }
+    }
+
+    const removeNextSub = async () => {
+      try {
+        const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
+        const { email } = savedFormData
+
+        const result = await fetch(`${API_URL}/remove-nextsub`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
         })
 
         const data = await result.json()
@@ -913,7 +950,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                       disabled={isProcessing}
                       onChange={() =>
                         setSelectedDuration(
-                          selectedDuration === opt.value ? '' : opt.value
+                          opt.value
                         )
                       }
                     />
@@ -983,8 +1020,8 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                     {selectedDuration === 'monthly'
                       ? 'per month'
                       : selectedDuration === 'half-yearly'
-                        ? `(${((amount / 6) / 100).toFixed(2)}/month)`
-                        : `(${((amount / 12) / 100).toFixed(2)}/month)`}
+                        ? `$(${((amount / 6) / 100).toFixed(2)}/month)`
+                        : `$(${((amount / 12) / 100).toFixed(2)}/month)`}
                   </div>
                 )}
               </div>
@@ -1013,7 +1050,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                 {isProcessing
                   ? 'Processing...'
                   : calculatedData && calculatedData?.refund
-                    ? 'Refund and Proceed'
+                    ? (calculatedData.amount > 0 ? 'Refund and Proceed' : 'Proceed')
                     : 'Proceed to Pay'}
               </Button>
 
@@ -1032,9 +1069,8 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
             </form>
           </div>
 
-
           {/* RIGHT COLUMN — Calculations */}
-          {(savedSubData.subscription !== 'Trial' && !savedSubData.expired && !savedSubData.isCancelled) && (calculatedData && (calculatedData.action === 'upgrade' || calculatedData.action === 'downgrade')) && (
+          {(savedSubData.subscription !== 'Trial' && !savedSubData.expired && !savedSubData.isCancelled && !savedFormData.nextSubs) && (calculatedData && (calculatedData.action === 'upgrade' || calculatedData.action === 'downgrade')) && (
             <div style={{
               flex: '1 1 340px',
               background: '#fff',
@@ -1095,7 +1131,9 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                       <li>New plan starts after <strong>{calculatedData.daysRemaining} days</strong></li>
                     </>
                   )}
-                  <li>Final amount ({`${actualAmount} - ${Number(calculatedData.totalLeftAmount).toFixed(2)}`}):  <strong>${Number(calculatedData.amount).toFixed(2)}</strong></li>
+                  {calculatedData.action !== 'downgrade' && (
+                    <li>Final amount (${`${actualAmount} - ${Number(calculatedData.totalLeftAmount).toFixed(2)}`}): <strong>${Number(calculatedData.amount).toFixed(2)}</strong></li>
+                  )}
                 </ul>
               </div>
 
@@ -1304,6 +1342,13 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                       <> You opted for <strong><u>{savedFormData.nextSubs.plan}</u></strong> plan on a <strong><u>{savedFormData.nextSubs.duration}</u></strong> basis after Trial, which you can change anytime.</>
                     ) : (
                       <> You have cancelled your subscription.</>
+                    )
+                  )}
+                  {subscription !== 'Trial' && !savedSubData.expired && (
+                    savedFormData.nextSubs ? (
+                      <> You have downgraded your plan to <strong><u>{savedFormData.nextSubs.plan}</u></strong> for the <strong><u>{savedFormData.nextSubs.duration}</u></strong> duration.</>
+                    ) : (
+                      <></>
                     )
                   )}
                 </p>
@@ -1666,7 +1711,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         title={` ${selectedTab} Payment`}
         icon="dollar"
         canOutsideClickClose={false}
-        style={{ width: (savedSubData.subscription !== 'Trial' && !savedSubData.expired && !savedSubData.isCancelled) ? '60vw' : '40vw', maxWidth: '90vw' }}
+        style={{ width: (savedSubData.subscription !== 'Trial' && !savedSubData.expired && !savedSubData.isCancelled && !savedFormData.nextSubs) ? '60vw' : '40vw', maxWidth: '90vw' }}
       >
 
         {/* Payment Section */}
@@ -1683,13 +1728,13 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
             </div>
           )}
 
-          {!isLoadingSecret && !clientSecret && (
+          {/* {!isLoadingSecret && !clientSecret && (
             <div style={{ color: 'red', margin: '15px 0', textAlign: 'center' }}>
               Unable to proceed with payment. Please contact support or try again later.
             </div>
-          )}
+          )} */}
 
-          {!isLoadingSecret && clientSecret && isValidClientSecret(clientSecret) ? (
+          {(!isLoadingSecret && clientSecret && isValidClientSecret(clientSecret)) ? (
             <Elements stripe={stripePromise} options={{ clientSecret }}>
               <CheckoutForm />
             </Elements>

@@ -9,6 +9,7 @@ import api from '~/app/api'
 import { auth } from 'botpress/shared'
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { FormGroup } from '@blueprintjs/core'
+import { is } from 'bluebird'
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
@@ -381,7 +382,8 @@ const CustomerWizard: React.FC = () => {
           plan: selectedPlan,
           duration: selectedDuration,
           price,
-          suggested: false
+          suggested: false,
+          isDowngrade: false // Default to false
         }
       }
 
@@ -536,7 +538,8 @@ const CustomerWizard: React.FC = () => {
         plan: selectedPlan,
         duration: selectedDuration,
         price,
-        suggested: false
+        suggested: false,
+        isDowngrade: false // Default to false
       }
     }
 
