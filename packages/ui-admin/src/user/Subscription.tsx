@@ -53,6 +53,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     amountUsedInDays?: number
     totalUsedAmount?: number
     totalLeftAmount: string
+    timestamp: Date
     amount: number
     message?: string
     error?: string
@@ -148,22 +149,25 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         )
       }
 
-      console.log('data ', data)
       if (data) {
         setCalculatedData(data) // Update state here
+        console.log('data ', data)
         price = (data.amount) * 100 // Convert to cents for Stripe
       }
     }
 
-    return parseFloat(price.toFixed(2))// Return as string with two decimal places
+    return parseFloat(price.toFixed(2)) // Return as string with two decimal places
   }, [selectedTab, selectedDuration])
 
 
   const getClientSecret = useCallback(async () => {
+    if (!isPaymentDialogOpen) {
+      return // Do not fetch client secret if payment dialog is not open
+    }
 
     let amt = amount
     if (!amt || amt <= 0) {
-      amt = 100 //If the 'amount' is zero, default to $1.00 
+      amt = 100 //If the 'amount' is zero, default to $1.00
     }
 
     console.log(amt)
@@ -184,7 +188,6 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         }),
       })
 
-      console.log(result)
       if (!result.ok) {
         throw new Error('Payment setup failed')
       }
@@ -201,7 +204,8 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     } finally {
       setIsLoadingSecret(false)
     }
-  }, [amount])
+  }, [amount, selectedDuration, isPaymentDialogOpen])
+
 
   const fetchedOnceRef = useRef(false)
   useEffect(() => {
@@ -389,7 +393,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       return {
         status: true,
         action: 'upgrade',
-        refund: (parseFloat(amountToChargeRefund) < 0) ? true : false,
+        refund: (parseFloat(amountToChargeRefund) <= 0) ? true : false,
         usedMonth,
         usedAmount,
         daysUsed,
@@ -903,7 +907,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
               }
             >
 
-              <h4 style={{ textAlign: 'center', marginBottom: '12px', fontWeight: 600 }}>
+              <h4 style={{ textAlign: 'center', marginBottom: '10px', fontWeight: 600 }}>
                 Choose Your plan billing duration
               </h4>
               <p
@@ -911,14 +915,14 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                   fontSize: '0.9em',
                   color: '#555',
                   textAlign: 'center',
-                  marginBottom: '16px',
+                  marginBottom: '12px',
                   lineHeight: '1.4',
                 }}
               >
-                Select the duration that best suits your needs. Discounts are applied
-                automatically for longer commitments.
+                Select the duration that best suits your needs.
               </p>
 
+              {/* Duration Radio buttons */}
               <div
                 style={{
                   display: 'flex',
@@ -947,14 +951,16 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                       name="subscriptionDuration"
                       value={opt.value}
                       checked={selectedDuration === opt.value}
-                      disabled={isProcessing}
-                      onChange={() =>
-                        setSelectedDuration(
-                          opt.value
-                        )
+                      disabled={
+                        isProcessing ||
+                        (savedSubData.subscription === selectedTab && savedSubData.duration === opt.value)
                       }
+                      onChange={() => {
+                        console.log(`selectedDuration: ${opt.value}, amount: ${amount}`)
+                        setSelectedDuration(opt.value)
+                      }}
                     />
-                    <span>{opt.label}</span>
+                    <span style={{ color: (savedSubData.subscription === selectedTab && savedSubData.duration === opt.value) ? 'grey' : 'inherit' }}>{opt.label}</span>
                     {opt.discount && (
                       <small
                         style={{
@@ -965,6 +971,10 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                       >
                         ({opt.discount})
                       </small>
+                    )}
+                    {/* Show (Current) in red if this option is the active one */}
+                    {savedSubData.subscription === selectedTab && savedSubData.duration === opt.value && (
+                      <div style={{ color: 'red', fontSize: '0.85em' }}>(Current)</div>
                     )}
                   </label>
                 ))}
@@ -977,68 +987,108 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
               )}
 
               {/* Amount Display */}
-              <div
-                style={{
-                  fontSize: '1.2em',
-                  fontWeight: 600,
-                  color: calculatedData?.refund ? '#2a7' : '#106ba3',
-                  margin: '16px 0 12px',
-                  textAlign: 'center',
-                  lineHeight: '1.4',
-                }}
-              >
-                {/* Title */}
-                <div style={{ fontSize: '0.9em', marginBottom: '4px', color: '#555' }}>
-                  {calculatedData?.refund ? 'Refund Amount' : 'Payable Amount'}
-                </div>
-
-                {/* Price Display */}
-                <div>
-                  {/* Show original price if discount applies */}
-                  {!calculatedData?.refund && (actualAmount !== amount / 100) && (
-                    <span
-                      style={{
-                        textDecoration: 'line-through',
-                        color: '#888',
-                        fontSize: '0.85em',
-                        marginRight: '8px',
-                      }}
-                    >
-                      ${actualAmount}
-                    </span>
-                  )}
-
-                  {/* Final Amount */}
-                  <span style={{ fontSize: '1.3em', fontWeight: 700 }}>
-                    ${amount / 100}
-                  </span>
-                </div>
-
-                {/* Per month / refund breakdown */}
-                {!calculatedData?.refund && (
-                  <div style={{ fontSize: '0.85em', color: '#777', marginTop: '2px' }}>
-                    {selectedDuration === 'monthly'
-                      ? 'per month'
-                      : selectedDuration === 'half-yearly'
-                        ? `$(${((amount / 6) / 100).toFixed(2)}/month)`
-                        : `$(${((amount / 12) / 100).toFixed(2)}/month)`}
+              {(savedSubData.subscription !== selectedTab || savedSubData.duration !== selectedDuration) ?
+                <div
+                  style={{
+                    fontSize: '1.2em',
+                    fontWeight: 600,
+                    color: calculatedData?.refund ? '#2a7' : '#106ba3',
+                    margin: '16px 0 12px',
+                    textAlign: 'center',
+                    lineHeight: '1.4',
+                  }}
+                >
+                  {/* Title */}
+                  <div style={{ fontSize: '0.9em', marginBottom: '4px', color: '#555' }}>
+                    {(amount === 0) ? 'Amount' : calculatedData?.refund ? 'Refund Amount' : 'Payable Amount'}
                   </div>
-                )}
-              </div>
+
+                  {/* Price Display */}
+                  <div>
+                    {/* Show original price if discount applies */}
+                    {!calculatedData?.refund && (actualAmount !== amount / 100) && (
+                      <span
+                        style={{
+                          textDecoration: 'line-through',
+                          color: '#888',
+                          fontSize: '0.85em',
+                          marginRight: '8px',
+                        }}
+                      >
+                        ${actualAmount}
+                      </span>
+                    )}
+
+                    {/* Final Amount */}
+                    <span style={{ fontSize: '1.3em', fontWeight: 700 }}>
+                      ${amount / 100}
+                    </span>
+
+                    {calculatedData?.refund && calculatedData.action === 'downgrade' && (
+                      <span
+                        style={{
+                          display: 'block',
+                          textAlign: 'center',
+                          marginTop: '12px',
+                          fontSize: '0.85em',
+                          color: '#106ba3',
+                        }}
+                      >
+                        Amount of <strong><u>${actualAmount}</u></strong> will be deducted from your account on the day of expiry.
+                      </span>
+                    )}
+
+                    {calculatedData?.refund && calculatedData.action === 'upgrade' && (
+                      <span
+                        style={{
+                          display: 'block',
+                          textAlign: 'center',
+                          marginTop: '12px',
+                          fontSize: '0.7em',
+                          color: '#106ba3',
+                        }}
+                      >
+                        Actual amount for this plan:- <strong>${actualAmount}</strong>
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Per month / refund breakdown */}
+                  {!calculatedData?.refund && (
+                    <div style={{ fontSize: '0.85em', color: '#777', marginTop: '2px' }}>
+                      {selectedDuration === 'monthly'
+                        ? 'per month'
+                        : selectedDuration === 'half-yearly'
+                          ? `($${((amount / 6) / 100).toFixed(2)}/month)`
+                          : `($${((amount / 12) / 100).toFixed(2)}/month)`}
+                    </div>
+                  )}
+                </div> :
+                <div
+                  style={{
+                    color: 'red',
+                    fontWeight: 600,
+                    textAlign: 'center',
+                    margin: '16px 0 12px',
+                    fontSize: '1em',
+                  }}
+                >
+                  You can't select your current active plan and duration.
+                </div>}
 
 
               {/* Payment Button */}
               <Button
                 type="submit"
                 intent="primary"
-                disabled={!stripe || isProcessing}
+                disabled={!stripe || isProcessing || (savedSubData.subscription === selectedTab && savedSubData.duration === selectedDuration)}
                 loading={isProcessing}
                 fill
                 style={{
                   height: '52px',
                   minWidth: '200px',
                   maxWidth: '230px',
-                  fontSize: '1.08em',
+                  fontSize: '1.05em',
                   borderRadius: 6,
                   margin: '20px auto 0',
                   display: 'flex',
@@ -1057,7 +1107,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
               <p
                 style={{
                   marginTop: '15px',
-                  fontSize: '0.95em',
+                  fontSize: '0.85em',
                   color: '#555',
                   textAlign: 'center',
                   lineHeight: '1.4',
@@ -1070,96 +1120,98 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
           </div>
 
           {/* RIGHT COLUMN — Calculations */}
-          {(savedSubData.subscription !== 'Trial' && !savedSubData.expired && !savedSubData.isCancelled && !savedFormData.nextSubs) && (calculatedData && (calculatedData.action === 'upgrade' || calculatedData.action === 'downgrade')) && (
-            <div style={{
-              flex: '1 1 340px',
-              background: '#fff',
-              borderRadius: '10px',
-              padding: '20px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-              border: '1px solid #e8e8e8'
-            }}>
-              <h3 style={{
-                marginBottom: '12px',
-                fontSize: '1.2em',
-                color: calculatedData.action === 'upgrade' ? '#106ba3' : '#d97706'
-              }}>
-                {calculatedData.action === 'upgrade' ? 'Plan Upgrade cost Adjustment' : 'Plan Downgrade cost Adjustment'}
-              </h3>
-
-              {/* Step 1: Current Plan Info */}
-              <div style={{ marginBottom: '14px' }}>
-                <strong>Current Plan:</strong> {subscription}
-                <br />
-                <strong>Duration:</strong> {savedSubData.duration || 'N/A'}
-              </div>
-
-              {/* Step 2: Usage Summary */}
-              <div style={{ marginBottom: '14px' }}>
-                <h4 style={{ marginBottom: '6px', fontSize: '1.05em', color: '#444' }}>Usage So Far</h4>
-                <ul style={{ paddingLeft: '18px', margin: 0, color: '#555' }}>
-                  <li>Your amount with us: <strong>{savedSubData.amount}</strong></li>
-                  <li>Total months used ({calculatedData.action === 'upgrade' ? 'excluding' : 'including'} current month): <strong>{calculatedData.usedMonth}</strong></li>
-                  <li>Cost per month (discount excluded): <strong>${subscription === 'Starter' ? '18' : '25'}</strong></li>
-                  <li>Cost used for {calculatedData.usedMonth} months: <strong>${calculatedData.usedAmount}</strong></li>
-                  {calculatedData.daysUsed !== undefined && (
-                    <li>Days used in current month cycle: <strong>{calculatedData.daysUsed}</strong></li>
-                  )}
-                  {calculatedData.dailyAmount !== undefined && (
-                    <li>Daily rate: <strong>${calculatedData.dailyAmount}</strong></li>
-                  )}
-                  {calculatedData.amountUsedInDays !== undefined && (
-                    <li>Cost for {calculatedData.daysUsed} days used: <strong>${calculatedData.amountUsedInDays}</strong></li>
-                  )}
-                  {calculatedData.totalUsedAmount !== undefined && (
-                    <li>Amount used till now (months + days): <strong>${calculatedData.totalUsedAmount}</strong></li>
-                  )}
-                </ul>
-              </div>
-
-              {/* Step 3: Remaining Credit / Additional Charge */}
-              <div style={{ marginBottom: '14px' }}>
-                <h4 style={{ marginBottom: '6px', fontSize: '1.05em', color: '#444' }}>Remaining Value</h4>
-                <ul style={{ paddingLeft: '18px', margin: 0, color: '#555' }}>
-                  <li>Total unused amount ({`${savedSubData.amount} - ${(calculatedData.action === 'upgrade') ? calculatedData.totalUsedAmount : calculatedData.usedAmount}`}):  <strong>${Number(calculatedData.totalLeftAmount).toFixed(2)}</strong></li>
-                  {calculatedData.action === 'downgrade' && (
-                    <>
-                      <li>Current plan will remain active until: <strong>
-                        {new Date(new Date().setDate(new Date().getDate() + (calculatedData.daysRemaining ?? 0)))
-                          .toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-                      </strong></li>
-                      <li>New plan starts after <strong>{calculatedData.daysRemaining} days</strong></li>
-                    </>
-                  )}
-                  {calculatedData.action !== 'downgrade' && (
-                    <li>Final amount (${`${actualAmount} - ${Number(calculatedData.totalLeftAmount).toFixed(2)}`}): <strong>${Number(calculatedData.amount).toFixed(2)}</strong></li>
-                  )}
-                </ul>
-              </div>
-
-              {/* Step 4: Final Amount */}
+          {(savedSubData.subscription !== 'Trial' && !savedSubData.expired && !savedSubData.isCancelled && !savedFormData.nextSubs) &&
+            (calculatedData && (calculatedData.action === 'upgrade' || calculatedData.action === 'downgrade')) &&
+            (savedSubData.subscription !== selectedTab || savedSubData.duration !== selectedDuration) && (
               <div style={{
-                marginTop: '20px',
-                paddingTop: '12px',
-                borderTop: '2px solid #eee'
+                flex: '1 1 340px',
+                background: '#fff',
+                borderRadius: '10px',
+                padding: '20px',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                border: '1px solid #e8e8e8'
               }}>
-                <div style={{
-                  display: 'flex', justifyContent: 'space-between',
-                  fontSize: '1.1em', fontWeight: 'bold'
+                <h3 style={{
+                  marginBottom: '12px',
+                  fontSize: '1.2em',
+                  color: calculatedData.action === 'upgrade' ? '#106ba3' : '#d97706'
                 }}>
-                  <span>{calculatedData.refund ? 'Refund Amount:' : 'Amount to Pay:'}</span>
-                  <span style={{
-                    color: calculatedData.refund ? 'green' : '#106ba3'
-                  }}>
-                    ${calculatedData.amount}
-                  </span>
+                  {calculatedData.action === 'upgrade' ? 'Plan Upgrade cost Adjustment' : 'Plan Downgrade cost Adjustment'}
+                </h3>
+
+                {/* Step 1: Current Plan Info */}
+                <div style={{ marginBottom: '14px' }}>
+                  <strong>Current Plan:</strong> {subscription}
+                  <br />
+                  <strong>Duration:</strong> {savedSubData.duration || 'N/A'}
                 </div>
-                {calculatedData.refund
-                  ? <p style={{ fontSize: '0.9em', color: '#444', marginTop: '6px' }}>This amount will be credited back to your payment method.</p>
-                  : <p style={{ fontSize: '0.9em', color: '#444', marginTop: '6px' }}>This amount will be charged to your selected payment method.</p>}
+
+                {/* Step 2: Usage Summary */}
+                <div style={{ marginBottom: '14px' }}>
+                  <h4 style={{ marginBottom: '6px', fontSize: '1.05em', color: '#444' }}>Usage So Far</h4>
+                  <ul style={{ paddingLeft: '18px', margin: 0, color: '#555' }}>
+                    <li>Your amount with us: <strong>{savedSubData.amount}</strong></li>
+                    <li>Total months used ({calculatedData.action === 'upgrade' ? 'excluding' : 'including'} current month): <strong>{calculatedData.usedMonth}</strong></li>
+                    <li>Cost per month (discount excluded): <strong>${subscription === 'Starter' ? '18' : '25'}</strong></li>
+                    <li>Cost used for {calculatedData.usedMonth} months: <strong>${calculatedData.usedAmount}</strong></li>
+                    {calculatedData.daysUsed !== undefined && (
+                      <li>Days used in current month cycle: <strong>{calculatedData.daysUsed}</strong></li>
+                    )}
+                    {calculatedData.dailyAmount !== undefined && (
+                      <li>Daily rate: <strong>${calculatedData.dailyAmount}</strong></li>
+                    )}
+                    {calculatedData.amountUsedInDays !== undefined && (
+                      <li>Cost for {calculatedData.daysUsed} days used: <strong>${calculatedData.amountUsedInDays}</strong></li>
+                    )}
+                    {calculatedData.totalUsedAmount !== undefined && (
+                      <li>Amount used till now (months + days): <strong>${calculatedData.totalUsedAmount}</strong></li>
+                    )}
+                  </ul>
+                </div>
+
+                {/* Step 3: Remaining Credit / Additional Charge */}
+                <div style={{ marginBottom: '14px' }}>
+                  <h4 style={{ marginBottom: '6px', fontSize: '1.05em', color: '#444' }}>Remaining Value</h4>
+                  <ul style={{ paddingLeft: '18px', margin: 0, color: '#555' }}>
+                    <li>Total unused amount ({`${savedSubData.amount} - $${(calculatedData.action === 'upgrade') ? calculatedData.totalUsedAmount : calculatedData.usedAmount}`}):  <strong>${Number(calculatedData.totalLeftAmount).toFixed(2)}</strong></li>
+                    {calculatedData.action === 'downgrade' && (
+                      <>
+                        <li>Current plan will remain active until: <strong>
+                          {new Date(new Date().setDate(new Date().getDate() + (calculatedData.daysRemaining ?? 0)))
+                            .toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                        </strong></li>
+                        <li>Your new plan will start after <strong>{calculatedData.daysRemaining} days</strong> </li>
+                      </>
+                    )}
+                    {calculatedData.action !== 'downgrade' && (
+                      <li>Final amount (${`${actualAmount} - ${Number(calculatedData.totalLeftAmount).toFixed(2)}`}): <strong>${Number(calculatedData.amount).toFixed(2)}</strong></li>
+                    )}
+                  </ul>
+                </div>
+
+                {/* Step 4: Final Amount */}
+                <div style={{
+                  marginTop: '20px',
+                  paddingTop: '12px',
+                  borderTop: '2px solid #eee'
+                }}>
+                  <div style={{
+                    display: 'flex', justifyContent: 'space-between',
+                    fontSize: '1.1em', fontWeight: 'bold'
+                  }}>
+                    <span>{(amount === 0) ? 'Amount' : calculatedData.refund ? 'Refund Amount:' : 'Amount to Pay:'}</span>
+                    <span style={{
+                      color: calculatedData.refund ? 'green' : '#106ba3'
+                    }}>
+                      ${calculatedData.amount}
+                    </span>
+                  </div>
+                  {calculatedData.refund
+                    ? (amount === 0) ? <p>No amount left to refund.</p> : <p style={{ fontSize: '0.9em', color: '#444', marginTop: '6px' }}>This amount will be credited back to your payment method.</p>
+                    : (amount === 0) ? <p>No extra amount to charge.</p> : <p style={{ fontSize: '0.9em', color: '#444', marginTop: '6px' }}>This amount will be charged to your selected payment method.</p>}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
         </div>
       </>
@@ -1346,7 +1398,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                   )}
                   {subscription !== 'Trial' && !savedSubData.expired && (
                     savedFormData.nextSubs ? (
-                      <> You have downgraded your plan to <strong><u>{savedFormData.nextSubs.plan}</u></strong> for the <strong><u>{savedFormData.nextSubs.duration}</u></strong> duration.</>
+                      <> You have downgraded your plan to <strong><u>{savedFormData.nextSubs.plan}</u></strong> for the <strong><u>{savedFormData.nextSubs.duration}</u></strong> duration, which will be activated on the day of expiry.</>
                     ) : (
                       <></>
                     )
@@ -1711,11 +1763,18 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         title={` ${selectedTab} Payment`}
         icon="dollar"
         canOutsideClickClose={false}
-        style={{ width: (savedSubData.subscription !== 'Trial' && !savedSubData.expired && !savedSubData.isCancelled && !savedFormData.nextSubs) ? '60vw' : '40vw', maxWidth: '90vw' }}
+        style={{
+          width: (savedSubData.subscription !== 'Trial' &&
+            !savedSubData.expired &&
+            !savedSubData.isCancelled &&
+            !savedFormData.nextSubs &&
+            (savedSubData.subscription !== selectedTab || savedSubData.duration !== selectedDuration)) ? '60vw' : '40vw',
+          maxWidth: '90vw'
+        }}
       >
 
         {/* Payment Section */}
-        <div style={{ borderTop: '1px solid #e0e0e0', paddingLeft: '15px', paddingRight: '14px', paddingTop: '14px' }}>
+        <div style={{ borderTop: '1px solid #e0e0e0', paddingLeft: '15px', paddingRight: '14px', paddingTop: '6px' }}>
           {isLoadingSecret && (
             <div style={{ padding: '25px', textAlign: 'center', fontWeight: 'bold' }}>
               Loading payment details...
