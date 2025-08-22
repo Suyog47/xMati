@@ -59,7 +59,6 @@ export const Subs = () => {
             padding: '12px 20px',
             borderRadius: '4px',
             marginTop: 10,
-            marginBottom: 5,
             textAlign: 'center',
             fontWeight: 700,
             color: '#721c24',
@@ -145,11 +144,11 @@ export const Subs = () => {
           width: '90%',
           maxWidth: 700,
           height: 'auto',
-          maxHeight: '97vh',
+          maxHeight: '95vh',
           overflow: 'visible',
         }}
       >
-        <div style={{ padding: '10px 18px' }}>
+        <div style={{ padding: '5px 18px' }}>
 
           {/* Header */}
           <h2
@@ -194,46 +193,81 @@ export const Subs = () => {
               >
                 Plan Features
               </h3>
+
               <div
                 style={{
                   fontWeight: 600,
-                  fontSize: 16,
-                  color: '#106ba3',
-                  backgroundColor: '#e3e3e3',
+                  fontSize: 13,
+                  color: '#fff',
+                  background: 'linear-gradient(135deg, #106ba3, #2196f3)', // gradient
                   padding: '6px 14px',
-                  borderRadius: '10px',
+                  borderRadius: '12px',
                   display: 'inline-block',
-                  marginBottom: 10,
                   marginTop: 10,
+                  marginBottom: 10,
+                  boxShadow: '0 3px 6px rgba(0,0,0,0.15)', // subtle depth
+                  border: '1px solid #0d5c91', // defined edge
+                  textTransform: 'uppercase', // bold label style
+                  letterSpacing: '0.5px',
                 }}
               >
                 {subscription.toLowerCase() === 'starter'
-                  ? '3 bots included'
-                  : '5 bots included'}
+                  ? '3 Bots Included'
+                  : '5 Bots Included'}
               </div>
 
-              <div style={{ fontWeight: 600, color: '#394B59', marginBottom: 8 }}>Includes:</div>
-              <ul style={{ paddingLeft: 16, marginBottom: 24 }}>
-                {['LLM Support', 'HITL (Human in the Loop)', 'Bot Analytics'].map((item, idx) => (
-                  <li key={idx} style={{ marginBottom: 6, color: '#106ba3' }}>
-                    ✓ {item}
-                  </li>
-                ))}
-              </ul>
 
-              <div style={{ fontWeight: 600, color: '#394B59', marginBottom: 8 }}>
-                Supported Channels:
+              {/* Horizontal layout for lists */}
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row', // explicit row direction
+                  gap: '40px',
+                  width: '100%', // ensure container has full width
+                  justifyContent: 'space-between'
+                }}
+              >
+                {/* Supported Channels */}
+                <div style={{ flex: '1 1 200px' }}>
+                  <div style={{ fontWeight: 600, color: '#394B59', marginBottom: 6 }}>
+                    Supported Channels:
+                  </div>
+                  <ul style={{ paddingLeft: 16, margin: 0 }}>
+                    {[
+                      'Whatsapp',
+                      'Web Channel',
+                      'Telegram',
+                      'Slack',
+                      'Facebook Messenger',
+                    ].map((ch, idx) =>
+                      subscription === 'Starter' && ch === 'Whatsapp' ? null : (
+                        <li key={idx} style={{ marginBottom: 6, color: '#106ba3' }}>
+                          {ch}
+                        </li>
+                      )
+                    )}
+                  </ul>
+                </div>
+
+
+                {/* Includes */}
+                <div style={{ flex: '1 1 200px' }}>
+                  <div style={{ fontWeight: 600, color: '#394B59', marginBottom: 6 }}>
+                    Includes:
+                  </div>
+                  <ul style={{ paddingLeft: 16, margin: 0 }}>
+                    {['LLM Support', 'HITL (Human in the Loop)', 'Bot Analytics'].map(
+                      (item, idx) => (
+                        <li key={idx} style={{ marginBottom: 6, color: '#106ba3' }}>
+                          ✓ {item}
+                        </li>
+                      )
+                    )}
+                  </ul>
+                </div>
               </div>
-              <ul style={{ paddingLeft: 16 }}>
-                {['Whatsapp', 'Web Channel', 'Telegram', 'Slack', 'Facebook Messenger'].map((ch, idx) => (
-                  (savedSubData.subscription === 'Starter' && ch === 'Whatsapp') ? null : (
-                    <li key={idx} style={{ marginBottom: 6, color: '#106ba3' }}>
-                      ✓ {ch}
-                    </li>
-                  )
-                ))}
-              </ul>
             </div>
+
 
             {/* Vertical Divider */}
             <div
@@ -306,79 +340,43 @@ export const Subs = () => {
             </div>
           </div>
 
-          {/* Plan Expiry Message
-          <div
-            style={{
-              marginTop: 8,
-              textAlign: 'center',
-              fontWeight: 700,
-              color: '#106BA3',
-              fontSize: 18,
-              textDecoration: 'underline'
-            }}
-          >
-            {days === 0
-              ? 'Your plan will expire today.'
-              : days !== '-' && days > 0
-                ? `Your plan expires in ${days} day${days > 1 ? 's' : ''}`
-                : 'Your plan has been expired.'}
-          </div> */}
-
           {/* Trial Plan Notification */}
           {!savedSubData.expired && savedFormData.nextSubs && (
-            <div
-              style={{
-                marginBottom: 5,
-                padding: '12px 16px',
-                background: '#f3f4f6',
-                borderRadius: 8,
-                fontSize: 14,
-                color: '#394B59',
-                lineHeight: 1.5,
-                textAlign: 'center',
-              }}
-            >
-              {subscription === 'Trial' ? (
-                <span>
-                  You opted for <strong><u>{savedFormData.nextSubs.plan}</u></strong> plan on a <strong><u>{savedFormData.nextSubs.duration}</u></strong> basis after Trial, which you can change anytime.
-                </span>
-              ) : (
-                <span>
-                  You have downgraded your plan to <strong><u>{savedFormData.nextSubs.plan}</u></strong> for the <strong><u>{savedFormData.nextSubs.duration}</u></strong> duration.
-                </span>
-              )}
-            </div>
+            <>
+              <br />
+              <div
+                style={{
+                  marginBottom: 8,
+                  padding: '10px 14px',
+                  borderLeft: '4px solid #2196f3',
+                  borderRight: '4px solid #2196f3',
+                  background: 'linear-gradient(to right, rgba(33,150,243,0.08) 0%, rgba(33,150,243,0.08) 100%)', // extended blue gradient
+                  borderRadius: 6,
+                  fontSize: 14,
+                  color: '#394B59',
+                  lineHeight: 1.6,
+                  fontStyle: 'italic',
+                  textAlign: 'center' // center aligned text
+                }}
+              >
+                {subscription === 'Trial' ? (
+                  <span>
+                    You opted for <strong style={{ textDecoration: 'underline' }}>{savedFormData.nextSubs.plan}</strong> plan on a{' '}
+                    <strong style={{ textDecoration: 'underline' }}>{savedFormData.nextSubs.duration}</strong> basis after Trial, which you can change anytime.
+                  </span>
+                ) : (
+                  <span>
+                    You have downgraded your plan to <strong style={{ textDecoration: 'underline' }}>{savedFormData.nextSubs.plan}</strong> for the{' '}
+                    <strong style={{ textDecoration: 'underline' }}>{savedFormData.nextSubs.duration}</strong> duration.
+                  </span>
+                )}
+              </div></>
           )}
 
+          <br />
 
           {/* Render the subscription status banner */}
           {renderAlertBanner()}
-
-          {/* Footer Buttons */}
-          {/* <div
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              justifyContent: 'center',
-              gap: 40,
-              marginTop: 16,
-            }}
-          >
-            <Button
-              intent="primary"
-              large
-              style={{
-                minWidth: 280,
-                height: 52,
-                fontSize: 16,
-                fontWeight: 600,
-                borderRadius: 8,
-              }}
-              onClick={() => setDialogOpen(false)}
-            >
-              Close
-            </Button>
-          </div> */}
         </div>
       </Dialog>
     </div>
