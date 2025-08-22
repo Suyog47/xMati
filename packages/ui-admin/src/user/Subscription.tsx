@@ -70,6 +70,9 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   // Add a new state to store refund details
   const [refundDetails, setRefundDetails] = useState<{
     status: boolean
+    usedMonth?: number
+    monthlyAmount?: number
+    usedAmount?: number
     daysRemainingInCycle?: number
     remainingMonths?: number
     refundAmount?: string
@@ -1181,7 +1184,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                       </>
                     )}
                     {calculatedData.action !== 'downgrade' && (
-                      <li>Final amount (${`${actualAmount} - ${Number(calculatedData.totalLeftAmount).toFixed(2)}`}): <strong>${Number(calculatedData.amount).toFixed(2)}</strong></li>
+                      <li>Final amount (${`${actualAmount} - $${Number(calculatedData.totalLeftAmount).toFixed(2)}`}): <strong>${Number(calculatedData.amount).toFixed(2)}</strong></li>
                     )}
                   </ul>
                 </div>
@@ -1299,6 +1302,9 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
 
       return {
         status: true,
+        usedMonth,
+        monthlyAmount,
+        usedAmount,
         daysRemainingInCycle: daysRemaining,
         remainingMonths,
         refundAmount: refundAmount.toFixed(2),
@@ -1489,18 +1495,20 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                       Supported Channels:
                     </div>
                     {['Whatsapp', 'Web Channel', 'Telegram', 'Slack', 'Facebook Messenger'].map((feature) => (
-                      <div
-                        key={feature}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          marginBottom: '6px',
-                          fontSize: '0.9em'
-                        }}
-                      >
-                        <span style={{ color: '#4caf50', marginRight: '6px' }}>✓</span>
-                        {feature}
-                      </div>
+                      (plan === 'Starter' && feature === 'Whatsapp') ? null : (
+                        <div
+                          key={feature}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            marginBottom: '6px',
+                            fontSize: '0.9em'
+                          }}
+                        >
+                          <span style={{ color: '#4caf50', marginRight: '6px' }}>✓</span>
+                          {feature}
+                        </div>
+                      )
                     ))}
                   </div>
                 </div>
@@ -1852,8 +1860,8 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       <Dialog
         isOpen={isConfirmCancelDialogOpen}
         onClose={() => setIsConfirmCancelDialogOpen(false)}
-        title="Confirm Subscription Cancellation"
-        icon="warning-sign"
+        title='Confirm Subscription Cancellation'
+        icon='warning-sign'
         canOutsideClickClose={false}
       >
         {/* Fullscreen loader while refund is processing */}
@@ -1865,7 +1873,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
               left: 0,
               width: '100vw',
               height: '100vh',
-              background: 'rgba(255,255,255,0.85)',
+              background: 'rgba(255,255,255,0.9)',
               zIndex: 99999,
               display: 'flex',
               flexDirection: 'column',
@@ -1873,90 +1881,155 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
               justifyContent: 'center',
             }}
           >
-            {/* Simple CSS spinner */}
+            {/* Spinner */}
             <div
               style={{
-                border: '8px solid #f3f3f3',
-                borderTop: '8px solid #106ba3',
+                border: '6px solid #eee',
+                borderTop: '6px solid #106ba3',
                 borderRadius: '50%',
-                width: 60,
-                height: 60,
+                width: 55,
+                height: 55,
                 animation: 'spin 1s linear infinite',
-                marginBottom: 24,
+                marginBottom: 20,
               }}
             />
             <style>
               {`
-                @keyframes spin {
-                  0% { transform: rotate(0deg); }
-                  100% { transform: rotate(360deg); }
-                }
-              `}
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}
             </style>
-            <div style={{ fontSize: 20, color: '#106ba3', fontWeight: 600 }}>
-              Your Cancellation is in progress...
+            <div style={{ fontSize: 18, color: '#106ba3', fontWeight: 600 }}>
+              Processing your cancellation...
             </div>
           </div>
         )}
+
         <div style={{ padding: '20px', textAlign: 'center' }}>
-          <h2 style={{ color: '#d9822b', marginBottom: '10px' }}>Are you sure?</h2>
-          <p style={{ fontSize: '1.1em', color: '#666' }}>
-            {subscription === 'Trial' ? 'Cancelling will stop the subscription plan from getting activated after Trial period. Till then you can use the service.'
-              : refundDetails && typeof refundDetails.daysRemainingInCycle === 'number'
-                ? (
-                  <>
-                    Cancelling your account will keep your subscription active until{' '}
-                    <strong>
-                      {new Date(
-                        new Date().setDate(new Date().getDate() + refundDetails.daysRemainingInCycle)
-                      ).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })}
-                    </strong>.
-                    {' '}
-                    {Number(refundDetails.refundAmount) <= 0
-                      ? 'No refund will be processed.'
-                      : (
-                        <>
-                          A refund of $<strong>{refundDetails.refundAmount}</strong> will be processed for the remaining <strong>{refundDetails.remainingMonths}</strong> months.
-                        </>
-                      )
-                    }
-                  </>
-                )
-                : 'Cancelling your account will keep your subscription active until the end of your current cycle. Any applicable refund for the remaining months (if any) will be processed shortly.'}
+          <h2 style={{ color: '#d9822b', marginBottom: '12px' }}>Are you sure you want to cancel?</h2>
+
+          {/* Explanation */}
+          <p style={{ fontSize: '1em', color: '#555', marginBottom: 20 }}>
+            {subscription === 'Trial' ? (
+              <>
+                Cancelling will stop your subscription from activating after the trial period.
+                You can continue using the service until your trial ends.
+              </>
+            ) : refundDetails ? (
+              <>
+                Your subscription will remain active until{' '}
+                <strong><u>
+                  {new Date(
+                    new Date().setDate(new Date().getDate() + (refundDetails.daysRemainingInCycle ?? 0))
+                  ).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })}
+                </u></strong>.
+                Below is a breakdown of your cancellation details:
+              </>
+            ) : (
+              <>
+                Cancelling will keep your subscription active until the end of the current billing cycle.
+                Refunds (if any) will be processed automatically.
+              </>
+            )}
           </p>
 
-          {/* Display refund details */}
-          <div style={{ marginTop: 24, color: '#c23030', fontWeight: 500, fontSize: 16 }}>
-            This action is irreversible. You will need to <strong>log in again</strong> to continue using the plan.
+          {/* Refund Breakdown */}
+          {refundDetails && (
+            <div
+              style={{
+                background: '#f9f9f9',
+                border: '1px solid #eee',
+                borderRadius: 8,
+                padding: '16px',
+                textAlign: 'left',
+                fontSize: '0.95em',
+                maxWidth: 480,
+                margin: '0 auto 20px',
+                lineHeight: 1.5,
+              }}
+            >
+              <h4 style={{ marginTop: 0, marginBottom: 12, color: '#106ba3' }}>
+                Refund Calculation:
+              </h4>
+              <p style={{ marginBottom: 10 }}>
+                The amount you have paid initially:- <strong>{savedSubData.amount}</strong>
+              </p>
+
+
+              <p style={{ marginBottom: 10 }}>
+                You will be charged for <strong>{refundDetails.usedMonth}</strong> month(s) of your subscription.
+                Each month will cost you <strong>${refundDetails.monthlyAmount}</strong>.
+              </p>
+
+              <p style={{ marginBottom: 10 }}>
+                That means, you have used <span>({`${(refundDetails.usedMonth ?? 0)} * $${(refundDetails.monthlyAmount ?? 0)}`})</span> = <strong>${(refundDetails.usedAmount ?? 0)}</strong> till now,
+              </p>
+
+              <p style={{ marginBottom: 10 }}>
+                And you have <strong>{refundDetails.remainingMonths}</strong> full month(s) left unused,
+              </p>
+
+              <p style={{ marginBottom: 10 }}>
+                So the remaining value comes as <span>{`${savedSubData.amount} - $${refundDetails.usedAmount}`}</span> = <strong>${refundDetails.refundAmount}</strong>.
+
+              </p>
+
+              <hr style={{ margin: '14px 0' }} />
+
+              <div
+                style={{
+                  fontSize: '1.1em',
+                  fontWeight: 600,
+                  textAlign: 'center',
+                  color: Number(refundDetails.refundAmount) > 0 ? '#106ba3' : '#d33',
+                }}
+              >
+                {Number(refundDetails.refundAmount) > 0 ? (
+                  <>💰 Your refund amount is <strong style={{ fontSize: '1.3em' }}><u>${refundDetails.refundAmount}</u></strong></>
+                ) : (
+                  <>⚠️ No refund will be processed</>
+                )}
+              </div>
+            </div>
+          )}
+
+
+          {/* Warning */}
+          <div style={{ marginTop: 12, color: '#c23030', fontSize: '1.1em' }}>
+            ⚠️ This action is <strong>irreversible</strong>.
+            We need to log you out and log in again if you decide to cancel your plan.
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginTop: 30 }}>
+          {/* Confirm Button */}
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 28 }}>
             <Button
-              intent="danger"
+              intent='danger'
               onClick={async () => {
                 void cancelSubscription()
               }}
               style={{
-                marginTop: '16px',
-                padding: '14px 32px',
-                fontSize: '1.05em',
-                fontWeight: 'bold',
-                minWidth: '250px',
+                padding: '12px 28px',
+                fontSize: '1em',
+                fontWeight: 600,
+                minWidth: '220px',
                 borderRadius: 6,
                 cursor: isLoadingTransactions ? 'not-allowed' : 'pointer',
-                opacity: isLoadingTransactions ? 0.4 : 1,
+                opacity: isLoadingTransactions ? 0.5 : 1,
               }}
               disabled={isLoadingTransactions}
             >
-              Confirm Cancellation
+              {isLoadingTransactions ? 'Processing...' : 'Confirm Cancellation'}
             </Button>
           </div>
         </div>
       </Dialog>
+
 
       {/* Subscription cancelled dialog */}
       <Dialog

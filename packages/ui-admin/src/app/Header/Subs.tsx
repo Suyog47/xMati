@@ -225,10 +225,12 @@ export const Subs = () => {
                 Supported Channels:
               </div>
               <ul style={{ paddingLeft: 16 }}>
-                {['Web Channel', 'Telegram', 'Slack', 'Facebook Messenger'].map((ch, idx) => (
-                  <li key={idx} style={{ marginBottom: 6, color: '#106ba3' }}>
-                    ✓ {ch}
-                  </li>
+                {['Whatsapp', 'Web Channel', 'Telegram', 'Slack', 'Facebook Messenger'].map((ch, idx) => (
+                  (savedSubData.subscription === 'Starter' && ch === 'Whatsapp') ? null : (
+                    <li key={idx} style={{ marginBottom: 6, color: '#106ba3' }}>
+                      ✓ {ch}
+                    </li>
+                  )
                 ))}
               </ul>
             </div>
