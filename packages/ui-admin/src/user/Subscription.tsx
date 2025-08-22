@@ -106,33 +106,22 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       const newPlan = selectedTab
 
       let data
+      let action
 
       if (currentPlan === 'Starter' && newPlan === 'Professional') {
-        data = calculateUpgradeAmount(
-          savedSubData.createdAt,
-          savedSubData.till,
-          currentPlan,
-          currentAmount,
-          price / 100
-        )
+        action = 'upgrade'
       } else if (currentPlan === 'Professional' && newPlan === 'Starter') {
-        data = calculateDowngradeAmount(
-          savedSubData.createdAt,
-          savedSubData.till,
-          currentPlan,
-          currentAmount,
-          price / 100
-        )
+        action = 'downgrade'
       } else if (durationOrder[selectedDuration] > durationOrder[savedSubData.duration]) {
-        data = calculateUpgradeAmount(
-          savedSubData.createdAt,
-          savedSubData.till,
-          currentPlan,
-          currentAmount,
-          price / 100
-        )
+        action = 'upgrade'
       } else if (durationOrder[selectedDuration] < durationOrder[savedSubData.duration]) {
-        data = calculateDowngradeAmount(
+        action = 'downgrade'
+      } else {
+        action = 'upgrade' // Default to upgrade
+      }
+
+      if (action === 'upgrade') {
+        data = calculateUpgradeAmount(
           savedSubData.createdAt,
           savedSubData.till,
           currentPlan,
@@ -140,13 +129,21 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
           price / 100
         )
       } else {
-        data = calculateUpgradeAmount(
+        data = calculateDowngradeAmount(
           savedSubData.createdAt,
           savedSubData.till,
           currentPlan,
           currentAmount,
           price / 100
         )
+        // } else {
+        //   data = {
+        //     status: true,
+        //     refund: true,
+        //     action: 'downgrade',
+        //     amount: 0,
+        //   }
+        // }
       }
 
       if (data) {
