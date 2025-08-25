@@ -76,7 +76,7 @@ class Bots extends Component<Props> {
     upgradeSelectedDuration: 'monthly',
     upgradePrice: 100,
     upgradeInProgress: false, // new state for upgrade loader
-    selectedBotIds: [] as string[] // new state for selected bot ids in the Bots limit exceeded Dialog
+    selectedBotIds: [] as string[], // new state for selected bot ids in the Bots limit exceeded Dialog
   }
 
   // New handler to update upgrade selection and price
@@ -188,6 +188,14 @@ class Bots extends Component<Props> {
       this.formData = JSON.parse(localStorage.getItem('formData') || '{}')
       this.subData = JSON.parse(localStorage.getItem('subData') || '{}')
 
+      // Auto-select bots with 'twilio' channel key
+      if (this.formData.filteredBots && this.formData.filteredBots.length) {
+        const autoSelected = this.formData.filteredBots
+          .filter((bot: any) => bot.messaging?.channels && Object.keys(bot.messaging.channels)[0] === 'twilio')
+          .map((bot: any) => bot.id)
+        this.setState({ selectedBotIds: autoSelected })
+      }
+
       this.state.numberOfBots = this.formData.numberOfBots || 0 // Initialize from localStorage
       console.log(this.formData)
       console.log(this.subData)
@@ -249,14 +257,14 @@ class Bots extends Component<Props> {
 
           localStorage.setItem('subData', JSON.stringify({ ... this.subData, promptRun: true }))  // set prompt run to false
 
-          // Hide the prompt after 10 seconds
+          // Hide the prompt after 8 seconds
           setTimeout(() => {
             this.setState({ showExpiryPrompt: false })
-          }, 10000)
+          }, 8000)
         }
 
       }
-    }, 1500) // Delay to ensure localStorage is populated
+    }, 700) // Delay to ensure localStorage is populated
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     telemetry.startFallback(api.getSecured({ useV1: true })).catch()
@@ -872,7 +880,7 @@ class Bots extends Component<Props> {
                   gap: '12px'
                 }}>
                   {this.formData.filteredBots && this.formData.filteredBots.length ? (
-                    this.formData.filteredBots.map((bot: { id: string; name: string }) => (
+                    this.formData.filteredBots.map((bot: { id: string; name: string; messaging: { channels: { [key: string]: any } } }) => (
                       <div
                         key={bot.id}
                         style={{
@@ -910,6 +918,16 @@ class Bots extends Component<Props> {
                         )}
                         <div style={{ fontWeight: 600, marginBottom: '5px' }}>{bot.name}</div>
                         <div style={{ fontSize: '13px', color: '#6c757d' }}>ID: {bot.id}</div>
+                        <div style={{ fontSize: '13px', color: '#6c757d' }}>
+                          Channel: {' '}
+                          {
+                            bot.messaging?.channels
+                              ? Object.keys(bot.messaging.channels)[0] === 'twilio'
+                                ? 'Whatsapp'
+                                : Object.keys(bot.messaging.channels)[0].charAt(0).toUpperCase() + Object.keys(bot.messaging.channels)[0].slice(1)
+                              : 'Web Chat'
+                          }
+                        </div>
                       </div>
                     ))
                   ) : (

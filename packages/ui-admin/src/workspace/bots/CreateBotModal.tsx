@@ -606,7 +606,11 @@ class CreateBotModal extends Component<Props, State> {
                 <Select
                   id="select-bot-channel"
                   tabIndex="5"
-                  options={this.state.channel}
+                  options={
+                    this.savedSubData.subscription === 'Starter'
+                      ? this.state.channel.filter(c => c.id !== 'whatsapp')
+                      : this.state.channel
+                  }
                   value={this.state.selectedChannel}
                   onChange={selectedChannel => {
                     this.resetvalues()

@@ -151,7 +151,6 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
 
       if (data) {
         setCalculatedData(data) // Update state here
-        console.log('data ', data)
         price = (data.amount) * 100 // Convert to cents for Stripe
       }
     }
@@ -170,7 +169,6 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       amt = 100 //If the 'amount' is zero, default to $1.00
     }
 
-    console.log(amt)
     setIsLoadingSecret(true)
     setPaymentError('')
     try {
@@ -956,7 +954,6 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                         (savedSubData.subscription === selectedTab && savedSubData.duration === opt.value)
                       }
                       onChange={() => {
-                        console.log(`selectedDuration: ${opt.value}, amount: ${amount}`)
                         setSelectedDuration(opt.value)
                       }}
                     />
@@ -2030,7 +2027,6 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         </div>
       </Dialog>
 
-
       {/* Subscription cancelled dialog */}
       <Dialog
         isOpen={isCancelDialogOpen}
@@ -2045,7 +2041,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         <div style={{ padding: '20px', textAlign: 'center' }}>
           <h2 style={{ color: '#4caf50', marginBottom: '10px' }}>Thank You!</h2>
           <p style={{ fontSize: '1.1em', color: '#666' }}>
-            Your Subscription has been cancelled and revoked back to 3-day trial...
+            Your subscription has been cancelled and automatic renewal is now disabled.
           </p>
           <div style={{ marginTop: 10, color: '#106ba3', fontWeight: 500, fontSize: 15 }}>
             You now need to log out and will need to log in again.<br />
