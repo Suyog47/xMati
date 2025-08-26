@@ -1,6 +1,6 @@
 import { Button, FormGroup, InputGroup, Intent, Spinner, SpinnerSize } from '@blueprintjs/core'
 import { lang } from 'botpress/shared'
-import React, { FC, useState, useRef } from 'react'
+import React, { FC, useState, useRef, useEffect } from 'react' // added useEffect
 import { useHistory } from 'react-router-dom'
 
 interface Props { }
@@ -15,6 +15,7 @@ export const ChangePasswordForm: FC<Props> = props => {
   const [isOtpValid, setOtpValid] = useState(false)
   const [otpChecked, setOtpChecked] = useState(false)
   const [otpSentMessage, setOtpSentMessage] = useState('')
+  const [resendCountdown, setResendCountdown] = useState(0) // New state for timer
 
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -97,6 +98,7 @@ export const ChangePasswordForm: FC<Props> = props => {
         setReceivedOtp(data.otp) // Capture OTP from response
         const message = resend ? `Your OTP has been resent to ${email}` : `Your OTP has been sent to ${email}`
         setOtpSentMessage(message)
+        setResendCountdown(30) // Start the 30 sec timer
       } else { // Unregistered email
         setEmailValid(false)
         setEmailChecked(true)
@@ -177,6 +179,16 @@ export const ChangePasswordForm: FC<Props> = props => {
     }
   }
 
+  // useEffect to handle countdown
+  useEffect(() => {
+    if (resendCountdown > 0) {
+      const timerId = setTimeout(() => {
+        setResendCountdown(resendCountdown - 1)
+      }, 1000)
+      return () => clearTimeout(timerId)
+    }
+  }, [resendCountdown])
+
   return (
     <div className="form-container" style={{ position: 'relative' }}>
       <form onSubmit={onSubmit}>
@@ -233,6 +245,11 @@ export const ChangePasswordForm: FC<Props> = props => {
                   Invalid OTP
                 </div>
               )}
+              {resendCountdown > 0 && ( // timer display
+                <div style={{ marginTop: '5px' }}>
+                  Resend OTP available in <strong>{resendCountdown}</strong> second{resendCountdown !== 1 ? 's' : ''}
+                </div>
+              )}
             </FormGroup>
 
             <Button
@@ -250,7 +267,7 @@ export const ChangePasswordForm: FC<Props> = props => {
               text="Resend OTP"
               id="btn-resend-otp"
               onClick={() => checkEmail(true)}
-              disabled={isLoading}
+              disabled={isLoading || resendCountdown > 0} // disable while timer is active
               intent={Intent.PRIMARY}
               style={{ marginTop: '10px' }}
             />

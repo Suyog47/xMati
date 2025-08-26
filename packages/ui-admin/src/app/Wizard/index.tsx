@@ -109,8 +109,8 @@ const CustomerWizard: React.FC = () => {
   })
   const [errors, setErrors] = useState<Errors>({})
   const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false) // Big loader for "Check User"
-  const [isValidatingCard, setIsValidatingCard] = useState(false) // Small loader for "Validate Card"
+  const [isLoading, setIsLoading] = useState(false) // Big loader for 'Check User'
+  const [isValidatingCard, setIsValidatingCard] = useState(false) // Small loader for 'Validate Card'
   const [cardValidated, setCardValidated] = useState(false) // State to track card validation success
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [cardErrorMessage, setCardErrorMessage] = useState<string | null>(null)
@@ -120,11 +120,12 @@ const CustomerWizard: React.FC = () => {
   // New state variables for OTP
   const [generatedOTP, setGeneratedOTP] = useState<string>('')
   const [enteredOTP, setEnteredOTP] = useState<string>('')
-  const [otpVerified, setOtpVerified] = useState<boolean>(false) // New state variable
-  // New state variables for OTP loaders
+  const [otpVerified, setOtpVerified] = useState<boolean>(false)
   const [isVerifyingOtp, setIsVerifyingOtp] = useState<boolean>(false)
   const [isResendingOtp, setIsResendingOtp] = useState<boolean>(false)
   const [otpResentMessage, setOtpResentMessage] = useState<string>('')
+  // New state for resend OTP countdown timer
+  const [resendCountdown, setResendCountdown] = useState<number>(0)
 
   const togglePasswordVisibility = () => {
     setShowPassword(prevState => !prevState)
@@ -162,6 +163,16 @@ const CustomerWizard: React.FC = () => {
     }))
   }, [formData.industryType])
 
+  // useEffect to handle countdown
+  useEffect(() => {
+    if (resendCountdown > 0) {
+      const timerId = setTimeout(() => {
+        setResendCountdown(resendCountdown - 1)
+      }, 1000)
+      return () => clearTimeout(timerId)
+    }
+  }, [resendCountdown])
+
 
   useEffect(() => {
     const basePrice = selectedPlan === 'Starter' ? 18 : 25
@@ -176,6 +187,7 @@ const CustomerWizard: React.FC = () => {
     }
     setPrice(finalPrice)
   }, [selectedPlan, selectedDuration])
+
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -499,9 +511,7 @@ const CustomerWizard: React.FC = () => {
       setGeneratedOTP(otp)
       await fetch(`${API_URL}/send-email-otp`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           fullName: formData.fullName,
           email: formData.email,
@@ -509,10 +519,9 @@ const CustomerWizard: React.FC = () => {
         }),
       })
 
-
       if (resent) {
-        // Set OTP resend notification
         setOtpResentMessage('OTP has been resent successfully')
+        setResendCountdown(30) // Start the 30-second timer
       }
     } catch (error) {
       console.log('Error sending OTP:', error)
@@ -685,6 +694,7 @@ const CustomerWizard: React.FC = () => {
         </div>
         <div className='wizard-body'>
 
+          {/* Personal Information */}
           {step === 1 && (
             <>
               <div className='step'>
@@ -804,6 +814,7 @@ const CustomerWizard: React.FC = () => {
             </>
           )}
 
+          {/* Email verification */}
           {step === 2 && (
             <>
               <div className='step'>
@@ -836,44 +847,97 @@ const CustomerWizard: React.FC = () => {
                   </p>
                 )}
                 {!otpVerified && (
-                  <div style={{ marginTop: '10px', textAlign: 'center', display: 'flex', gap: '10px', justifyContent: 'center' }}>
-                    <button
-                      onClick={handleOTPVerification}
-                      disabled={otpVerified || isVerifyingOtp}
-                      style={{
-                        padding: '8px 16px',
-                        backgroundColor: '#28a745',
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px'
-                      }}
-                    >
-                      {isVerifyingOtp && <div className='small-loader' style={{ background: 'black' }}></div>}
-                      Verify OTP
-                    </button>
-                    <button
-                      onClick={() => sendOtp(true)}
-                      disabled={otpVerified || isResendingOtp}
-                      style={{
-                        padding: '8px 16px',
-                        backgroundColor: '#ffc107',
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px'
-                      }}
-                    >
-                      {isResendingOtp && <div className='small-loader' style={{ background: 'black' }}></div>}
-                      Resend OTP
-                    </button>
-                  </div>
+                  <>
+                    <div style={{ marginTop: '10px', textAlign: 'center', display: 'flex', gap: '10px', justifyContent: 'center' }}>
+                      <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
+                        {/* ✅ Verify OTP Button */}
+                        <button
+                          onClick={handleOTPVerification}
+                          disabled={otpVerified || isVerifyingOtp}
+                          style={{
+                            padding: '10px 18px',
+                            backgroundColor: otpVerified ? '#6c757d' : '#28a745',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: '8px',
+                            cursor: otpVerified ? 'not-allowed' : 'pointer',
+                            fontSize: '15px',
+                            fontWeight: 500,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            minWidth: '120px',
+                            boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+                            transition: 'background 0.3s ease'
+                          }}
+                        >
+                          {isVerifyingOtp ? (
+                            <div
+                              className='small-loader'
+                              style={{
+                                border: '3px solid rgba(255,255,255,0.3)',
+                                borderTop: '3px solid white',
+                                borderRadius: '50%',
+                                width: '18px',
+                                height: '18px',
+                                animation: 'spin 1s linear infinite'
+                              }}
+                            />
+                          ) : (
+                            'Verify OTP'
+                          )}
+                        </button>
+
+                        {/* 🔁 Resend OTP Button */}
+                        <button
+                          onClick={() => sendOtp(true)}
+                          disabled={otpVerified || isResendingOtp || resendCountdown > 0}
+                          style={{
+                            padding: '10px 18px',
+                            backgroundColor:
+                              otpVerified || resendCountdown > 0 ? '#6c757d' : '#007bff',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: '8px',
+                            cursor:
+                              otpVerified || resendCountdown > 0 ? 'not-allowed' : 'pointer',
+                            fontSize: '15px',
+                            fontWeight: 500,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            minWidth: '120px',
+                            boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+                            transition: 'background 0.3s ease'
+                          }}
+                        >
+                          {isResendingOtp ? (
+                            <div
+                              className='small-loader'
+                              style={{
+                                border: '3px solid rgba(255,255,255,0.3)',
+                                borderTop: '3px solid white',
+                                borderRadius: '50%',
+                                width: '18px',
+                                height: '18px',
+                                animation: 'spin 1s linear infinite'
+                              }}
+                            />
+                          ) : resendCountdown > 0 ? (
+                            `Resend in ${resendCountdown}s`
+                          ) : (
+                            'Resend OTP'
+                          )}
+                        </button>
+                      </div>
+
+                    </div>
+                    {/* {resendCountdown > 0 && ( // timer display
+                      <div style={{ marginTop: '5px' }}>
+                        Resend OTP available in <strong>{resendCountdown}</strong> second{resendCountdown !== 1 ? 's' : ''}
+                      </div>
+                    )} */}
+                  </>
                 )}
                 {otpVerified && (
                   <p style={{ marginTop: '10px', color: 'green', textAlign: 'center' }}>
@@ -897,6 +961,7 @@ const CustomerWizard: React.FC = () => {
             </>
           )}
 
+          {/* Organization Information */}
           {step === 3 && (
             <>
               <div className='step'>
@@ -968,6 +1033,7 @@ const CustomerWizard: React.FC = () => {
             </>
           )}
 
+          {/* Subscription plan */}
           {step === 4 && (
             <>
               <div
@@ -1078,9 +1144,9 @@ const CustomerWizard: React.FC = () => {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                     <label style={{ fontSize: '1em', color: '#555' }}>
                       <input
-                        type="radio"
-                        name="subscriptionDuration"
-                        value="monthly"
+                        type='radio'
+                        name='subscriptionDuration'
+                        value='monthly'
                         checked={selectedDuration === 'monthly'}
                         onChange={() => setSelectedDuration('monthly')}
                         style={{ marginRight: '10px' }}
@@ -1089,9 +1155,9 @@ const CustomerWizard: React.FC = () => {
                     </label>
                     <label style={{ fontSize: '1em', color: '#555' }}>
                       <input
-                        type="radio"
-                        name="subscriptionDuration"
-                        value="half-yearly"
+                        type='radio'
+                        name='subscriptionDuration'
+                        value='half-yearly'
                         checked={selectedDuration === 'half-yearly'}
                         onChange={() => setSelectedDuration('half-yearly')}
                         style={{ marginRight: '10px' }}
@@ -1100,9 +1166,9 @@ const CustomerWizard: React.FC = () => {
                     </label>
                     <label style={{ fontSize: '1em', color: '#555' }}>
                       <input
-                        type="radio"
-                        name="subscriptionDuration"
-                        value="yearly"
+                        type='radio'
+                        name='subscriptionDuration'
+                        value='yearly'
                         checked={selectedDuration === 'yearly'}
                         onChange={() => setSelectedDuration('yearly')}
                         style={{ marginRight: '10px' }}
@@ -1132,6 +1198,7 @@ const CustomerWizard: React.FC = () => {
             </>
           )}
 
+          {/* Payment Information */}
           {step === 5 && (
             <>
               <div className='step'>
@@ -1139,7 +1206,7 @@ const CustomerWizard: React.FC = () => {
                 <p className='stepSubtitleSmall'>We are securely saving your credit card details to simplify future subscription plan purchases. No charges will be made at this time.</p>
 
                 <div className='card-element-container'>
-                  <FormGroup label="Credit/Debit Card Details">
+                  <FormGroup label='Credit/Debit Card Details'>
                     <CardElement
                       options={{
                         style: {
