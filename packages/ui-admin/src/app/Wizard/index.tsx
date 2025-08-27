@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react'
-import { IoIosCall, IoMdPerson, IoMdMail, IoMdBusiness, IoIosLock, IoMdEye, IoMdEyeOff } from 'react-icons/io'
-import Check from '../../assets/images/check.png'
-import './style.css'
 import { useHistory } from 'react-router-dom'
+import PersonalInfo from './steps/PersonalInfo'
+import EmailVerification from './steps/EmailVerification'
+import OrganizationInfo from './steps/OrganizationInfo'
+import SubscriptionPlan from './steps/SubscriptionPlan'
+import PaymentInfo from './steps/PaymentInfo'
 import bgImage from '../../assets/images/background.jpg'
 import logo from '../../assets/images/xmati.png'
+import Check from '../../assets/images/check.png'
+import './style.css'
 import api from '~/app/api'
 import { auth } from 'botpress/shared'
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
@@ -625,16 +629,13 @@ const CustomerWizard: React.FC = () => {
       width: '100%',
       minHeight: '100vh',
     }}>
-      <div
-        className='wizard-header-container'
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '10px 20px',
-          whiteSpace: 'nowrap'
-        }}
-      >
+      <div className='wizard-header-container' style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '10px 20px',
+        whiteSpace: 'nowrap'
+      }}>
         <img src={logo} alt='logo' className='wizard-header-logo' />
         <h3 style={{
           flex: 1,
@@ -657,8 +658,7 @@ const CustomerWizard: React.FC = () => {
             borderRadius: '4px',
             cursor: 'pointer',
             fontWeight: 600
-          }}
-        >
+          }}>
           Back to Login
         </button>
       </div>
@@ -669,20 +669,12 @@ const CustomerWizard: React.FC = () => {
               const stepNumber = index + 1
               const isActive = step === stepNumber
               const isCompleted = step > stepNumber
-
               return (
                 <div key={label} className='step-container'>
-                  <div
-                    className={`step ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''
-                      }`}
-                  >
+                  <div className={`step ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}`}>
                     <div className='step-title'>
                       {isCompleted && (
-                        <img
-                          src={Check}
-                          alt='Completed'
-                          className='completed-icon'
-                        />
+                        <img src={Check} alt='Completed' className='completed-icon' />
                       )}
                       <p>{label}</p>
                     </div>
@@ -693,609 +685,76 @@ const CustomerWizard: React.FC = () => {
           </div>
         </div>
         <div className='wizard-body'>
-
-          {/* Personal Information */}
           {step === 1 && (
-            <>
-              <div className='step'>
-                <p className='stepHeader'>Personal Information</p>
-                <div className='input-container'>
-                  <IoMdPerson className='input-icon' />
-                  <input
-                    type='text'
-                    name='fullName'
-                    placeholder='Full Name'
-                    value={formData.fullName}
-                    onChange={handleChange}
-                    className='custom-input'
-                  />
-                </div>
-                {errors.fullName && (
-                  <span className='error'>{errors.fullName}</span>
-                )}
-
-                <div className='input-container'>
-                  <IoMdMail className='input-icon' />
-                  <input
-                    type='email'
-                    name='email'
-                    placeholder='Email'
-                    value={formData.email}
-                    onChange={handleChange}
-                    className='custom-input'
-                  />
-                </div>
-                {errors.email && <span className='error'>{errors.email}</span>}
-
-                <div className='input-container' style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <IoIosCall className='input-icon' />
-                  <select
-                    name='countryCode'
-                    value={formData.countryCode}
-                    onChange={handleChange}
-                    style={{
-                      width: 60,
-                      minWidth: 60,
-                      fontSize: 15,
-                      padding: '4px 4px',
-                      border: 'none',
-                      borderRadius: 4,
-                      background: '#f9f9f9',
-                      textAlign: 'center'
-                    }}
-                  >
-                    {countryOptions.map(opt => (
-                      <option key={opt.code} value={opt.code} label={`${opt.code}    (${opt.name})`}>
-                        {opt.code}
-                      </option>
-                    ))}
-                  </select>
-                  <div style={{
-                    width: 1,
-                    height: 24,
-                    background: '#ccc',
-                    margin: '0 6px'
-                  }} />
-                  <input
-                    type='tel'
-                    name='phoneNumber'
-                    placeholder='Phone Number'
-                    value={formData.phoneNumber}
-                    onChange={handleChange}
-                    className='custom-input'
-                    style={{ flex: 1 }}
-                  />
-                </div>
-                {errors.countryCode && <span className='error'>{errors.countryCode}</span>}
-                {errors.phoneNumber && (
-                  <span className='error'>{errors.phoneNumber}</span>
-                )}
-
-                <div className='input-container'>
-                  <IoIosLock className='input-icon' />
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    name='password'
-                    placeholder='Password'
-                    value={formData.password}
-                    onChange={handleChange}
-                    className='custom-input'
-                  />
-                  <span className='eye-icon' onClick={togglePasswordVisibility}>
-                    {showPassword ? <IoMdEyeOff /> : <IoMdEye />}
-                  </span>
-                </div>
-                {errors.password && <span className='error'>{errors.password}</span>}
-
-              </div>
-              <div className='button-container'>
-                <button className='nextButton' onClick={nextStep} disabled={isLoading}>
-                  Next
-                </button>
-
-                {(isLoading) && (
-                  <div className='modal-overlay'>
-                    <div className='modal-content'>
-                      {isLoading ? (
-                        <>
-                          <div className='loader'></div>
-                          <p>Email is getting checked... Please wait.</p>
-                        </>
-                      ) : (
-                        <>
-                          {/* <p>{errorMessage}</p>
-                              <button onClick={() => setErrorMessage(null)}>Close</button> */}
-                        </>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </>
+            <PersonalInfo
+              formData={formData}
+              errors={errors}
+              handleChange={handleChange}
+              togglePasswordVisibility={togglePasswordVisibility}
+              showPassword={showPassword}
+              countryOptions={countryOptions}
+              nextStep={nextStep}
+              isLoading={isLoading}
+              history={history}
+            />
           )}
-
-          {/* Email verification */}
           {step === 2 && (
-            <>
-              <div className='step'>
-                <p className='stepHeader'>Email Verification</p>
-                <p className='stepDescription'>
-                  A 6-digit OTP has been generated and sent to {formData.email}. Please enter it below to verify your email.
-                </p>
-                <div className='input-container otp-input-container'>
-                  <input
-                    type='text'
-                    name='otp'
-                    placeholder='Enter OTP'
-                    value={enteredOTP}
-                    onChange={(e) => {
-                      setEnteredOTP(e.target.value)
-                      if (errors.otp) {
-                        setErrors({ ...errors, otp: '' })
-                      }
-                      setOtpVerified(false) // Reset verification if OTP changes
-                    }}
-                    disabled={otpVerified}
-                    className='custom-input'
-                    maxLength={6}
-                    style={{ fontSize: '2em', textAlign: 'center', letterSpacing: '0.5em', padding: '10px' }}
-                  />
-                </div>
-                {errors.otp && (
-                  <p style={{ marginTop: '10px', color: 'red', textAlign: 'center' }}>
-                    {errors.otp}
-                  </p>
-                )}
-                {!otpVerified && (
-                  <>
-                    <div style={{ marginTop: '10px', textAlign: 'center', display: 'flex', gap: '10px', justifyContent: 'center' }}>
-                      <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
-                        {/* ✅ Verify OTP Button */}
-                        <button
-                          onClick={handleOTPVerification}
-                          disabled={otpVerified || isVerifyingOtp}
-                          style={{
-                            padding: '10px 18px',
-                            backgroundColor: otpVerified ? '#6c757d' : '#28a745',
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: '8px',
-                            cursor: otpVerified ? 'not-allowed' : 'pointer',
-                            fontSize: '15px',
-                            fontWeight: 500,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            minWidth: '120px',
-                            boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
-                            transition: 'background 0.3s ease'
-                          }}
-                        >
-                          {isVerifyingOtp ? (
-                            <div
-                              className='small-loader'
-                              style={{
-                                border: '3px solid rgba(255,255,255,0.3)',
-                                borderTop: '3px solid white',
-                                borderRadius: '50%',
-                                width: '18px',
-                                height: '18px',
-                                animation: 'spin 1s linear infinite'
-                              }}
-                            />
-                          ) : (
-                            'Verify OTP'
-                          )}
-                        </button>
-
-                        {/* 🔁 Resend OTP Button */}
-                        <button
-                          onClick={() => sendOtp(true)}
-                          disabled={otpVerified || isResendingOtp || resendCountdown > 0}
-                          style={{
-                            padding: '10px 18px',
-                            backgroundColor:
-                              otpVerified || resendCountdown > 0 ? '#6c757d' : '#007bff',
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: '8px',
-                            cursor:
-                              otpVerified || resendCountdown > 0 ? 'not-allowed' : 'pointer',
-                            fontSize: '15px',
-                            fontWeight: 500,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            minWidth: '120px',
-                            boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
-                            transition: 'background 0.3s ease'
-                          }}
-                        >
-                          {isResendingOtp ? (
-                            <div
-                              className='small-loader'
-                              style={{
-                                border: '3px solid rgba(255,255,255,0.3)',
-                                borderTop: '3px solid white',
-                                borderRadius: '50%',
-                                width: '18px',
-                                height: '18px',
-                                animation: 'spin 1s linear infinite'
-                              }}
-                            />
-                          ) : resendCountdown > 0 ? (
-                            `Resend in ${resendCountdown}s`
-                          ) : (
-                            'Resend OTP'
-                          )}
-                        </button>
-                      </div>
-
-                    </div>
-                    {/* {resendCountdown > 0 && ( // timer display
-                      <div style={{ marginTop: '5px' }}>
-                        Resend OTP available in <strong>{resendCountdown}</strong> second{resendCountdown !== 1 ? 's' : ''}
-                      </div>
-                    )} */}
-                  </>
-                )}
-                {otpVerified && (
-                  <p style={{ marginTop: '10px', color: 'green', textAlign: 'center' }}>
-                    OTP Verified!
-                  </p>
-                )}
-                {otpResentMessage && (
-                  <p style={{ marginTop: '10px', color: '#007bff', textAlign: 'center' }}>
-                    {otpResentMessage}
-                  </p>
-                )}
-              </div>
-              <div className='button-container'>
-                <div className='buttons'>
-                  <button onClick={prevStep}>Back</button>
-                  <button onClick={nextStep}>
-                    Next
-                  </button>
-                </div>
-              </div>
-            </>
+            <EmailVerification
+              formData={formData}
+              errors={errors}
+              enteredOTP={enteredOTP}
+              setEnteredOTP={setEnteredOTP}
+              otpVerified={otpVerified}
+              isVerifyingOtp={isVerifyingOtp}
+              isResendingOtp={isResendingOtp}
+              resendCountdown={resendCountdown}
+              otpResentMessage={otpResentMessage}
+              handleOTPVerification={handleOTPVerification}
+              sendOtp={sendOtp}
+              nextStep={nextStep}
+              prevStep={prevStep}
+            />
           )}
-
-          {/* Organization Information */}
           {step === 3 && (
-            <>
-              <div className='step'>
-
-                <p className='stepHeader'>Organization Name</p>
-                <div className='input-container'>
-                  <IoMdBusiness className='input-icon' />
-                  <input
-                    type='text'
-                    name='organisationName'
-                    placeholder='Organisation Name'
-                    value={formData.organisationName}
-                    onChange={handleChange}
-                    className='custom-input'
-                  />
-                </div>
-                {errors.organisationName && (
-                  <span className='error'>{errors.organisationName}</span>
-                )}
-
-                <p className='stepHeader'>Industry Type</p>
-                <div className='selectbox-container'>
-                  <select
-                    name='industryType'
-                    className='custom-input selectbox-input'
-                    value={formData.industryType}
-                    onChange={handleChange}
-                  >
-                    <option value=''>Select Industry</option>
-                    {industryData.map((item, index) => (
-                      <option key={index} value={item.industry}>
-                        {item.industry}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                {errors.industryType && <span className='error'>{errors.industryType}</span>}
-
-                {formData.industryType && (
-                  <>
-                    <p className='stepHeader'>Sub Industry Type</p>
-                    <div className='selectbox-container'>
-                      <select
-                        name='subIndustryType'
-                        className='custom-input selectbox-input'
-                        value={formData.subIndustryType}
-                        onChange={handleChange}
-                      >
-                        <option value=''>Select Sub Industry</option>
-                        {industryData
-                          .find((item) => item.industry === formData.industryType)
-                          ?.subIndustries.map((subIndustry, index) => (
-                            <option key={index} value={subIndustry}>
-                              {subIndustry}
-                            </option>
-                          ))}
-                      </select>
-                    </div>
-                    {errors.subIndustryType && <span className='error'>{errors.subIndustryType}</span>}
-                  </>
-                )}
-              </div>
-              <div className='button-container'>
-                <div className='buttons'>
-                  <button onClick={prevStep}>Back</button>
-                  <button onClick={nextStep}>Next</button>
-                </div>
-              </div>
-            </>
+            <OrganizationInfo
+              formData={formData}
+              errors={errors}
+              industryData={industryData}
+              handleChange={handleChange}
+              nextStep={nextStep}
+              prevStep={prevStep}
+            />
           )}
-
-          {/* Subscription plan */}
           {step === 4 && (
-            <>
-              <div
-                style={{
-                  padding: 20,
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'flex-start',
-                }}
-              >
-                {/* Left: Subscription Plan Container */}
-                <div
-                  style={{
-                    flex: 1,
-                    marginRight: '20px',
-                    border: '1px solid #e0e0e0',
-                    borderRadius: '8px',
-                    padding: '15px',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                  }}
-                >
-                  <h2 style={{ marginBottom: '15px', fontSize: '1.3em', color: '#333' }}>
-                    Select Your Subscription Plan
-                  </h2>
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-around',
-                      marginBottom: '20px',
-                    }}
-                  >
-                    {['Starter', 'Professional'].map((plan) => {
-                      const basePrice = plan === 'Starter' ? 18 : 25
-                      const monthlyPrice =
-                        selectedDuration === 'monthly'
-                          ? basePrice
-                          : selectedDuration === 'half-yearly'
-                            ? (basePrice * 0.95).toFixed(2)
-                            : (basePrice * 0.85).toFixed(2)
-                      return (
-                        <div
-                          key={plan}
-                          onClick={() => setSelectedPlan(plan)}
-                          style={{
-                            flex: 1,
-                            margin: '0 10px',
-                            border: `2px solid ${selectedPlan === plan ? '#2196f3' : '#e0e0e0'}`,
-                            borderRadius: '8px',
-                            padding: '20px',
-                            cursor: 'pointer',
-                            backgroundColor: selectedPlan === plan ? '#f8fbff' : '#fff',
-                            transition: 'all 0.2s ease',
-                          }}
-                        >
-                          <h3 style={{ margin: '0 0 10px 0', fontSize: '1.2em' }}>
-                            {plan}
-                          </h3>
-                          <h4 style={{ margin: '0 0 10px 0', fontSize: '1.1em', color: '#555' }}>
-                            ${monthlyPrice}/month &nbsp;&nbsp; <span style={{ fontSize: '0.8em', color: '#666' }}> (Introductory price)</span>
-                          </h4>
-                          <p style={{ margin: '0 0 5px 0', fontSize: '0.95em', color: '#777' }}>
-                            {plan === 'Starter' ? '3 bots included' : '5 bots included'}
-                          </p>
-                          <div
-                            style={{
-                              marginTop: '10px',
-                              textAlign: 'left',
-                              fontSize: '0.9em',
-                              color: '#555',
-                            }}
-                          >
-                            <strong>Includes:</strong>
-                            <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
-                              <li>LLM Support</li>
-                              <li>HITL Enabled</li>
-                              <li>Bot Analytics</li>
-                            </ul>
-                            <strong>Supported Channels:</strong>
-                            <ul style={{ listStyleType: 'disc', paddingLeft: '20px' }}>
-                              <li>WhatsApp</li>
-                              <li>Web Chat</li>
-                              <li>Telegram</li>
-                              <li>Slack</li>
-                              <li>Facebook Messenger</li>
-                            </ul>
-                          </div>
-                        </div>
-                      )
-                    })
-                    }
-                  </div>
-                </div>
-
-                {/* Right: Subscription Duration Section */}
-                <div
-                  style={{
-                    flexBasis: '35%',
-                    border: '1px solid #e0e0e0',
-                    borderRadius: '8px',
-                    padding: '20px',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                    textAlign: 'left',
-                  }}
-                >
-                  <h4 style={{ marginBottom: '15px', fontSize: '1.2em', color: '#333' }}>
-                    Subscription Duration
-                  </h4>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    <label style={{ fontSize: '1em', color: '#555' }}>
-                      <input
-                        type='radio'
-                        name='subscriptionDuration'
-                        value='monthly'
-                        checked={selectedDuration === 'monthly'}
-                        onChange={() => setSelectedDuration('monthly')}
-                        style={{ marginRight: '10px' }}
-                      />
-                      Monthly
-                    </label>
-                    <label style={{ fontSize: '1em', color: '#555' }}>
-                      <input
-                        type='radio'
-                        name='subscriptionDuration'
-                        value='half-yearly'
-                        checked={selectedDuration === 'half-yearly'}
-                        onChange={() => setSelectedDuration('half-yearly')}
-                        style={{ marginRight: '10px' }}
-                      />
-                      Half-Yearly<span style={{ color: 'green', fontWeight: 'bold' }}>  (5% discount)</span>
-                    </label>
-                    <label style={{ fontSize: '1em', color: '#555' }}>
-                      <input
-                        type='radio'
-                        name='subscriptionDuration'
-                        value='yearly'
-                        checked={selectedDuration === 'yearly'}
-                        onChange={() => setSelectedDuration('yearly')}
-                        style={{ marginRight: '10px' }}
-                      />
-                      Yearly<span style={{ color: 'green', fontWeight: 'bold' }}>  (15% discount)</span>
-                    </label>
-                  </div>
-                  <div style={{ marginTop: '20px', fontSize: '0.95em', color: '#666' }}>
-                    <p>
-                      Enjoy a 30-day free trial. Your subscription will be activated only after the trial period ends.
-                    </p>
-                  </div>
-
-                  <div style={{ marginTop: '20px', textAlign: 'center' }}>
-                    <p style={{ fontSize: '1.1em', fontWeight: 'bold', color: '#333' }}>
-                      Price after 30-day free trial: ${price}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className='button-container'>
-                <div className='buttons'>
-                  <button onClick={prevStep}>Back</button>
-                  <button onClick={nextStep}>Next</button>
-                </div>
-              </div>
-            </>
+            <SubscriptionPlan
+              selectedPlan={selectedPlan}
+              setSelectedPlan={setSelectedPlan}
+              selectedDuration={selectedDuration}
+              setSelectedDuration={setSelectedDuration}
+              price={price}
+              nextStep={nextStep}
+              prevStep={prevStep}
+            />
           )}
-
-          {/* Payment Information */}
           {step === 5 && (
-            <>
-              <div className='step'>
-                <p className='stepHeader'>Payment Information</p>
-                <p className='stepSubtitleSmall'>We are securely saving your credit card details to simplify future subscription plan purchases. No charges will be made at this time.</p>
-
-                <div className='card-element-container'>
-                  <FormGroup label='Credit/Debit Card Details'>
-                    <CardElement
-                      options={{
-                        style: {
-                          base: { fontSize: '16px', color: '#424770', lineHeight: '24px', letterSpacing: '0.025em' },
-                          invalid: { color: '#9e2146' },
-                        },
-                        hidePostalCode: true,
-                      }}
-                    />
-                    <button
-                      onClick={verifyCard}
-                      className='validate-card-button'
-                      style={{
-                        marginTop: '20px',
-                        padding: '10px 20px',
-                        backgroundColor: '#007BFF',
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '16px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '10px',
-                      }}
-                      disabled={isValidatingCard || !stripe || !elements}
-                    >
-                      {isValidatingCard && <div className='small-loader'></div>}
-                      Verify your Card
-                    </button>
-                  </FormGroup>
-
-                  {cardValidated && (
-                    <div className='success-message'>
-                      <img
-                        src='https://cdn-icons-png.flaticon.com/512/845/845646.png'
-                        alt='Success'
-                        className='success-icon'
-                      />
-                      <span>Your card has been successfully verified.</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className='button-container'>
-                <div className='buttons'>
-                  <button onClick={prevStep}>Back</button>
-                  <button onClick={handleSubmit} disabled={isLoading || !stripe || !elements}>
-                    Submit
-                  </button>
-                </div>
-                {(isLoading || errorMessage || cardErrorMessage || isValidatingCard) && (
-                  <div className='modal-overlay'>
-                    <div className='modal-content'>
-                      {isLoading ? (
-                        <>
-                          <div className='loader'></div>
-                          <p>Your xMati account is getting created... Please wait...</p>
-                        </>
-                      ) : (
-                        <>
-                          {(errorMessage && <><p>{errorMessage}</p><button onClick={() => setErrorMessage(null)}>Close</button></>)}
-                        </>
-                      )}
-
-                      {isValidatingCard ? (
-                        <>
-                          <div className='loader'></div>
-                          <p>Your card is being validated... Please wait...</p>
-                        </>
-                      ) : (
-                        <>
-                          {(cardErrorMessage && <><p>{cardErrorMessage}</p><button onClick={() => setCardErrorMessage(null)}>Close</button></>)}
-                        </>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </>
+            <PaymentInfo
+              verifyCard={verifyCard}
+              isValidatingCard={isValidatingCard}
+              cardValidated={cardValidated}
+              isLoading={isLoading}
+              errorMessage={errorMessage}
+              cardErrorMessage={cardErrorMessage}
+              handleSubmit={handleSubmit}
+              prevStep={prevStep}
+              clearErrorMessage={() => setErrorMessage(null)}
+              clearCardErrorMessage={() => setCardErrorMessage(null)}
+            />
           )}
-
-
         </div>
       </div>
-    </div >
+    </div>
   )
 }
 
 export default CustomerWizard
+
