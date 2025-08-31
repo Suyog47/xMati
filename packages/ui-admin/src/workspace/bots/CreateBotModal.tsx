@@ -256,8 +256,8 @@ class CreateBotModal extends Component<Props, State> {
     }
     if (selectedChannel.id === 'messenger') {
       return !(
-        messengerAccessToken.trim().length >= 20 &&
-        messengerAccessToken.trim().length <= 90 &&
+        messengerAccessToken.trim().length >= 50 &&
+        messengerAccessToken.trim().length <= 400 &&
         messengerAppSecret.trim().length >= 20 &&
         messengerAppSecret.trim().length <= 90 &&
         !isProcessing
@@ -674,7 +674,7 @@ class CreateBotModal extends Component<Props, State> {
 
                   {this.state.selectedChannel && this.state.selectedChannel.id === 'messenger' && (
                     <div>
-                      <FormGroup label="Messenger Access Token" labelFor="messenger-access-token" labelInfo="(Must be between 20 and 90 characters.)">
+                      <FormGroup label="Messenger Access Token" labelFor="messenger-access-token" labelInfo="(Must be between 50 and 400 characters.)">
                         <InputGroup
                           id="messenger-access-token"
                           placeholder="Enter Messenger Access Token"
