@@ -276,6 +276,14 @@ class CreateBotModal extends Component<Props, State> {
     return false
   }
 
+  channelTutorials: Record<string, string> = {
+    'webchat': 'https://www.youtube.com/embed/PPgn5X7l-So',
+    'telegram': 'https://www.youtube.com/embed/XHfE8cqgdiE',
+    'slack': 'https://www.youtube.com/embed/iRU9iPO26jY',
+    'messenger': 'https://www.youtube.com/embed/CvQ-JIqU-Yk',
+    'whatsapp': 'https://www.youtube.com/embed/rP3iLSqBUBI'
+  }
+
   get isBotLimitExceeded() {
     this.savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
     const { subscription } = this.savedSubData
@@ -598,7 +606,11 @@ class CreateBotModal extends Component<Props, State> {
           title="Select a Channel"
           icon="select"
           canOutsideClickClose={false}
-          style={{ width: '600px', borderRadius: '8px', boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)' }}
+          style={{
+            width: this.state.selectedChannel ? '1100px' : '600px',
+            borderRadius: '8px',
+            boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)'
+          }}
         >
           <form ref={form => (this._form2 = form)}>
             <div className={Classes.DIALOG_BODY}>
@@ -623,100 +635,167 @@ class CreateBotModal extends Component<Props, State> {
 
               {this.state.selectedChannel && (
                 <Callout intent="primary">
-                  <div
-                    style={{
-                      fontSize: '14px',
-                      maxHeight: '40vh',
-                      overflowY: 'auto',
-                      paddingRight: '2px'
-                    }}
-                    dangerouslySetInnerHTML={{
-                      __html: channelInstructions[this.state.selectedChannel.id] // Use the dynamically created object
-                    }}
-                  /><br />
-                  <Divider></Divider>
-                  {this.state.selectedChannel && this.state.selectedChannel.id === 'telegram' && (
-                    <div>
-                      <FormGroup label="Bot Token" labelFor="bot-token" labelInfo="(Must be between 20 and 90 characters.)">
-                        <InputGroup
-                          id="bot-token"
-                          placeholder="Enter Telegram Bot Token"
-                          onChange={(e) => {
-                            this.setState({ botToken: e.target.value })
-                          }}
-                        />
-                      </FormGroup>
-                    </div>
-                  )}
+                  <div style={{ display: 'flex', gap: '12px' }}>
 
-                  {this.state.selectedChannel && this.state.selectedChannel.id === 'slack' && (
-                    <div>
-                      <FormGroup label="Slack Bot Token" labelFor="slack-bot-token" labelInfo="(Must be between 20 and 90 characters.)">
-                        <InputGroup
-                          id="slack-bot-token"
-                          placeholder="Enter Slack Bot Token"
-                          onChange={(e) => {
-                            this.setState({ slackBotToken: e.target.value })
-                          }}
-                        />
-                      </FormGroup>
-                      <FormGroup label="Slack Signing Secret" labelFor="slack-signing-secret" labelInfo="(Must be between 20 and 90 characters.)">
-                        <InputGroup
-                          id="slack-signing-secret"
-                          placeholder="Enter Slack Signing Secret"
-                          onChange={(e) => {
-                            this.setState({ slackSigningSecret: e.target.value })
-                          }}
-                        />
-                      </FormGroup>
-                    </div>
-                  )}
+                    {/* Left: Inputs + Instructions */}
+                    <div style={{ flex: 1, overflowY: 'auto', maxHeight: '65vh', paddingRight: '8px' }}>
+                      {/* Instructions (scrollable) */}
+                      <div
+                        style={{
+                          maxHeight: '300px',   // 👈 match YouTube iframe height
+                          overflowY: 'auto',
+                          paddingRight: '6px',
+                          border: '1px solid #eee',
+                          borderRadius: '6px',
+                          marginBottom: '12px'
+                        }}
+                        dangerouslySetInnerHTML={{
+                          __html: channelInstructions[this.state.selectedChannel.id]
+                        }}
+                      />
 
-                  {this.state.selectedChannel && this.state.selectedChannel.id === 'messenger' && (
-                    <div>
-                      <FormGroup label="Messenger Access Token" labelFor="messenger-access-token" labelInfo="(Must be between 50 and 400 characters.)">
-                        <InputGroup
-                          id="messenger-access-token"
-                          placeholder="Enter Messenger Access Token"
-                          onChange={(e) => {
-                            this.setState({ messengerAccessToken: e.target.value })
-                          }}
-                        />
-                      </FormGroup>
-                      <FormGroup label="Messenger App Secret" labelFor="messenger-app-secret" labelInfo="(Must be between 20 and 90 characters.)">
-                        <InputGroup
-                          id="messenger-app-secret"
-                          placeholder="Enter Messenger App Secret"
-                          onChange={(e) => {
-                            this.setState({ messengerAppSecret: e.target.value })
-                          }}
-                        />
-                      </FormGroup>
-                    </div>
-                  )}
+                      <Divider style={{ margin: '12px 0' }} />
 
-                  {this.state.selectedChannel && this.state.selectedChannel.id === 'whatsapp' && (
-                    <div>
-                      <FormGroup label="Twilio account SID" labelFor="twilio-account-sid" labelInfo="(Must be between 20 and 90 characters.)">
-                        <InputGroup
-                          id="twilio-account-sid"
-                          placeholder="Enter twilio account SID"
-                          onChange={(e) => {
-                            this.setState({ twilioAccountSid: e.target.value })
-                          }}
-                        />
-                      </FormGroup>
-                      <FormGroup label="Twilio auth token" labelFor="twilio-auth-token" labelInfo="(Must be between 20 and 90 characters.)">
-                        <InputGroup
-                          id="twilio-auth-token"
-                          placeholder="Enter Twlio auth token"
-                          onChange={(e) => {
-                            this.setState({ twilioAuthToken: e.target.value })
-                          }}
-                        />
-                      </FormGroup>
+                      {/* Fixed inputs */}
+                      <div style={{ flexShrink: 0 }}>
+                        {this.state.selectedChannel.id === 'telegram' && (
+                          <FormGroup
+                            label="Bot Token"
+                            labelFor="bot-token"
+                            labelInfo="(Must be between 20 and 90 characters.)"
+                          >
+                            <InputGroup
+                              id="bot-token"
+                              placeholder="Enter Telegram Bot Token"
+                              onChange={e => {
+                                this.setState({ botToken: e.target.value })
+                              }}
+                            />
+                          </FormGroup>
+                        )}
+
+                        {this.state.selectedChannel.id === 'slack' && (
+                          <>
+                            <FormGroup
+                              label="Slack Bot Token"
+                              labelFor="slack-bot-token"
+                              labelInfo="(Must be between 20 and 90 characters.)"
+                            >
+                              <InputGroup
+                                id="slack-bot-token"
+                                placeholder="Enter Slack Bot Token"
+                                onChange={e => {
+                                  this.setState({ slackBotToken: e.target.value })
+                                }}
+                              />
+                            </FormGroup>
+                            <FormGroup
+                              label="Slack Signing Secret"
+                              labelFor="slack-signing-secret"
+                              labelInfo="(Must be between 20 and 90 characters.)"
+                            >
+                              <InputGroup
+                                id="slack-signing-secret"
+                                placeholder="Enter Slack Signing Secret"
+                                onChange={e => {
+                                  this.setState({ slackSigningSecret: e.target.value })
+                                }}
+                              />
+                            </FormGroup>
+                          </>
+                        )}
+
+                        {this.state.selectedChannel.id === 'messenger' && (
+                          <>
+                            <FormGroup
+                              label="Messenger Access Token"
+                              labelFor="messenger-access-token"
+                              labelInfo="(Must be between 50 and 400 characters.)"
+                            >
+                              <InputGroup
+                                id="messenger-access-token"
+                                placeholder="Enter Messenger Access Token"
+                                onChange={e => {
+                                  this.setState({ messengerAccessToken: e.target.value })
+                                }}
+                              />
+                            </FormGroup>
+                            <FormGroup
+                              label="Messenger App Secret"
+                              labelFor="messenger-app-secret"
+                              labelInfo="(Must be between 20 and 90 characters.)"
+                            >
+                              <InputGroup
+                                id="messenger-app-secret"
+                                placeholder="Enter Messenger App Secret"
+                                onChange={e => {
+                                  this.setState({ messengerAppSecret: e.target.value })
+                                }}
+                              />
+                            </FormGroup>
+                          </>
+                        )}
+
+                        {this.state.selectedChannel.id === 'whatsapp' && (
+                          <>
+                            <FormGroup
+                              label="Twilio account SID"
+                              labelFor="twilio-account-sid"
+                              labelInfo="(Must be between 20 and 90 characters.)"
+                            >
+                              <InputGroup
+                                id="twilio-account-sid"
+                                placeholder="Enter Twilio account SID"
+                                onChange={e => {
+                                  this.setState({ twilioAccountSid: e.target.value })
+                                }}
+                              />
+                            </FormGroup>
+                            <FormGroup
+                              label="Twilio auth token"
+                              labelFor="twilio-auth-token"
+                              labelInfo="(Must be between 20 and 90 characters.)"
+                            >
+                              <InputGroup
+                                id="twilio-auth-token"
+                                placeholder="Enter Twilio Auth Token"
+                                onChange={e => {
+                                  this.setState({ twilioAuthToken: e.target.value })
+                                }}
+                              />
+                            </FormGroup>
+                          </>
+                        )}
+                      </div>
                     </div>
-                  )}
+
+                    {/* RIGHT SIDE: YouTube Tutorial */}
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      <p style={{ fontWeight: 'bold', fontSize: '16px', margin: '10px 0' }}>Tutorial Video</p>
+                      <iframe
+                        width="100%"
+                        height="350"
+                        src={
+                          this.state.selectedChannel?.id === 'webchat'
+                            ? 'https://www.youtube.com/embed/PPgn5X7l-So'
+                            : this.state.selectedChannel.id === 'telegram'
+                              ? 'https://www.youtube.com/embed/XHfE8cqgdiE'
+                              : this.state.selectedChannel.id === 'slack'
+                                ? 'https://www.youtube.com/embed/iRU9iPO26jY'
+                                : this.state.selectedChannel.id === 'messenger'
+                                  ? 'https://www.youtube.com/embed/CvQ-JIqU-Yk'
+                                  : this.state.selectedChannel.id === 'whatsapp'
+                                    ? 'https://www.youtube.com/embed/rP3iLSqBUBI'
+                                    : ''
+                        }
+                        title="Tutorial Video"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
+
+                  </div>
                 </Callout>
               )}
             </div>
