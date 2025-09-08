@@ -36,7 +36,7 @@ import { filterList } from '~/workspace/util'
 
 import BotItemCompact from './BotItemCompact'
 import BotItemPipeline from './BotItemPipeline'
-import CreateBotModal from './CreateBotModal'
+import CreateBotModal from './CreateBot-screens/CreateBotModal'
 import EditStageModal from './EditStageModal'
 import ImportBotModal from './ImportBotModal'
 import RollbackBotModal from './RollbackBotModal'

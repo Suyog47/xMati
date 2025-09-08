@@ -5,7 +5,7 @@ import ms from 'ms'
 import React, { Component } from 'react'
 
 import api from '~/app/api'
-import { sanitizeBotId } from './CreateBotModal'
+import { sanitizeBotId } from './CreateBot-screens/CreateBotModal'
 
 interface Props {
   onCreateBotSuccess: () => void

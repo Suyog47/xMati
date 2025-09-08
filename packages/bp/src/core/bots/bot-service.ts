@@ -866,15 +866,6 @@ export class BotService {
         await scopedGhost.upsertFile('/', BOT_CONFIG_FILENAME, stringify(mergedConfigs))
         await scopedGhost.upsertFiles('/', files, { ignoreLock: true })
 
-        // create skills folder inside 'flows' subdirectory
-        // const baseDirectory = path.resolve(`./data/bots/${botConfig.name}/flows`)
-        // const botFolderPath = path.join(baseDirectory, 'skills')
-
-        // try {
-        //   await fse.ensureDir(botFolderPath)
-        // } catch (error) {
-        //   console.error('Error creating skills folders:', error)
-        // }
         await this._generateBot(botConfig.id, botConfig.owner, botDesc, mergedConfigs)
 
         return mergedConfigs
