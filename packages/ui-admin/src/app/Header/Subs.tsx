@@ -259,7 +259,7 @@ export const Subs = () => {
                     {['LLM Support', 'HITL (Human in the Loop)', 'Bot Analytics'].map(
                       (item, idx) => (
                         <li key={idx} style={{ marginBottom: 6, color: '#106ba3' }}>
-                          ✓ {item}
+                          {item}
                         </li>
                       )
                     )}
