@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import { Card, Elevation, Icon, Dialog, Button } from '@blueprintjs/core'
+import { confirmDialog, lang, toast } from 'botpress/shared'
+import api from '~/app/api'
 
 interface UserData {
   fullName: string
@@ -69,6 +71,32 @@ const UserCard: React.FC<UserCardProps> = ({ email, userData, subscriptionData, 
     return tillDate < today
   }
   const isExpired = getIsExpired()
+
+  const deleteBot = async (fullName, email, botId: string) => {
+    const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
+
+    const confirmed = await confirmDialog(lang.tr('admin.workspace.bots.confirmDelete'), {
+      acceptLabel: lang.tr('delete')
+    })
+    if (!confirmed) {
+      return
+    }
+
+
+    try {
+      await api.getSecured().post(`/admin/workspace/bots/${fullName}/${email}/${botId}/delete`)
+
+      setTimeout(() => {
+        window.location.reload()    // reloading for the bot creation limit check
+      }, 500)
+      toast.success(lang.tr('The bot has been deleted successfully'))
+    } catch (err) {
+      console.error(err)
+      toast.failure(lang.tr('The bot could not be deleted'))
+    } finally {
+
+    }
+  }
 
   return (
     <>
@@ -207,10 +235,23 @@ const UserCard: React.FC<UserCardProps> = ({ email, userData, subscriptionData, 
                       padding: '12px',
                       borderRadius: '6px',
                       border: '1px solid #dce0e6',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
                     }}
                   >
-                    <div><strong>Bot Name:</strong> {bot.name}</div>
-                    <div><strong>ID:</strong> {bot.id}</div>
+                    <div>
+                      <div><strong>Bot Name:</strong> {bot.name}</div>
+                      <div><strong>ID:</strong> {bot.id}</div>
+                    </div>
+                    <Button
+                      icon="trash"
+                      intent="danger"
+                      minimal
+                      onClick={async () => {
+                        await deleteBot(userData.fullName, userData.email, bot.id)
+                      }}
+                    />
                   </div>
                 ))}
               </div>
