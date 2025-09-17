@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
-import { Card, Elevation, Icon, Dialog, Button } from '@blueprintjs/core'
+import React, { useEffect, useState } from 'react'
+import { Card, Elevation, Icon, Dialog, Button, Spinner, Divider } from '@blueprintjs/core'
 import { confirmDialog, lang, toast } from 'botpress/shared'
 import api from '~/app/api'
+import TransactionHistory from './Subscription-screens/TransactionHistory'
 
 interface UserData {
   fullName: string
@@ -39,8 +40,70 @@ interface UserCardProps {
   botsData: BotsData[]
 }
 
+const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
+
 const UserCard: React.FC<UserCardProps> = ({ email, userData, subscriptionData, botsData }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
+  const savedSubData = JSON.parse(localStorage.getItem('subData') || '{}')
+
+  // Dummy transaction state and functions for UI demo
+  const [transactions, setTransactions] = useState<any[]>([])
+  const [isLoadingTransactions, setIsLoadingTransactions] = useState(false)
+
+  const fetchTransactions = async (email) => {
+    setIsLoadingTransactions(true)
+    try {
+      const res = await fetch(`${API_URL}/get-stripe-transactions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error)
+      }
+
+      if (!data || !Array.isArray(data.charges)) {
+        throw new Error('Invalid data of transactions.')
+      }
+
+      const latestCharge = data?.charges?.[0]
+      if (latestCharge?.id) {
+        localStorage.setItem('subData', JSON.stringify({ ...savedSubData, transactionId: latestCharge.id }))
+      }
+
+      if (data.charges) {
+        setTransactions(data.charges)
+      }
+    } catch (error) {
+      alert(error)
+      console.error('Failed to fetch transactions:', error)
+    } finally {
+      setIsLoadingTransactions(false)
+    }
+  }
+
+  const downloadCSV = async () => {
+    const email = userData.email
+
+    const res = await fetch(`${API_URL}/download-csv`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ data: transactions, email }),
+    })
+
+    const blob = await res.blob()
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${email}-data.csv`
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+  }
 
   const handleOpenDialog = () => setIsDialogOpen(true)
   const handleCloseDialog = () => setIsDialogOpen(false)
@@ -59,6 +122,13 @@ const UserCard: React.FC<UserCardProps> = ({ email, userData, subscriptionData, 
       })
   }
 
+  // Automatically fetch transactions when the dialog opens
+  useEffect(() => {
+    if (isDialogOpen) {
+      void fetchTransactions(userData.email)
+    }
+  }, [isDialogOpen])
+
   // Calculate isExpired by comparing only dates (ignoring time)
   const getIsExpired = () => {
     if (!subscriptionData.till) {
@@ -72,7 +142,7 @@ const UserCard: React.FC<UserCardProps> = ({ email, userData, subscriptionData, 
   }
   const isExpired = getIsExpired()
 
-  const deleteBot = async (fullName, email, botId: string) => {
+  const deleteBot = async (fullName: string, email: string, botId: string) => {
     const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
 
     const confirmed = await confirmDialog(lang.tr('admin.workspace.bots.confirmDelete'), {
@@ -82,10 +152,8 @@ const UserCard: React.FC<UserCardProps> = ({ email, userData, subscriptionData, 
       return
     }
 
-
     try {
       await api.getSecured().post(`/admin/workspace/bots/${fullName}/${email}/${botId}/delete`)
-
       setTimeout(() => {
         window.location.reload()    // reloading for the bot creation limit check
       }, 500)
@@ -93,8 +161,6 @@ const UserCard: React.FC<UserCardProps> = ({ email, userData, subscriptionData, 
     } catch (err) {
       console.error(err)
       toast.failure(lang.tr('The bot could not be deleted'))
-    } finally {
-
     }
   }
 
@@ -118,7 +184,6 @@ const UserCard: React.FC<UserCardProps> = ({ email, userData, subscriptionData, 
         }}
       >
         {subscriptionData.till && (() => {
-          // We already calculated isExpired above, so just use it
           return (
             isExpired && (
               <div
@@ -168,13 +233,11 @@ const UserCard: React.FC<UserCardProps> = ({ email, userData, subscriptionData, 
         isOpen={isDialogOpen}
         onClose={handleCloseDialog}
         title="User Overview"
-        style={{ width: '1000px', maxHeight: '97vh' }}
+        style={{ width: '1400px', maxHeight: '97vh' }}
       >
         <div style={{ display: 'flex', padding: '24px', gap: '32px' }}>
-
-          {/* LEFT SIDE: User Info + Subscription */}
+          {/* LEFT: User Info + Subscription */}
           <div style={{ flex: 1 }}>
-            {/* Section 1: User Info */}
             <h3 style={{ borderBottom: '1px solid #eee', paddingBottom: '8px', marginBottom: '16px' }}>
               👤 User Information
             </h3>
@@ -183,26 +246,31 @@ const UserCard: React.FC<UserCardProps> = ({ email, userData, subscriptionData, 
               <div><strong>Email:</strong><br />{userData.email || 'N/A'}</div>
               <div><strong>Phone Number:</strong><br />{userData.phoneNumber || 'N/A'}</div>
               <div><strong>Organisation:</strong><br />{userData.organisationName || 'N/A'}</div>
-              <div><strong>Industry:</strong><br />{userData.industryType} | {userData.subIndustryType || 'N/A'}</div>
+              <div>
+                <strong>Industry:</strong><br />
+                {userData.industryType} | {userData.subIndustryType || 'N/A'}
+              </div>
               <div><strong>No. of Bots:</strong><br />{botsData.length ?? '0'}</div>
               <div><strong>Stripe Customer ID:</strong><br />{userData.stripeCustomerId || 'N/A'}</div>
               <div><strong>Stripe Payment ID:</strong><br />{userData.stripePayementId || 'N/A'}</div>
             </div>
-
-            {/* Section 2: Subscription */}
             <hr style={{ margin: '32px 0', border: 'none', borderTop: '2px solid #ccc' }} />
-
             <h3 style={{ borderBottom: '1px solid #eee', paddingBottom: '8px', marginBottom: '16px' }}>
               💳 Subscription Details
             </h3>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 24px' }}>
               <div><strong>Plan:</strong><br />{subscriptionData.subscription || 'N/A'}</div>
-              <div><strong>Created At:</strong><br />{subscriptionData.createdAt ? formatDate(subscriptionData.createdAt) : 'N/A'}</div>
-              <div><strong>Valid Till:</strong><br />{subscriptionData.till ? formatDate(subscriptionData.till) : 'N/A'}</div>
+              <div>
+                <strong>Created At:</strong><br />
+                {subscriptionData.createdAt ? formatDate(subscriptionData.createdAt) : 'N/A'}
+              </div>
+              <div>
+                <strong>Valid Till:</strong><br />
+                {subscriptionData.till ? formatDate(subscriptionData.till) : 'N/A'}
+              </div>
               <div><strong>Duration:</strong><br />{subscriptionData.duration || 'N/A'}</div>
               <div><strong>Amount:</strong><br />{subscriptionData.amount || 'N/A'}</div>
             </div>
-
             {subscriptionData.isCancelled && (
               <div
                 style={{
@@ -220,13 +288,17 @@ const UserCard: React.FC<UserCardProps> = ({ email, userData, subscriptionData, 
             )}
           </div>
 
-          {/* RIGHT SIDE: Bots List */}
-          <div style={{ flex: 1 }}>
+          <Divider
+            style={{ height: 'auto', alignSelf: 'stretch' }}
+          />
+
+          {/* MIDDLE: Bots List */}
+          <div style={{ flex: 0.8 }}>
             <h3 style={{ borderBottom: '1px solid #eee', paddingBottom: '8px', marginBottom: '16px' }}>
               🤖 Bots Owned
             </h3>
             {botsData.length > 0 ? (
-              <div style={{ display: 'grid', overflowY: 'auto', gridTemplateColumns: '1fr', gap: '12px' }}>
+              <div style={{ display: 'grid', gap: '12px' }}>
                 {botsData.map((bot) => (
                   <div
                     key={bot.id}
@@ -256,15 +328,25 @@ const UserCard: React.FC<UserCardProps> = ({ email, userData, subscriptionData, 
                 ))}
               </div>
             ) : (
-              <p style={{ fontStyle: 'italic', color: '#888' }}>
-                No bots created by this user.
-              </p>
+              <p style={{ fontStyle: 'italic', color: '#888' }}>No bots created by this user.</p>
             )}
+          </div>
+
+          <Divider
+            style={{ height: 'auto', alignSelf: 'stretch' }}
+          />
+
+          {/* RIGHT: Transaction History */}
+          <div style={{ flex: 1.5 }}>
+            <TransactionHistory
+              transactions={transactions}
+              isLoadingTransactions={isLoadingTransactions}
+              fetchTransactions={() => fetchTransactions(userData.email)}
+              downloadCSV={downloadCSV}
+            />
           </div>
         </div>
       </Dialog>
-
-
     </>
   )
 }

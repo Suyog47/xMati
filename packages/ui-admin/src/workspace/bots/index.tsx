@@ -354,27 +354,60 @@ class Bots extends Component<Props> {
 
     return (
       <AccessControl resource="admin.bots.*" operation="write">
-        <Popover minimal interactionKind={PopoverInteractionKind.HOVER} position={Position.BOTTOM}>
+        <Popover
+          minimal={false}
+          interactionKind={PopoverInteractionKind.CLICK}
+          position={Position.BOTTOM}
+          content={
+            <div
+              style={{
+                padding: '16px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px',
+                minWidth: '220px',
+                background: '#ffffff',
+                borderRadius: '8px',
+                boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
+              }}
+            >
+              <Button
+                id="btn-new-bot"
+                text={lang.tr('admin.workspace.bots.new')}
+                icon="add"
+                intent={Intent.PRIMARY}
+                style={{
+                  borderRadius: '6px'
+                }}
+                onClick={() => this.setState({ isCreateBotModalOpen: true })}
+              />
+              <Button
+                id="btn-import-bot"
+                text={lang.tr('admin.workspace.bots.importExisting')}
+                icon="import"
+                intent={Intent.SUCCESS}
+                style={{
+                  borderRadius: '6px'
+                }}
+                onClick={() => this.setState({ isImportBotModalOpen: true })}
+              />
+            </div>
+          }
+        >
           <Button
             id="btn-create-bot"
             intent={Intent.NONE}
             text={lang.tr('admin.workspace.bots.createBot')}
             rightIcon="caret-down"
+            style={{
+              background: '#f0f5ff',
+              border: '1px solid #c3d4ff',
+              borderRadius: '6px',
+              padding: '8px 16px',
+              fontWeight: 600,
+              color: '#304ffe'
+            }}
           />
-          <ButtonGroup vertical={true} minimal={true} fill={true} alignText={Alignment.LEFT}>
-            <Button
-              id="btn-new-bot"
-              text={lang.tr('admin.workspace.bots.new')}
-              icon="add"
-              onClick={() => this.setState({ isCreateBotModalOpen: true })}
-            />
-            <Button
-              id="btn-import-bot"
-              text={lang.tr('admin.workspace.bots.importExisting')}
-              icon="import"
-              onClick={() => this.setState({ isImportBotModalOpen: true })}
-            />
-          </ButtonGroup>
         </Popover>
       </AccessControl>
     )
