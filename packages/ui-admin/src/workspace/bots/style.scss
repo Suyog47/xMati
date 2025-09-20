@@ -31,7 +31,7 @@
 .compact_view {
   .botbadge {
     margin-left: 10px;
-    font-size: 65%;
+    font-size: 45%;
   }
 
   .actions button {
@@ -206,5 +206,151 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* style.css */
+
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8f9fa;
+  padding: 24px;
+  width: 120%;
+  border-radius: 10px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.titleSection {
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  margin: 0;
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 24px;
+}
+
+.botCount {
+  color: #5c7080;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.createButton {
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.searchFilterSection {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 16px;
+}
+
+.searchContainer {
+  display: flex;
+  flex: 1;
+  max-width: 500px;
+  gap: 12px;
+}
+
+.searchField {
+  flex: 1;
+}
+
+.searchField input {
+  border-radius: 4px;
+}
+
+.filterToggle {
+  border-radius: 4px;
+}
+
+.viewToggle {
+  display: flex;
+}
+
+.extraFiltersPanel {
+  background-color: white;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  margin-bottom: 24px;
+  border-left: 3px solid #8a9ba8;
+}
+
+.extraFiltersHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.extraFiltersHeader h4 {
+  margin: 0;
+  color: #394b59;
+}
+
+.extraFiltersContent {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.noResultsCallout {
+  margin-bottom: 24px;
+  border-radius: 6px;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: 40px 0;
+}
+
+.emptyStateIllustration {
+  color: #ced9e0;
+  margin-bottom: 16px;
+}
+
+.emptyStateCallout {
+  text-align: center;
+  max-width: 500px;
+  border-radius: 6px;
+}
+
+.emptyStateButton {
+  margin-top: 16px;
+}
+
+.warningCallout {
+  margin-bottom: 24px;
+  border-radius: 6px;
+}
+
+.botsContainer {
+  flex: 1;
+  overflow: auto;
+  height: 20px
 }
 

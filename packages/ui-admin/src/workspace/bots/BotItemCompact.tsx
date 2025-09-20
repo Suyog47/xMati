@@ -148,20 +148,20 @@ const BotItemCompact: FC<Props> = props => {
         )}
 
         {hasStudioAccess ? (
-          <a href={botStudioLink}>{props.bot.name || props.bot.id}</a>
+          <a href={botStudioLink} style={{ fontSize: '15px', fontWeight: 600, marginRight: '5px' }}>{props.bot.name || props.bot.id}</a>
         ) : (
-          <span>{props.bot.name || props.bot.id}</span>
+          <span style={{ fontSize: '15px', fontWeight: 600, marginRight: '5px' }}>{props.bot.name || props.bot.id}</span>
         )}
 
         {/*
           TODO: remove this NeedsTrainingWarning component.
           This is a temp fix but won't be useful after we bring back training on bot mount.
           */}
-        <AccessControl resource="module.nlu" operation="write">
+        {/* <AccessControl resource="module.nlu" operation="write">
           {nluModuleEnabled && !props.bot.disabled && (
             <NeedsTrainingWarning bot={props.bot.id} languages={props.bot.languages} />
           )}
-        </AccessControl>
+        </AccessControl> */}
 
         {botHasUninstalledNLULanguages && (
           <Tooltip

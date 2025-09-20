@@ -523,7 +523,7 @@ class Bots extends Component<Props> {
               <div key={stage.id} style={{ flex: colSize, marginRight: 20 }}>
                 {pipeline.length > 1 && (
                   <div className={style.pipeline_title}>
-                    <h3>{stage.label}</h3>
+                    <p>{stage.label}</p>
                     <AccessControl resource="admin.bots.*" operation="write" superAdmin>
                       <Button className={style.pipeline_edit_button} onClick={() => this.toggleEditStage(stage)}>
                         <Icon icon="edit" />
@@ -579,62 +579,152 @@ class Bots extends Component<Props> {
 
   renderBots() {
     const { email, strategy } = this.props.profile || {}
+    const { filter, showFilters, needApprovalFilter } = this.state
 
     const filteredBots = filterList<BotConfig>(this.props.bots, botFilterFields, this.state.filter).filter(x =>
       this.filterStageApproval(x, email!, strategy!)
     )
 
     const hasBots = !!this.props.bots.length
-    const botsView = this.isPipelineView ? this.renderPipelineView(filteredBots) : this.renderCompactView(filteredBots)
+    const botsView = this.isPipelineView ?
+      this.renderPipelineView(filteredBots) :
+      this.renderCompactView(filteredBots)
 
     return (
-      <div>
-        {hasBots && (
-          <Fragment>
-            <div className={style.filterWrapper}>
-              <InputGroup
-                id="input-filter"
-                placeholder={lang.tr('admin.workspace.bots.filter')}
-                value={this.state.filter}
-                onChange={e => this.setState({ filter: e.target.value.toLowerCase() })}
-                autoComplete="off"
-                className={style.filterField}
-              />
-              {this.isPipelineView && <Button icon="filter" onClick={this.toggleFilters}></Button>}
-            </div>
-            {this.state.showFilters && (
-              <div className={style.extraFilters}>
-                <h2>{lang.tr('admin.workspace.bots.extraFilters')}</h2>
-                <Checkbox
-                  label={lang.tr('admin.workspace.bots.needYourApproval')}
-                  checked={this.state.needApprovalFilter}
-                  onChange={e => this.setState({ needApprovalFilter: e.currentTarget.checked })}
-                ></Checkbox>
+      <div className={style.container}>
+        {/* Header with title and stats */}
+        <div className={style.header}>
+          <div className={style.titleSection}>
+            <h1 className={style.title}>{'Your Bots'}</h1>
+            {hasBots && (
+              <span className={style.botCount}>
+                {filteredBots.length} of {(this.subData.subscription === 'Starter') ? '3' : '5'} bots
+              </span>
+            )}
+          </div>
+
+          {/* Create new bot button */}
+          {this.renderCreateNewBotButton()}
+        </div>
+
+        {/* Main content area */}
+        <div className={style.content}>
+          {hasBots ? (
+            <>
+              {/* Search and filter section */}
+              <div className={style.searchFilterSection}>
+                <div className={style.searchContainer}>
+                  <InputGroup
+                    leftIcon="search"
+                    id="input-filter"
+                    placeholder={lang.tr('admin.workspace.bots.filter')}
+                    value={filter}
+                    onChange={e => this.setState({ filter: e.target.value.toLowerCase() })}
+                    autoComplete="off"
+                    className={style.searchField}
+                  />
+
+                  {this.isPipelineView && (
+                    <Button
+                      icon="filter"
+                      onClick={this.toggleFilters}
+                      minimal={true}
+                      active={showFilters}
+                      className={style.filterToggle}
+                    >
+                      {lang.tr('admin.workspace.bots.filters')}
+                    </Button>
+                  )}
+                </div>
+
+                {/* View toggle */}
+                {/* <div className={style.viewToggle}>
+                  <ButtonGroup>
+                    <Button
+                      icon="grid-view"
+                      active={!this.isPipelineView}
+                      onClick={() => this.setState({ isPipelineView: false })}
+                      minimal={true}
+                    />
+                    <Button
+                      icon="diagram-tree"
+                      active={this.isPipelineView}
+                      onClick={() => this.setState({ isPipelineView: true })}
+                      minimal={true}
+                    />
+                  </ButtonGroup>
+                </div> */}
               </div>
-            )}
 
-            {this.state.filter && !filteredBots.length && (
-              <Callout title={lang.tr('admin.workspace.bots.noBotMatches')} className={style.filterCallout} />
-            )}
-          </Fragment>
-        )}
+              {/* Extra filters panel */}
+              {showFilters && (
+                <div className={style.extraFiltersPanel}>
+                  <div className={style.extraFiltersHeader}>
+                    <h4>{lang.tr('admin.workspace.bots.extraFilters')}</h4>
+                    <Button
+                      icon="cross"
+                      minimal={true}
+                      small={true}
+                      onClick={this.toggleFilters}
+                    />
+                  </div>
+                  <div className={style.extraFiltersContent}>
+                    <Checkbox
+                      label={lang.tr('admin.workspace.bots.needYourApproval')}
+                      checked={needApprovalFilter}
+                      onChange={e => this.setState({ needApprovalFilter: e.currentTarget.checked })}
+                    />
+                    {/* Additional filters could be added here */}
+                  </div>
+                </div>
+              )}
 
-        {!hasBots && (
-          <Callout title={lang.tr('admin.workspace.bots.noBotYet')} className={style.filterCallout}>
-            <p>
-              <br />
-              {lang.tr('admin.workspace.bots.alwaysAssignedToWorkspace')}
-              <br />
-              {lang.tr('admin.workspace.bots.createYourFirstBot')}
-            </p>
-          </Callout>
-        )}
+              {/* No results message */}
+              {filter && !filteredBots.length && (
+                <Callout
+                  title={lang.tr('admin.workspace.bots.noBotMatches')}
+                  icon="search"
+                  intent={Intent.WARNING}
+                  className={style.noResultsCallout}
+                >
+                </Callout>
+              )}
+            </>
+          ) : (
+            <>
+              {/* Empty state */}
+              <div className={style.emptyState}>
+                <div className={style.emptyStateIllustration}>
+                  <Icon icon="cube" iconSize={64} />
+                </div>
+                <Callout
+                  title={lang.tr('admin.workspace.bots.noBotYet')}
+                  className={style.emptyStateCallout}
+                >
+                  <p>{lang.tr('admin.workspace.bots.alwaysAssignedToWorkspace')}</p>
+                  <p>{lang.tr('admin.workspace.bots.createYourFirstBot')}</p>
+                </Callout>
+              </div>
+            </>
+          )}
 
-        {this.hasUnlangedBots() && (
-          <Callout intent={Intent.WARNING}>{lang.tr('admin.workspace.bots.noSpecifiedLanguage')}</Callout>
-        )}
-        {botsView}
-      </div>
+          {/* Warning for bots without language */}
+          {this.hasUnlangedBots() && (
+            <Callout
+              intent={Intent.WARNING}
+              icon="translate"
+              className={style.warningCallout}
+            >
+              {lang.tr('admin.workspace.bots.noSpecifiedLanguage')}
+            </Callout>
+          )}
+
+          {/* Bots list/pipeline view */}
+          <div className={style.botsContainer}>
+            {botsView}
+          </div>
+        </div>
+      </div >
     )
   }
 
@@ -996,7 +1086,7 @@ class Bots extends Component<Props> {
           </Dialog>
         )}
 
-        <SplitPage sideMenu={(this.state.isExpired) ? !this.isPipelineView : !this.isPipelineView && this.renderCreateNewBotButton()}>
+        <SplitPage sideMenu={(this.state.isExpired) ? !this.isPipelineView : !this.isPipelineView}>
           <Fragment>
             <Subscription
               isOpen={this.state.isSubscriptionOpen}
