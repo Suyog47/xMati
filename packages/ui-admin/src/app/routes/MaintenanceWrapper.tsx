@@ -1,8 +1,8 @@
+import { auth } from 'botpress/shared'
 import React, { useEffect, useState, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
-import logo from './xmati.png' // Make sure this path is correct
-import { auth } from 'botpress/shared'
 import api from '~/app/api'
+import logo from './xmati.png' // Make sure this path is correct
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
@@ -37,7 +37,7 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const formData = JSON.parse(localStorage.getItem('formData') || '{}')
   const subData = JSON.parse(localStorage.getItem('subData') || '{}')
-  const isAdminUser = formData.email === 'admin@gmail.com'
+  const isAdminUser = formData.email === 'xmatiservice@gmail.com'
 
   const handleLogout = () => {
     localStorage.clear()

@@ -17,14 +17,14 @@ import { connect, ConnectedProps } from 'react-redux'
 import { AppState } from '~/app/rootReducer'
 import BasicAuthentication from '~/auth/basicAuth'
 import ChangeLanguage from '~/user/ChangeLanguage'
+import AdminControl from './AdminControl'
 import { fetchProfile } from './reducer'
 import style from './style.scss'
-import UpdatePassword from './UpdatePassword'
 import Subscription from './Subscription-screens/Subscription'
-import VoiceRecorder from './VoicetoText'
-import UserProfile from './UpdateUserProfile'
-import AdminControl from './AdminControl'
 import UpdateCardDetails from './UpdateCardDetails'
+import UpdatePassword from './UpdatePassword'
+import UserProfile from './UpdateUserProfile'
+import VoiceRecorder from './VoicetoText'
 
 
 type Props = ConnectedProps<typeof connector>
@@ -95,7 +95,7 @@ const UserDropdownMenu: FC<Props> = props => {
 
           {/* <MenuItem id="btn-gemini" icon="user" text={'Gemini Speech'} onClick={toggleGemini} /> */}
 
-          {savedFormData.email === 'admin@gmail.com' && (<MenuItem id="btn-admin-control" icon="user" text={'Admin Control'} onClick={toggleAdminControl} />)}
+          {savedFormData.email === 'xmatiservice@gmail.com' && (<MenuItem id="btn-admin-control" icon="user" text={'Admin Control'} onClick={toggleAdminControl} />)}
 
           {!isExpired && (<MenuItem id="btn-profile" icon="user" text={lang.tr('admin.updateProfile')} onClick={toggleProfile} />)}
 

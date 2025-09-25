@@ -3,11 +3,11 @@ import { AuthStrategyConfig } from 'common/typings'
 import { get } from 'lodash'
 import React, { FC, useEffect, useState } from 'react'
 import { RouteComponentProps } from 'react-router'
-import { GhostService } from '../../../bp/dist/core/bpfs'
-import { fetchBots } from '~/workspace/bots/reducer'
 import api from '~/app/api'
 import { ExtendedHistory } from '~/app/history'
 import BasicAuthentication, { setActiveWorkspace, setChatUserAuth } from '~/auth/basicAuth'
+import { fetchBots } from '~/workspace/bots/reducer'
+import { GhostService } from '../../../bp/dist/core/bpfs'
 
 import { AuthMethodPicker } from './AuthMethodPicker'
 import LoginContainer from './LoginContainer'
@@ -128,7 +128,7 @@ const Login: FC<Props> = props => {
 
   const loginUser = async (email: string, password: string) => {
     try {
-      if (maintenanceStatus.status && email !== 'admin@gmail.com') {
+      if (maintenanceStatus.status && email !== 'xmatiservice@gmail.com') {
         setError('Maintenance mode is active. Only Admins are allowed to Login.')
         return
       }
@@ -136,13 +136,13 @@ const Login: FC<Props> = props => {
       // setLoading(true)
       setError(undefined)
 
-      let status = await userLogin(email, password)
+      const status = await userLogin(email, password)
       if (!status.success) {
         setError(status.msg)
         return
       }
 
-      let subStatus = await userSubscription(email)
+      const subStatus = await userSubscription(email)
       if (!subStatus.status) {
         setError(subStatus.msg)
         return

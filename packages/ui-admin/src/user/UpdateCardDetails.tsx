@@ -1,8 +1,8 @@
-import React, { FC, useState, useEffect } from 'react'
 import { Button, Classes, Dialog, Spinner } from '@blueprintjs/core'
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
 import { lang, toast } from 'botpress/shared'
+import React, { FC, useState, useEffect } from 'react'
 import CardForm from './CardForm'
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
@@ -48,7 +48,7 @@ const UpdateCardDetails: FC<Props> = props => {
   const [isSaving, setIsSaving] = useState(false)
   const [cardDetails, setCardDetails] = useState<CardDetails | null>(null)
   const [isLoadingCard, setIsLoadingCard] = useState(false)
-  let formData = JSON.parse(localStorage.getItem('formData') || '{}')
+  const formData = JSON.parse(localStorage.getItem('formData') || '{}')
 
   // Fetch card details on dialog open using POST; loader added for the card area
   useEffect(() => {
@@ -96,6 +96,7 @@ const UpdateCardDetails: FC<Props> = props => {
         })
       })
 
+      console.log(result)
       const data = await result.json()
 
       if (!data.success) {

@@ -1,3 +1,4 @@
+import axios from 'axios'
 import { BotConfig, BotTemplate, Logger, Stage, WorkspaceUserWithAttributes } from 'botpress/sdk'
 import cluster from 'cluster'
 import { findDeletedFiles } from 'common/fs'
@@ -32,7 +33,6 @@ import path from 'path'
 import replace from 'replace-in-file'
 import tmp from 'tmp'
 import { VError } from 'verror'
-import axios from 'axios'
 import zlib from 'zlib'
 
 const BOT_DIRECTORIES = ['actions', 'flows', 'entities', 'content-elements', 'intents', 'qna']
@@ -56,10 +56,10 @@ const getBotStatusKey = (serverId: string) => makeRedisKey(`bp_server_${serverId
 const debug = DEBUG('services:bots')
 
 // Localhost url
-// const API_URL = 'http://localhost:8000'
+const API_URL = 'http://localhost:8000'
 
 // Production url
-const API_URL = 'https://www.app.xmati.ai/apis'
+// const API_URL = 'https://www.app.xmati.ai/apis'
 
 @injectable()
 export class BotService {
@@ -176,8 +176,7 @@ export class BotService {
     let mergedConfigs
     if (source.from == 'llm') {
       mergedConfigs = await this._createBotFromLLM(bot, desc.botDesc!)
-    }
-    else {
+    } else {
       mergedConfigs = await this._createBotFromTemplate(bot, botTemplate, email)
     }
 
@@ -204,32 +203,32 @@ export class BotService {
 
       result = result.data
 
-      const botIds: string[] = [];
+      const botIds: string[] = []
 
       for (const botRecord of result.data) {
         try {
           // Directly use the data from the response (no decompression needed)
-          const botConfig = botRecord.data;
+          const botConfig = botRecord.data
 
           // Extract bot ID from key
-          const botId = botRecord.key.toString().split('_')[1];
+          const botId = botRecord.key.toString().split('_')[1]
 
           // Process and save the bot files
-          const files = await this._parseBotFiles(JSON.parse(botConfig));
-          await this._saveFiles(botId, files);
-          await this.mountBot(botId);
+          const files = await this._parseBotFiles(JSON.parse(botConfig))
+          await this._saveFiles(botId, files)
+          await this.mountBot(botId)
 
-          botIds.push(botId);
+          botIds.push(botId)
         } catch (error) {
-          console.error(`Error processing bot with key ${botRecord.key}:`, error);
+          console.error(`Error processing bot with key ${botRecord.key}:`, error)
           // Continue processing other bots even if one fails
         }
       }
 
-      return botIds;
+      return botIds
     } catch (error) {
       console.log('Something went wrong in get bots', error)
-      return false;
+      return false
     }
   }
 
@@ -244,32 +243,32 @@ export class BotService {
 
       result = result.data
 
-      const botIds: string[] = [];
+      const botIds: string[] = []
 
       for (const botRecord of result.data) {
         try {
           // Directly use the data from the response (no decompression needed)
-          const botConfig = botRecord.data;
+          const botConfig = botRecord.data
 
           // Extract bot ID from key
-          const botId = botRecord.key.toString().split('_')[1];
+          const botId = botRecord.key.toString().split('_')[1]
 
           // Process and save the bot files
-          const files = await this._parseBotFiles(JSON.parse(botConfig));
-          await this._saveFiles(botId, files);
-          await this.mountBot(botId);
+          const files = await this._parseBotFiles(JSON.parse(botConfig))
+          await this._saveFiles(botId, files)
+          await this.mountBot(botId)
 
-          botIds.push(botId);
+          botIds.push(botId)
         } catch (error) {
-          console.error(`Error processing bot with key ${botRecord.key}:`, error);
+          console.error(`Error processing bot with key ${botRecord.key}:`, error)
           // Continue processing other bots even if one fails
         }
       }
 
-      return botIds;
+      return botIds
     } catch (error) {
       console.log('Something went wrong in get bots', error)
-      return false;
+      return false
     }
   }
 
@@ -359,10 +358,10 @@ export class BotService {
   }
 
   async importBot(botData: any, archive: Buffer, workspaceId: string, allowOverwrite?: boolean): Promise<void> {
-    const fullName = botData.fullName;
-    const botId = botData.oldBotId;
-    const newBotId = botData.newBotId;
-    const email = botData.email;
+    const fullName = botData.fullName
+    const botId = botData.oldBotId
+    const newBotId = botData.newBotId
+    const email = botData.email
 
     const startTime = Date.now()
     if (!isValidBotId(newBotId)) {         // newBotId
@@ -421,12 +420,12 @@ export class BotService {
         await this.ghostService.forBot(newBotId).importFromDirectory(folder)
 
         // Load the bot.config.json from the extracted archive
-        const configFilePath = path.join(folder, 'bot.config.json');
+        const configFilePath = path.join(folder, 'bot.config.json')
         if (!(await fse.pathExists(configFilePath))) {
-          throw new Error(`Configuration file "bot.config.json" not found in the archive for botId: ${newBotId}`);
+          throw new Error(`Configuration file "bot.config.json" not found in the archive for botId: ${newBotId}`)
         }
 
-        const originalConfig = JSON.parse(await fse.readFile(configFilePath, 'utf-8'));      // oldBotId
+        const originalConfig = JSON.parse(await fse.readFile(configFilePath, 'utf-8'))      // oldBotId
         const newConfigs = <Partial<BotConfig>>{
           id: newBotId,                                                           // newBotId
           name: `${originalConfig.name}`,
@@ -669,14 +668,12 @@ export class BotService {
           'Content-Type': 'application/json',
         },
         data: {
-          fullName: fullName,
+          fullName,
           key,
         },
       })
-
-      console.log(result.data);
     } catch (error) {
-      console.error('Error deleting from S3:', error);
+      console.error('Error deleting from S3:', error)
     }
   }
 
@@ -761,7 +758,7 @@ export class BotService {
       //   },
       //   data: {
       //     prompt: `
-      //     Generate Botpress files for: ${botDesc}. 
+      //     Generate Botpress files for: ${botDesc}.
       //     Here is an example bot structure: ${dummyBot}
       //     Analyze this folder structure and provide the response strictly according to the dummy structure provided.
       //     some files have flow and ui json, please dont ignore any.
@@ -826,7 +823,7 @@ export class BotService {
     const scopedGhost = this.ghostService.forBot(id)
     await scopedGhost.upsertFiles('/', files, { ignoreLock: true })
     await scopedGhost.upsertFile('/', BOT_CONFIG_FILENAME, stringify(mergedConfigs))
-    this._convertBot(`${owner}_${id}`, id);
+    this._convertBot(`${owner}_${id}`, id)
   }
 
   private async _convertBot(key, id, from = 'user') {
@@ -869,8 +866,7 @@ export class BotService {
         await this._generateBot(botConfig.id, botConfig.owner, botDesc, mergedConfigs)
 
         return mergedConfigs
-      }
-      else {
+      } else {
         throw new Error('Something went wrong while creating botConfig file')
       }
     } catch (err) {
@@ -911,7 +907,7 @@ export class BotService {
         await scopedGhost.ensureDirs('/', BOT_DIRECTORIES)
         await scopedGhost.upsertFile('/', BOT_CONFIG_FILENAME, stringify(mergedConfigs))
         await scopedGhost.upsertFiles('/', files, { ignoreLock: true })
-        await this._convertBot(`${email}_${botConfig.id}`, botConfig.id);
+        await this._convertBot(`${email}_${botConfig.id}`, botConfig.id)
 
         return mergedConfigs
       } else {
@@ -937,12 +933,12 @@ export class BotService {
           fullName: BotService.fullName,
           organizationName: BotService.organisationName,
           key,
-          data: data,
+          data,
           from
         },
       })
 
-      console.log(result.data);
+      console.log(result.data)
     } catch (error) {
       console.log('error:- ', error)
       return { success: false, msg: 'Error uploading credentials to S3' }

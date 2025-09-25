@@ -76,7 +76,7 @@ const BotItemCompact: FC<Props> = props => {
         )} */}
 
         <AccessControl resource="admin.bots.*" operation="read">
-          <Popover minimal position={Position.BOTTOM} interactionKind={PopoverInteractionKind.HOVER}>
+          <Popover minimal position={Position.BOTTOM} interactionKind={PopoverInteractionKind.CLICK}>
             <Button className="btn-menu-bot-item" icon={<Icon icon="menu" />} minimal />
 
             <Menu>

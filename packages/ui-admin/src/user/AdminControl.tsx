@@ -1,9 +1,9 @@
-import React, { FC, useEffect, useState } from 'react'
 import { Dialog, Button, FormGroup, Spinner, Card, Elevation } from '@blueprintjs/core'
-import api from '~/app/api'
-import ms from 'ms'
-import UserCard from './UserCard'
 import { toast } from 'botpress/shared'
+import ms from 'ms'
+import React, { FC, useEffect, useState } from 'react'
+import api from '~/app/api'
+import UserCard from './UserCard'
 
 interface Props {
   isOpen: boolean

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'
-import { useStripe, useElements } from '@stripe/react-stripe-js'
 import { Button } from '@blueprintjs/core'
+import { useStripe, useElements } from '@stripe/react-stripe-js'
 import { toast } from 'botpress/shared'
+import React, { useState, useEffect } from 'react'
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
@@ -195,7 +195,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
         }
       }
 
-      let price = calculatedData?.refund ? `$${actualAmount}` : `$${amount / 100}`
+      const price = calculatedData?.refund ? `$${actualAmount}` : `$${amount / 100}`
       if (calculatedData?.action === 'upgrade') {
         await removeNextSub()
         await setSubscriber(price)
@@ -669,7 +669,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
             >
               {isProcessing
                 ? 'Processing...'
-                : calculatedData && calculatedData?.refund
+                : (savedSubData.subscription === 'Trial' && !savedSubData.expired && !savedSubData.isCancelled) ? 'Proceed to Update' : (calculatedData && calculatedData?.refund)
                   ? (calculatedData.amount > 0 ? 'Refund and Proceed' : 'Proceed')
                   : 'Proceed to Pay'}
             </Button>

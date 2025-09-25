@@ -275,7 +275,7 @@
     },
     "workspace": {
       "bots": {
-        "alwaysAssignedToWorkspace": "In xMati, bots are always assigned to a workspace.",
+        "alwaysAssignedToWorkspace": "In xMati, bots are always assigned to each unique account.",
         "approvedPromotion": "Approved bot promotion to next stage",
         "bots": "Bots",
         "confirmDelete": "Are you sure you want to delete this bot? This can't be undone.",
@@ -346,7 +346,7 @@
         "needYourApproval": "Need your approval",
         "new": "New Bot",
         "noBotMatches": "No bot matches your query",
-        "noBotYet": "This workspace has no bots, yet",
+        "noBotYet": "This account has no bots, yet",
         "noSpecifiedLanguage": "You have bots without specified language. Default language is mandatory since xMati 11.8. Please set bot language in the bot config page.",
         "promoted": "Bot promoted to next stage",
         "remounted": "Bot remounted successfully",

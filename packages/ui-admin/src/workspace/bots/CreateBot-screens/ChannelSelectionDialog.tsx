@@ -1,7 +1,7 @@
-import React from 'react'
 import { Button, Classes, Dialog, FormGroup, InputGroup, Callout, Divider, Intent } from '@blueprintjs/core'
-import Select from 'react-select'
 import { lang } from 'botpress/shared'
+import React from 'react'
+import Select from 'react-select'
 
 export interface ChannelSelectionDialogProps {
   isOpen: boolean
@@ -64,7 +64,7 @@ const ChannelSelectionDialog: React.FC<ChannelSelectionDialogProps> = ({
   const channelInstructions = {
     telegram: `
           <ol>
-            <li>Open <strong>BotFather</strong> in Telegram.</li>
+            <li>Open <strong><a href="https://t.me/BotFather" target="_blank" rel="noopener noreferrer">@BotFather</a></strong> in Telegram.</li>
             <li>Type <code>/newbot</code> and follow the steps.</li>
             <li>Copy the <strong>botToken</strong> and provide it below.</li><br />
           </ol>

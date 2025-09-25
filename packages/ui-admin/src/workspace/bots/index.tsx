@@ -13,6 +13,8 @@ import {
   Position,
   Spinner
 } from '@blueprintjs/core'
+import { isDarkTheme } from '@blueprintjs/core/lib/esm/common/utils'
+import { is } from 'bluebird'
 import { BotConfig } from 'botpress/sdk'
 import { confirmDialog, lang, telemetry, toast } from 'botpress/shared'
 import cx from 'classnames'
@@ -20,7 +22,6 @@ import _ from 'lodash'
 import React, { Component, Fragment } from 'react'
 import { connect, ConnectedProps } from 'react-redux'
 import { generatePath, RouteComponentProps } from 'react-router'
-import Subscription from '~/user/Subscription-screens/Subscription'
 import api from '~/app/api'
 import { Downloader } from '~/app/common/Downloader'
 import LoadingSection from '~/app/common/LoadingSection'
@@ -31,6 +32,7 @@ import AccessControl from '~/auth/AccessControl'
 import { getActiveWorkspace } from '~/auth/basicAuth'
 import { fetchLicensing } from '~/management/licensing/reducer'
 import { fetchModules } from '~/management/modules/reducer'
+import Subscription from '~/user/Subscription-screens/Subscription'
 import { fetchBotHealth, fetchBots, fetchBotNLULanguages } from '~/workspace/bots/reducer'
 import { filterList } from '~/workspace/util'
 
@@ -41,8 +43,6 @@ import EditStageModal from './EditStageModal'
 import ImportBotModal from './ImportBotModal'
 import RollbackBotModal from './RollbackBotModal'
 import style from './style.scss'
-import { is } from 'bluebird'
-import { isDarkTheme } from '@blueprintjs/core/lib/esm/common/utils'
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
@@ -377,6 +377,7 @@ class Bots extends Component<Props> {
                 icon="add"
                 intent={Intent.PRIMARY}
                 style={{
+                  height: '45px',
                   borderRadius: '6px'
                 }}
                 onClick={() => this.setState({ isCreateBotModalOpen: true })}
@@ -387,6 +388,7 @@ class Bots extends Component<Props> {
                 icon="import"
                 intent={Intent.SUCCESS}
                 style={{
+                  height: '45px',
                   borderRadius: '6px'
                 }}
                 onClick={() => this.setState({ isImportBotModalOpen: true })}
@@ -400,11 +402,13 @@ class Bots extends Component<Props> {
             text={lang.tr('admin.workspace.bots.createBot')}
             rightIcon="caret-down"
             style={{
+              height: '45px',
               background: '#f0f5ff',
               border: '1px solid #c3d4ff',
               borderRadius: '6px',
               padding: '8px 16px',
               fontWeight: 600,
+              fontSize: '15px',
               color: '#304ffe'
             }}
           />

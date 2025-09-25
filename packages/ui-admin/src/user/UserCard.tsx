@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react'
 import { Card, Elevation, Icon, Dialog, Button, Spinner, Divider } from '@blueprintjs/core'
 import { confirmDialog, lang, toast } from 'botpress/shared'
+import React, { useEffect, useState } from 'react'
 import api from '~/app/api'
 import TransactionHistory from './Subscription-screens/TransactionHistory'
 
@@ -131,6 +131,7 @@ const UserCard: React.FC<UserCardProps> = ({ email, userData, subscriptionData, 
 
   // Calculate isExpired by comparing only dates (ignoring time)
   const getIsExpired = () => {
+    console.log('till: ', subscriptionData)
     if (!subscriptionData.till) {
       return false
     }

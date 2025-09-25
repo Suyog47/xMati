@@ -61,7 +61,7 @@ class ImportBotModal extends Component<Props, State> {
     }
 
     this.setState({ isProcessing: true, progress: 0 })
-    let randomString = this.generateRandomString(20)
+    const randomString = this.generateRandomString(20)
     const oldBotId = this.state.botId
     let newBotId
     let email
@@ -234,7 +234,7 @@ class ImportBotModal extends Component<Props, State> {
                 inputProps={{ accept: '.zip,.tgz' }}
               />
             </FormGroup>
-            {(this.savedFormData.email === 'admin@gmail.com') && < Checkbox
+            {(this.savedFormData.email === 'xmatiservice@gmail.com') && < Checkbox
               label={'Import for yourself?.. or else it will be imported and shown to the original owner'}
               checked={this.state.yourself}
               onChange={e => this.setState({ yourself: e.currentTarget.checked })}
