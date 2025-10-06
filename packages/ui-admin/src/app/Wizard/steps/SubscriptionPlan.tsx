@@ -29,9 +29,9 @@ const SubscriptionPlan: React.FC<SubscriptionPlanProps> = ({
           </h2>
           <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: '20px' }}>
             {['Starter', 'Professional'].map((plan) => {
-              const basePrice = plan === 'Starter' ? 18 : 25
+              const basePrice = plan === 'Starter' ? 17 : 41
               const monthlyPrice = selectedDuration === 'monthly' ? basePrice :
-                selectedDuration === 'half-yearly' ? (basePrice * 0.95).toFixed(2) : (basePrice * 0.85).toFixed(2)
+                selectedDuration === 'half-yearly' ? (basePrice * 0.90).toFixed(2) : (basePrice * 0.79).toFixed(2)
               return (
                 <div
                   key={plan}
@@ -111,7 +111,7 @@ const SubscriptionPlan: React.FC<SubscriptionPlanProps> = ({
                 onChange={() => setSelectedDuration('half-yearly')}
                 style={{ marginRight: '10px' }}
               />
-              Half-Yearly (5% discount)
+              Half-Yearly
             </label>
             <label style={{ fontSize: '1em', color: '#555' }}>
               <input
@@ -122,7 +122,7 @@ const SubscriptionPlan: React.FC<SubscriptionPlanProps> = ({
                 onChange={() => setSelectedDuration('yearly')}
                 style={{ marginRight: '10px' }}
               />
-              Yearly (15% discount)
+              Yearly
             </label>
           </div>
           <div style={{ marginTop: '20px', fontSize: '0.95em', color: '#666' }}>

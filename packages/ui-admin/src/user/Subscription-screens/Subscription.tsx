@@ -89,19 +89,20 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   const amount = useMemo(() => {
     let price: number
 
-    price = selectedTab === 'Starter' ? 1800 : 2500 // Monthly prices: $18 and $25 respectively
+    price = selectedTab === 'Starter' ? 1700 : 4100 // Monthly prices: $17 and $41 respectively
 
     if (selectedDuration === 'half-yearly') {
       price = selectedTab === 'Starter'
-        ? Math.round(1800 * 6 * 0.95)    // Starter: 5% discount for half-yearly
-        : Math.round(2500 * 6 * 0.95)    // Professional: 5% discount for half-yearly
+        ? Math.ceil(1700 * 6 * 0.90)    // Starter: 10% discount for half-yearly
+        : Math.ceil(4100 * 6 * 0.90)    // Professional: 10% discount for half-yearly
     } else if (selectedDuration === 'yearly') {
       price = selectedTab === 'Starter'
-        ? Math.round(1800 * 12 * 0.85)   // Starter: 15% discount for yearly
-        : Math.round(2500 * 12 * 0.85)   // Professional: 15% discount for yearly
+        ? Math.ceil(1700 * 12 * 0.79)   // Starter: 21% discount for yearly
+        : Math.ceil(4100 * 12 * 0.79)   // Professional: 21% discount for yearly
     }
 
     setActualAmount(price / 100)
+    console.log('price: ', actualAmount)
 
     if (subscription !== 'Trial' && !savedSubData.expired && !savedSubData.isCancelled && !savedFormData.nextSubs) {
       const durationOrder: { [key: string]: number } = {
@@ -373,7 +374,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       const usedMonth = cycleNumber
 
       // Calculate refund
-      const monthlyAmount = (subs === 'Professional') ? 25 : 18
+      const monthlyAmount = (subs === 'Professional') ? 41 : 17
       const usedAmount = usedMonth * monthlyAmount
 
 
@@ -449,7 +450,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       const usedMonth = cycleNumber + 1 // 0-based cycle number, so add 1 for used months
 
       // Calculate refund
-      const monthlyAmount = (subs === 'Professional') ? 25 : 18
+      const monthlyAmount = (subs === 'Professional') ? 41 : 17
       const usedAmount = usedMonth * monthlyAmount
 
       // Calculate remaining days
@@ -550,7 +551,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       const remainingMonths = totalMonths - usedMonth
 
       // Calculate refund
-      const monthlyAmount = (subs === 'Professional') ? 25 : 18
+      const monthlyAmount = (subs === 'Professional') ? 41 : 17
       const usedAmount = usedMonth * monthlyAmount
 
       const remainingAmount = totalAmount - usedAmount
@@ -705,7 +706,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                     marginBottom: '12px',
                     fontSize: '1.2em'
                   }}>
-                    {plan === 'Starter' ? '$18/month' : '$25/month'} &nbsp;&nbsp; <span style={{ fontSize: '0.75em', color: '#666' }}>(Introductory price)</span>
+                    {plan === 'Starter' ? '$17/month' : '$41/month'} &nbsp;&nbsp; <span style={{ fontSize: '0.75em', color: '#666' }}>(Introductory price)</span>
                   </h3>
                   <div style={{
                     marginBottom: '12px',

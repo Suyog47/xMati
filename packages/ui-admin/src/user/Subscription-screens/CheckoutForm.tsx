@@ -629,8 +629,8 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                     {selectedDuration === 'monthly'
                       ? 'per month'
                       : selectedDuration === 'half-yearly'
-                        ? `($${((amount / 6) / 100).toFixed(2)}/month)`
-                        : `($${((amount / 12) / 100).toFixed(2)}/month)`}
+                        ? `($${(Math.ceil(amount / 6) / 100).toFixed(2)}/month)`
+                        : `($${(Math.ceil(amount / 12) / 100).toFixed(2)}/month)`}
                   </div>
                 )}
               </div> :

@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
-import PersonalInfo from './steps/PersonalInfo'
+import api from '~/app/api'
+import bgImage from '../../assets/images/background.jpg'
+import Check from '../../assets/images/check.png'
+import logo from '../../assets/images/xmati.png'
 import EmailVerification from './steps/EmailVerification'
 import OrganizationInfo from './steps/OrganizationInfo'
-import SubscriptionPlan from './steps/SubscriptionPlan'
 import PaymentInfo from './steps/PaymentInfo'
-import bgImage from '../../assets/images/background.jpg'
-import logo from '../../assets/images/xmati.png'
-import Check from '../../assets/images/check.png'
+import PersonalInfo from './steps/PersonalInfo'
+import SubscriptionPlan from './steps/SubscriptionPlan'
 import './style.css'
-import api from '~/app/api'
 import { auth } from 'botpress/shared'
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { FormGroup } from '@blueprintjs/core'
@@ -120,7 +120,7 @@ const CustomerWizard: React.FC = () => {
   const [cardErrorMessage, setCardErrorMessage] = useState<string | null>(null)
   const [selectedPlan, setSelectedPlan] = useState<string>('Starter')
   const [selectedDuration, setSelectedDuration] = useState<string>('monthly')
-  const [price, setPrice] = useState(18)
+  const [price, setPrice] = useState(17)
   // New state variables for OTP
   const [generatedOTP, setGeneratedOTP] = useState<string>('')
   const [enteredOTP, setEnteredOTP] = useState<string>('')
@@ -179,15 +179,15 @@ const CustomerWizard: React.FC = () => {
 
 
   useEffect(() => {
-    const basePrice = selectedPlan === 'Starter' ? 18 : 25
+    const basePrice = selectedPlan === 'Starter' ? 17 : 41
     let finalPrice = 0
 
     if (selectedDuration === 'monthly') {
       finalPrice = basePrice
     } else if (selectedDuration === 'half-yearly') {
-      finalPrice = Math.round(basePrice * 6 * 0.95 * 100) / 100
+      finalPrice = Math.ceil(basePrice * 6 * 0.90 * 100) / 100
     } else if (selectedDuration === 'yearly') {
-      finalPrice = Math.round(basePrice * 12 * 0.85 * 100) / 100
+      finalPrice = Math.ceil(basePrice * 12 * 0.79 * 100) / 100
     }
     setPrice(finalPrice)
   }, [selectedPlan, selectedDuration])
@@ -332,7 +332,7 @@ const CustomerWizard: React.FC = () => {
 
     if (await validateStep()) {
       if (formData && typeof formData === 'object') {
-        let status = await register()
+        const status = await register()
         setIsLoading(false)
         if (status) {
           await setLocalData()
@@ -462,7 +462,7 @@ const CustomerWizard: React.FC = () => {
         return { success: false, msg: 'Payment method ID is not valid' }
       }
 
-      let data = await result.json()
+      const data = await result.json()
 
       if (!data.success) {
         return { success: false, msg: result.status === 500 ? 'We are unable to validate your card... You can try with another one' : data.msg }
