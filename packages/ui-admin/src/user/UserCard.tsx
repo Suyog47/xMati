@@ -131,7 +131,6 @@ const UserCard: React.FC<UserCardProps> = ({ email, userData, subscriptionData, 
 
   // Calculate isExpired by comparing only dates (ignoring time)
   const getIsExpired = () => {
-    console.log('till: ', subscriptionData)
     if (!subscriptionData.till) {
       return false
     }

@@ -56,10 +56,10 @@ const getBotStatusKey = (serverId: string) => makeRedisKey(`bp_server_${serverId
 const debug = DEBUG('services:bots')
 
 // Localhost url
-//const API_URL = 'http://localhost:8000'
+const API_URL = 'http://localhost:8000'
 
 // Production url
-const API_URL = 'https://www.app.xmati.ai/apis'
+// const API_URL = 'https://www.app.xmati.ai/apis'
 
 @injectable()
 export class BotService {
@@ -174,7 +174,7 @@ export class BotService {
     BotService.organisationName = organisationName
 
     let mergedConfigs
-    if (source.from == 'llm') {
+    if (source.from === 'llm') {
       mergedConfigs = await this._createBotFromLLM(bot, desc.botDesc!)
     } else {
       mergedConfigs = await this._createBotFromTemplate(bot, botTemplate, email)
@@ -254,7 +254,7 @@ export class BotService {
           const botId = botRecord.key.toString().split('_')[1]
 
           // Process and save the bot files
-          const files = await this._parseBotFiles(JSON.parse(botConfig))
+          const files = await this._parseBotFiles(botConfig)
           await this._saveFiles(botId, files)
           await this.mountBot(botId)
 

@@ -94,14 +94,14 @@ class BotsRouter extends CustomAdminRouter {
       '/getBots',
       this.needPermissions('write', this.resource),
       this.asyncMiddleware(async (req, res) => {
-        let botIds = await this.botService.getAndLoadUserBots(req.body.email)
+        const botIds = await this.botService.getAndLoadUserBots(req.body.email)
         if (!botIds || !Array.isArray(botIds)) {
-          console.log('Something went wrong while adding bot reference');
-          return;
+          console.log('Something went wrong while adding bot reference')
+          return
         }
 
         for (const id of botIds) {
-          await this.workspaceService.addBotRef(id, 'default');
+          await this.workspaceService.addBotRef(id, 'default')
         }
 
         return sendSuccess(res, 'api called successfully')
@@ -112,16 +112,16 @@ class BotsRouter extends CustomAdminRouter {
       '/getAllBots',
       this.needPermissions('write', this.resource),
       this.asyncMiddleware(async (req, res) => {
-        let botIds = await this.botService.getAndLoadAllBots()
+        const botIds = await this.botService.getAndLoadAllBots()
         if (!botIds || !Array.isArray(botIds)) {
-          console.log('Something went wrong while adding bot reference');
-          return;
+          console.log('Something went wrong while adding bot reference')
+          return
         }
 
         // await new Promise(resolve => setTimeout(resolve, 1000));
         for (const id of botIds) {
           //await assertBotInWorkspace(id, req.workspace)
-          await this.workspaceService.addBotRef(id, req.workspace!);
+          await this.workspaceService.addBotRef(id, req.workspace!)
         }
 
         return sendSuccess(res, 'api called successfully')
@@ -142,39 +142,39 @@ class BotsRouter extends CustomAdminRouter {
       '/',
       this.needPermissions('write', this.resource),
       this.asyncMiddleware(async (req, res) => {
-        let bot;
+        let bot
         try {
           req.setTimeout(600000, () => {
-            this.logger.error('Timing out bot creation after 10 minutes... Bot creation shifted background');
-          });
+            this.logger.error('Timing out bot creation after 10 minutes... Bot creation shifted background')
+          })
 
-          bot = <BotConfig>_.pick(req.body, ['id', 'name', 'owner', 'category', 'defaultLanguage']);
-          const source = <BotConfig>_.pick(req.body, ['from']);
-          const botDesc = <BotConfig>_.pick(req.body, ['botDesc']);
-          const telegram = <BotConfig>_.pick(req.body, ['telegramToken']);
-          const slackBotToken = <BotConfig>_.pick(req.body, ['slackBotToken']);
-          const slackSigningSecret = <BotConfig>_.pick(req.body, ['slackSigningSecret']);
-          const messengerAccessToken = <BotConfig>_.pick(req.body, ['messengerAccessToken']);
-          const messengerAppSecret = <BotConfig>_.pick(req.body, ['messengerAppSecret']);
-          const messengerVerifyToken = <BotConfig>_.pick(req.body, ['messengerVerifyToken']);
-          const twilioAccountSid = <BotConfig>_.pick(req.body, ['twilioAccountSid']);
-          const twilioAuthToken = <BotConfig>_.pick(req.body, ['twilioAuthToken']);
-          const { fullName, organisationName } = req.body;
+          bot = <BotConfig>_.pick(req.body, ['id', 'name', 'owner', 'category', 'defaultLanguage'])
+          const source = <BotConfig>_.pick(req.body, ['from'])
+          const botDesc = <BotConfig>_.pick(req.body, ['botDesc'])
+          const telegram = <BotConfig>_.pick(req.body, ['telegramToken'])
+          const slackBotToken = <BotConfig>_.pick(req.body, ['slackBotToken'])
+          const slackSigningSecret = <BotConfig>_.pick(req.body, ['slackSigningSecret'])
+          const messengerAccessToken = <BotConfig>_.pick(req.body, ['messengerAccessToken'])
+          const messengerAppSecret = <BotConfig>_.pick(req.body, ['messengerAppSecret'])
+          const messengerVerifyToken = <BotConfig>_.pick(req.body, ['messengerVerifyToken'])
+          const twilioAccountSid = <BotConfig>_.pick(req.body, ['twilioAccountSid'])
+          const twilioAuthToken = <BotConfig>_.pick(req.body, ['twilioAuthToken'])
+          const { fullName, organisationName } = req.body
 
-          await assertBotInWorkspace(bot.id, req.workspace, bot.name);
-          const botExists = (await this.botService.getBotsIds()).includes(bot.id);
-          const botLinked = (await this.workspaceService.getBotRefs()).includes(bot.id);
+          await assertBotInWorkspace(bot.id, req.workspace, bot.name)
+          const botExists = (await this.botService.getBotsIds()).includes(bot.id)
+          const botLinked = (await this.workspaceService.getBotRefs()).includes(bot.id)
 
-          bot.id = await this.botService.makeBotId(bot.id, req.workspace!);
+          bot.id = await this.botService.makeBotId(bot.id, req.workspace!)
 
           if (botExists && botLinked) {
-            throw new ConflictError(`Bot "${bot.name}" already exists... Try creating with another name`);
+            throw new ConflictError(`Bot "${bot.name}" already exists... Try creating with another name`)
           }
 
           if (botExists) {
-            this.logger.warn(`Bot "${bot.name}" already exists. Linking to workspace`);
+            this.logger.warn(`Bot "${bot.name}" already exists. Linking to workspace`)
           } else {
-            const pipeline = await this.workspaceService.getPipeline(req.workspace!);
+            const pipeline = await this.workspaceService.getPipeline(req.workspace!)
 
             bot.pipeline_status = {
               current_stage: {
@@ -182,7 +182,7 @@ class BotsRouter extends CustomAdminRouter {
                 promoted_on: new Date(),
                 promoted_by: req.tokenUser!.email,
               },
-            };
+            }
 
             if (
               telegram.telegramToken ||
@@ -221,21 +221,21 @@ class BotsRouter extends CustomAdminRouter {
                     },
                   }),
                 },
-              };
+              }
             }
 
-            await this.botService.addBot(bot, req.body.template, source, botDesc, bot.owner, fullName, organisationName);
+            await this.botService.addBot(bot, req.body.template, source, botDesc, bot.owner, fullName, organisationName)
           }
 
           if (botLinked) {
-            this.logger.warn(`Bot "${bot.id}" already linked in workspace. See workspaces.json for more details`);
+            this.logger.warn(`Bot "${bot.id}" already linked in workspace. See workspaces.json for more details`)
           } else {
-            await this.workspaceService.addBotRef(bot.id, req.workspace!);
+            await this.workspaceService.addBotRef(bot.id, req.workspace!)
           }
 
           return sendSuccess(res, 'Added new bot', {
             botId: bot.id,
-          });
+          })
         } catch (error) {
           return res.json({
             status: 'failed',
@@ -329,10 +329,10 @@ class BotsRouter extends CustomAdminRouter {
           return res.status(400).send('Bot should be imported from archive')
         }
 
-        const fullName = req.params.fullName;
-        const oldBotId = req.params.botId;
-        const newBotId = req.params.newBotId;
-        const email = req.params.email;
+        const fullName = req.params.fullName
+        const oldBotId = req.params.botId
+        const newBotId = req.params.newBotId
+        const email = req.params.email
 
         const overwrite = yn(req.query.overwrite)
         const botId = await this.botService.makeBotId(newBotId, req.workspace!)
@@ -429,28 +429,28 @@ class BotsRouter extends CustomAdminRouter {
           industry: Joi.string().required(),
           subIndustry: Joi.string().required(),
           description: Joi.string().optional(),
-        });
+        })
 
-        const { error, value } = schema.validate(req.body);
+        const { error, value } = schema.validate(req.body)
         if (error) {
-          return res.status(400).send({ success: false, message: error.details[0].message });
+          return res.status(400).send({ success: false, message: error.details[0].message })
         }
 
         try {
           const industryData = {
             industry: value.industry,
             subIndustry: value.subIndustry,
-            description: value.description || "No description provided",
-          };
+            description: value.description || 'No description provided',
+          }
 
-          await this.workspaceService.addIndustry(req.workspace as string, industryData);
+          await this.workspaceService.addIndustry(req.workspace as string, industryData)
 
-          return sendSuccess(res, "Industry and Sub-Industry added successfully", industryData);
+          return sendSuccess(res, 'Industry and Sub-Industry added successfully', industryData)
         } catch (err) {
-          return res.status(400).send({ success: false, message: err.message || "Failed to add industry" });
+          return res.status(400).send({ success: false, message: err.message || 'Failed to add industry' })
         }
       })
-    );
+    )
 
     router.get(
       '/industries',
