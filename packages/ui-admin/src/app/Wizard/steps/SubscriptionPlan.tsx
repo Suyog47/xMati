@@ -29,9 +29,18 @@ const SubscriptionPlan: React.FC<SubscriptionPlanProps> = ({
           </h2>
           <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: '20px' }}>
             {['Starter', 'Professional'].map((plan) => {
-              const basePrice = plan === 'Starter' ? 17 : 41
-              const monthlyPrice = selectedDuration === 'monthly' ? basePrice :
-                selectedDuration === 'half-yearly' ? (basePrice * 0.90).toFixed(2) : (basePrice * 0.79).toFixed(2)
+              let monthlyPrice
+              if (selectedDuration === 'monthly') {
+                monthlyPrice = plan === 'Starter' ? 17 : 41
+              } else if (selectedDuration === 'half-yearly' && plan === 'Starter') {
+                monthlyPrice = 15
+              } else if (selectedDuration === 'half-yearly' && plan === 'Professional') {
+                monthlyPrice = 37
+              } else if (selectedDuration === 'yearly' && plan === 'Starter') {
+                monthlyPrice = 14
+              } else if (selectedDuration === 'yearly' && plan === 'Professional') {
+                monthlyPrice = 32
+              }
               return (
                 <div
                   key={plan}

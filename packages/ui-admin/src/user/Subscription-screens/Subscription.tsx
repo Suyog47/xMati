@@ -93,16 +93,15 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
 
     if (selectedDuration === 'half-yearly') {
       price = selectedTab === 'Starter'
-        ? Math.ceil(1700 * 6 * 0.90)    // Starter: 10% discount for half-yearly
-        : Math.ceil(4100 * 6 * 0.90)    // Professional: 10% discount for half-yearly
+        ? Math.ceil(1500 * 6)    // Starter: 10% discount or 15$ for half-yearly
+        : Math.ceil(3700 * 6)    // Professional: 10% discount or 37$ for half-yearly
     } else if (selectedDuration === 'yearly') {
       price = selectedTab === 'Starter'
-        ? Math.ceil(1700 * 12 * 0.79)   // Starter: 21% discount for yearly
-        : Math.ceil(4100 * 12 * 0.79)   // Professional: 21% discount for yearly
+        ? Math.ceil(1400 * 12)   // Starter: 21% discount or 14$ for yearly
+        : Math.ceil(3200 * 12)   // Professional: 21% discount or 32$ for yearly
     }
 
     setActualAmount(price / 100)
-    console.log('price: ', actualAmount)
 
     if (subscription !== 'Trial' && !savedSubData.expired && !savedSubData.isCancelled && !savedFormData.nextSubs) {
       const durationOrder: { [key: string]: number } = {
