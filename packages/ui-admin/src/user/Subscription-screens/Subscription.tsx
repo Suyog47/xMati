@@ -11,6 +11,7 @@ import React, { FC, useState, useEffect, useMemo, useCallback, useRef } from 're
 import BasicAuthentication from '~/auth/basicAuth'
 import CheckoutForm from './CheckoutForm'
 import CancellationFailedDialog from './dialogs/CancellationFailedDialog'
+import SubscriptionInvoiceLicenseDialog from './dialogs/LicenseInvoiceDialog'
 import PaymentFailedDialog from './dialogs/PaymentFailedDialog'
 import PaymentSuccessDialog from './dialogs/PaymentSuccessDialog'
 import SubscriptionCancelConfirmDialog from './dialogs/SubscriptionCancelConfirmDialog'
@@ -44,7 +45,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false)
   const [isCancelProcessing, setIsCancelProcessing] = useState(false)
   const [selectedDuration, setSelectedDuration] = useState<string>('monthly')
-
+  const [isInvoiceLicenseDialogOpen, setIsInvoiceLicenseDialogOpen] = useState(false)
 
   interface CalculatedData {
     status: boolean
@@ -85,6 +86,12 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     message?: string
   } | null>(null)
 
+  // Example data for invoice and license agreement
+  const invoiceDetails = {
+    subscriptionName: subscription || 'N/A',
+    amount: savedSubData?.amount || '0.00',
+    duration: savedSubData?.duration || 'N/A',
+  }
 
   const amount = useMemo(() => {
     let price: number
@@ -809,7 +816,8 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                       flex: 1,
                     }}
                     onClick={() => {
-                      setIsConfirmCancelDialogOpen(true)
+                      // setIsConfirmCancelDialogOpen(true)
+                      setIsInvoiceLicenseDialogOpen(true)
                     }}
                     disabled={isLoadingTransactions}
                   >
@@ -905,6 +913,13 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
           )}
         </div>
       </Dialog>
+
+      {/* Subscription Invoice and License Dialog */}
+      <SubscriptionInvoiceLicenseDialog
+        isOpen={isInvoiceLicenseDialogOpen}
+        invoiceDetails={invoiceDetails}
+        onClose={() => setIsInvoiceLicenseDialogOpen(false)}
+      />
 
       {/* Payment success dialog */}
       <PaymentSuccessDialog

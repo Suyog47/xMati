@@ -51,6 +51,7 @@ interface State {
   shownSection: string
   disableAnalyticsFetching?: boolean
   topQnaQuestions: { id: string; question?: string; count: number; upVoteCount?: number; downVoteCount?: number }[]
+  unmatchedQuestions: { id: string; question?: string; count: number }[]
 }
 
 interface ExportPeriod {
@@ -133,6 +134,11 @@ const fetchReducer = (state: State, action): State => {
       ...state,
       topQnaQuestions: action.data.topQnaQuestions
     }
+  } else if (action.type === 'receivedUnmatchedQuestions') {
+    return {
+      ...state,
+      unmatchedQuestions: action.data.unmatchedQuestions
+    }
   } else {
     throw new Error("That action type isn't supported.")
   }
@@ -157,7 +163,8 @@ const Analytics: FC<any> = ({ bp }) => {
     pageTitle: lang.tr('module.analytics.dashboard'),
     selectedChannel: defaultChannels[0].value,
     shownSection: 'dashboard',
-    topQnaQuestions: []
+    topQnaQuestions: [],
+    unmatchedQuestions: [] // Add this
   })
 
   useEffect(() => {
@@ -206,6 +213,9 @@ const Analytics: FC<any> = ({ bp }) => {
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     fetchQnaQuestions()
+    // Add this line to fetch unmatched questions
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    fetchUnmatchedQuestions()
   }, [state.metrics])
 
   const fetchAnalytics = async (channel: string, dateRange): Promise<MetricEntry[]> => {
@@ -227,7 +237,7 @@ const Analytics: FC<any> = ({ bp }) => {
       feedback_negative_qna: getMetric('feedback_negative_qna')
     }
 
-    const metrics = orderMetrics(getMetric('msg_sent_qna_count').filter(metric => metric.subMetric)).slice(0, 10)
+    const metrics = orderMetrics(getMetric('msg_sent_qna_count').filter(metric => metric.subMetric))
 
     const countVotes = (metric: MetricTypes, id: string) => votes[metric].find(m => m.subMetric === id)?.value
 
@@ -277,6 +287,22 @@ const Analytics: FC<any> = ({ bp }) => {
   const fetchQnaQuestion = async (id: string): Promise<any> => {
     const { data } = await bp.axios.get(`qna/questions/${id}`)
     return data
+  }
+
+  const fetchUnmatchedQuestions = async () => {
+    // Get messages that triggered 'none' intent (unmatched questions)
+    const noneIntentMetrics = orderMetrics(getMetric('msg_nlu_intent').filter(metric => metric.subMetric === 'none'))
+
+    const unmatchedQuestions = noneIntentMetrics.map(({ name: id, count }) => ({
+      id,
+      count,
+      question: 'Unmatched message (Intent: none)' // You might want to fetch actual message text if available
+    }))
+
+    dispatch({
+      type: 'receivedUnmatchedQuestions',
+      data: { unmatchedQuestions }
+    })
   }
 
   const handleChannelChange = async ({ target: { value: selectedChannel } }) => {
@@ -454,7 +480,17 @@ const Analytics: FC<any> = ({ bp }) => {
             label: q.question || renderDeletedQna(q.id),
             onClick: q.question ? navigateToElement(q.id, 'qna') : undefined
           }))}
-          className={cx(style.genericMetric, style.threeQuarter, style.list)}
+          className={cx(style.genericMetric, style.quarter, style.list)}
+        />
+        {/* Add this new section for unmatched questions */}
+        <ItemsList
+          name="Failed/Unmatched Questions"
+          items={state.unmatchedQuestions.map(q => ({
+            count: q.count,
+            label: q.question || `Unmatched Query (${q.id})`,
+            onClick: undefined // No navigation for unmatched questions
+          }))}
+          className={cx(style.genericMetric, style.quarter, style.list)}
         />
       </div>
     )
