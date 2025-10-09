@@ -86,13 +86,6 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     message?: string
   } | null>(null)
 
-  // Example data for invoice and license agreement
-  const invoiceDetails = {
-    subscriptionName: subscription || 'N/A',
-    amount: savedSubData?.amount || '0.00',
-    duration: savedSubData?.duration || 'N/A',
-  }
-
   const amount = useMemo(() => {
     let price: number
 
@@ -171,6 +164,15 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     return parseFloat(price.toFixed(2)) // Return as string with two decimal places
   }, [selectedTab, selectedDuration])
 
+  // Data for invoice and license agreement
+  const invoiceDetails = {
+    userName: savedFormData.fullName || 'Valued Customer',
+    email: savedFormData.email || '',
+    subscriptionName: subscription || 'N/A',
+    amount: `$${amount / 100}`,
+    paymentType: calculatedData?.refund ? 'REFUNDED' : 'CHARGED',
+    duration: selectedDuration,
+  }
 
   const getClientSecret = useCallback(async () => {
     if (!isPaymentDialogOpen) {
@@ -481,7 +483,6 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       return { status: false, message: 'Failed to calculate refund details', error: error.message }
     }
   }
-
 
   const togglePaymentDialog = async (val) => {
     setIsPaymentDialogOpen(val)
@@ -816,8 +817,8 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                       flex: 1,
                     }}
                     onClick={() => {
-                      // setIsConfirmCancelDialogOpen(true)
-                      setIsInvoiceLicenseDialogOpen(true)
+                      setIsConfirmCancelDialogOpen(true)
+                      //setIsInvoiceLicenseDialogOpen(true)
                     }}
                     disabled={isLoadingTransactions}
                   >
@@ -900,7 +901,8 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                 setSelectedDuration={setSelectedDuration}
                 setPaymentFailedMessage={setPaymentFailedMessage}
                 setIsPaymentFailedDialogOpen={setIsPaymentFailedDialogOpen}
-                setIsSuccessDialogOpen={setIsSuccessDialogOpen}
+                //setIsSuccessDialogOpen={setIsSuccessDialogOpen}
+                setIsLicenseDialogOpen={setIsInvoiceLicenseDialogOpen}
                 cardData={cardData}
               />
             </Elements>
@@ -918,6 +920,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       <SubscriptionInvoiceLicenseDialog
         isOpen={isInvoiceLicenseDialogOpen}
         invoiceDetails={invoiceDetails}
+        setIsSuccessDialogOpen={setIsSuccessDialogOpen}
         onClose={() => setIsInvoiceLicenseDialogOpen(false)}
       />
 

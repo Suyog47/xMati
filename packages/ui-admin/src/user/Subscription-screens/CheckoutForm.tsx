@@ -18,7 +18,8 @@ interface CheckoutFormProps {
   toggle: () => void
   setPaymentFailedMessage: (msg: string) => void
   setIsPaymentFailedDialogOpen: (val: boolean) => void
-  setIsSuccessDialogOpen: (val: boolean) => void
+  //setIsSuccessDialogOpen: (val: boolean) => void
+  setIsLicenseDialogOpen: (val: boolean) => void
 }
 
 const isValidClientSecret = (secret: string) => {
@@ -38,7 +39,8 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
   toggle,
   setPaymentFailedMessage,
   setIsPaymentFailedDialogOpen,
-  setIsSuccessDialogOpen
+  //setIsSuccessDialogOpen,
+  setIsLicenseDialogOpen
 }) => {
   const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
   const savedSubData = JSON.parse(localStorage.getItem('subData') || '{}')
@@ -207,7 +209,8 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
         await setSubscriber(`$${amount / 100}`)
       }
 
-      setIsSuccessDialogOpen(true)
+      //setIsSuccessDialogOpen(true)
+      setIsLicenseDialogOpen(true)
       await togglePaymentDialog(false)
       toggle()
     } catch (err: any) {
