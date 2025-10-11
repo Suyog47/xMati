@@ -89,16 +89,16 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   const amount = useMemo(() => {
     let price: number
 
-    price = selectedTab === 'Starter' ? 1700 : 4100 // Monthly prices: $17 and $41 respectively
+    price = selectedTab === 'Starter' ? 1900 : 4500 // Monthly prices: $19 and $45 respectively
 
     if (selectedDuration === 'half-yearly') {
       price = selectedTab === 'Starter'
-        ? Math.ceil(1500 * 6)    // Starter: 10% discount or 15$ for half-yearly
-        : Math.ceil(3700 * 6)    // Professional: 10% discount or 37$ for half-yearly
+        ? Math.ceil(1700 * 6)
+        : Math.ceil(3700 * 6)
     } else if (selectedDuration === 'yearly') {
       price = selectedTab === 'Starter'
-        ? Math.ceil(1400 * 12)   // Starter: 21% discount or 14$ for yearly
-        : Math.ceil(3200 * 12)   // Professional: 21% discount or 32$ for yearly
+        ? Math.ceil(1600 * 12)
+        : Math.ceil(3600 * 12)
     }
 
     setActualAmount(price / 100)
@@ -382,7 +382,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       const usedMonth = cycleNumber
 
       // Calculate refund
-      const monthlyAmount = (subs === 'Professional') ? 41 : 17
+      const monthlyAmount = (subs === 'Professional') ? 45 : 19
       const usedAmount = usedMonth * monthlyAmount
 
 
@@ -458,7 +458,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       const usedMonth = cycleNumber + 1 // 0-based cycle number, so add 1 for used months
 
       // Calculate refund
-      const monthlyAmount = (subs === 'Professional') ? 41 : 17
+      const monthlyAmount = (subs === 'Professional') ? 45 : 19
       const usedAmount = usedMonth * monthlyAmount
 
       // Calculate remaining days
@@ -558,7 +558,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       const remainingMonths = totalMonths - usedMonth
 
       // Calculate refund
-      const monthlyAmount = (subs === 'Professional') ? 41 : 17
+      const monthlyAmount = (subs === 'Professional') ? 45 : 19
       const usedAmount = usedMonth * monthlyAmount
 
       const remainingAmount = totalAmount - usedAmount
@@ -713,7 +713,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
                     marginBottom: '12px',
                     fontSize: '1.2em'
                   }}>
-                    {plan === 'Starter' ? '$17/month' : '$41/month'} &nbsp;&nbsp; <span style={{ fontSize: '0.75em', color: '#666' }}>(Introductory price)</span>
+                    {plan === 'Starter' ? '$19/month' : '$45/month'} &nbsp;&nbsp; <span style={{ fontSize: '0.75em', color: '#666' }}>(Introductory price)</span>
                   </h3>
                   <div style={{
                     marginBottom: '12px',

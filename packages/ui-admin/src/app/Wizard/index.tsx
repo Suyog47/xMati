@@ -120,7 +120,7 @@ const CustomerWizard: React.FC = () => {
   const [cardErrorMessage, setCardErrorMessage] = useState<string | null>(null)
   const [selectedPlan, setSelectedPlan] = useState<string>('Starter')
   const [selectedDuration, setSelectedDuration] = useState<string>('monthly')
-  const [price, setPrice] = useState(17)
+  const [price, setPrice] = useState(19)
   // New state variables for OTP
   const [generatedOTP, setGeneratedOTP] = useState<string>('')
   const [enteredOTP, setEnteredOTP] = useState<string>('')
@@ -182,15 +182,15 @@ const CustomerWizard: React.FC = () => {
     let finalPrice = 0
 
     if (selectedDuration === 'monthly') {
-      finalPrice = selectedPlan === 'Starter' ? 17 : 41
+      finalPrice = selectedPlan === 'Starter' ? 19 : 45
     } else if (selectedDuration === 'half-yearly' && selectedPlan === 'Starter') {
-      finalPrice = Math.ceil(15 * 6 * 100) / 100
+      finalPrice = Math.ceil(17 * 6 * 100) / 100
     } else if (selectedDuration === 'half-yearly' && selectedPlan === 'Professional') {
       finalPrice = Math.ceil(37 * 6 * 100) / 100
     } else if (selectedDuration === 'yearly' && selectedPlan === 'Starter') {
-      finalPrice = Math.ceil(14 * 12 * 100) / 100
+      finalPrice = Math.ceil(16 * 12 * 100) / 100
     } else if (selectedDuration === 'yearly' && selectedPlan === 'Professional') {
-      finalPrice = Math.ceil(32 * 12 * 100) / 100
+      finalPrice = Math.ceil(36 * 12 * 100) / 100
     }
     setPrice(finalPrice)
   }, [selectedPlan, selectedDuration])

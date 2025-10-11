@@ -56,10 +56,10 @@ const getBotStatusKey = (serverId: string) => makeRedisKey(`bp_server_${serverId
 const debug = DEBUG('services:bots')
 
 // Localhost url
-const API_URL = 'http://localhost:8000'
+// const API_URL = 'http://localhost:8000'
 
 // Production url
-// const API_URL = 'https://www.app.xmati.ai/apis'
+const API_URL = 'https://www.app.xmati.ai/apis'
 
 @injectable()
 export class BotService {

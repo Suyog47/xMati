@@ -507,8 +507,8 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
             >
               {[
                 { value: 'monthly', label: 'Monthly' },
-                { value: 'half-yearly', label: 'Half-yearly', discount: '5% discount' },
-                { value: 'yearly', label: 'Yearly', discount: '15% discount' },
+                { value: 'half-yearly', label: 'Half-yearly' },
+                { value: 'yearly', label: 'Yearly' },
               ].map((opt) => (
                 <label
                   key={opt.value}
@@ -534,17 +534,6 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                     }}
                   />
                   <span style={{ color: (savedSubData.subscription === selectedPlan && savedSubData.duration === opt.value) ? 'grey' : 'inherit' }}>{opt.label}</span>
-                  {opt.discount && (
-                    <small
-                      style={{
-                        fontSize: '0.85em',
-                        fontWeight: 'bold',
-                        color: 'green',
-                      }}
-                    >
-                      ({opt.discount})
-                    </small>
-                  )}
                   {/* Show (Current) in red if this option is the active one */}
                   {savedSubData.subscription === selectedPlan && savedSubData.duration === opt.value && (
                     <div style={{ color: 'red', fontSize: '0.85em' }}>(Current)</div>
@@ -725,7 +714,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                 <ul style={{ paddingLeft: '18px', margin: 0, color: '#555' }}>
                   <li>Your amount with us: <strong>{savedSubData.amount}</strong></li>
                   <li>Total months used ({calculatedData.action === 'upgrade' ? 'excluding' : 'including'} current month): <strong>{calculatedData.usedMonth}</strong></li>
-                  <li>Cost per month (discount excluded): <strong>${savedSubData.subscription === 'Starter' ? '18' : '25'}</strong></li>
+                  <li>Cost per month (discount excluded): <strong>${savedSubData.subscription === 'Starter' ? '19' : '45'}</strong></li>
                   <li>Cost used for {calculatedData.usedMonth} months: <strong>${(calculatedData.usedAmount).toFixed(2)}</strong></li>
                   {calculatedData.daysUsed !== undefined && (
                     <li>Days used in current month cycle: <strong>{calculatedData.daysUsed}</strong></li>
