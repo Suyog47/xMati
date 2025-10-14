@@ -56,10 +56,10 @@ const getBotStatusKey = (serverId: string) => makeRedisKey(`bp_server_${serverId
 const debug = DEBUG('services:bots')
 
 // Localhost url
-// const API_URL = 'http://localhost:8000'
+const API_URL = 'http://localhost:8000'
 
 // Production url
-const API_URL = 'https://www.app.xmati.ai/apis'
+// const API_URL = 'https://www.app.xmati.ai/apis'
 
 @injectable()
 export class BotService {
@@ -194,7 +194,7 @@ export class BotService {
       let result = await axios(`${API_URL}/get-bots`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
         data: JSON.stringify({
           email
@@ -927,7 +927,7 @@ export class BotService {
       const result = await axios(`${API_URL}/save-bot`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
         data: {
           fullName: BotService.fullName,

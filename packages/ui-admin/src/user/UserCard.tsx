@@ -46,6 +46,7 @@ const UserCard: React.FC<UserCardProps> = ({ email, userData, subscriptionData, 
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
   const savedSubData = JSON.parse(localStorage.getItem('subData') || '{}')
+  const token = JSON.parse(localStorage.getItem('token') || '{}')
 
   // Dummy transaction state and functions for UI demo
   const [transactions, setTransactions] = useState<any[]>([])
@@ -56,7 +57,7 @@ const UserCard: React.FC<UserCardProps> = ({ email, userData, subscriptionData, 
     try {
       const res = await fetch(`${API_URL}/get-stripe-transactions`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ email })
       })
 
@@ -91,7 +92,7 @@ const UserCard: React.FC<UserCardProps> = ({ email, userData, subscriptionData, 
 
     const res = await fetch(`${API_URL}/download-csv`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({ data: transactions, email }),
     })
 

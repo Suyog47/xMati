@@ -148,8 +148,8 @@ const Login: FC<Props> = props => {
         return
       }
 
-      await setLocalData(status.s3Data, subStatus.data)
-      await props.auth.login({ owner: status.s3Data.email, email: 'admin@gmail.com', password: 'Admin@123' }, loginUrl, redirectTo)
+      await setLocalData(status.dbData, subStatus.data)
+      await props.auth.login({ owner: status.dbData.email, email: 'admin@gmail.com', password: 'Admin@123' }, loginUrl, redirectTo)
     } catch (err) {
       if (err.type === 'PasswordExpiredError') {
         props.history.push({ pathname: '/changePassword', state: { email, password, loginUrl } })
@@ -235,17 +235,6 @@ const Login: FC<Props> = props => {
     if (subData.isCancelled === true) {
       canCancel = false
     }
-    // if (subData.subscription === 'Trial') {
-    //   canCancel = false
-    // } else {
-    //   // Check if current date is within 7 days from createdDate
-    //   const msInOneDay = 24 * 60 * 60 * 1000
-    //   const daysSinceCreation = (currentDate.getTime() - createdDate.getTime()) / msInOneDay
-    //   const isWithinOneWeek = daysSinceCreation >= 0 && daysSinceCreation <= 7
-
-    //   // keep true for now
-    //   canCancel = true //isWithinyarOneWeek
-    // }
 
 
     const updatedSubData = {
@@ -264,6 +253,7 @@ const Login: FC<Props> = props => {
 
     localStorage.setItem('formData', JSON.stringify(updatedFormData))
     localStorage.setItem('subData', JSON.stringify(updatedSubData))
+    localStorage.setItem('token', JSON.stringify(formData.token))
   }
 
 

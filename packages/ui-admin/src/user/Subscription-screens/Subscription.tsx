@@ -30,6 +30,7 @@ const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PROMISE || 'pk_liv
 const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   let savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
   const savedSubData = JSON.parse(localStorage.getItem('subData') || '{}')
+  const token = JSON.parse(localStorage.getItem('token') || '{}')
 
   const [actualAmount, setActualAmount] = useState<any>(null)
   const [clientSecret, setClientSecret] = useState<string>('')
@@ -190,7 +191,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       savedFormData = JSON.parse(localStorage.getItem('formData') || '{}') // reinitializing to get the latest data
       const result = await fetch(`${API_URL}/create-payment-intent`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({
           amount: amt, currency: 'usd',
           customerId: { id: savedFormData.stripeCustomerId },
@@ -250,7 +251,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     try {
       const res = await fetch(`${API_URL}/get-stripe-transactions`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ email: savedFormData.email })
       })
 
@@ -285,7 +286,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
 
     const res = await fetch(`${API_URL}/download-csv`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({ data: transactions, email }),
     })
 
@@ -311,6 +312,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify({ chargeId: savedSubData.transactionId, reason: '', email, fullName, subscription, amount, refundDetails }),
         })
@@ -319,6 +321,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify({ email }),
         })

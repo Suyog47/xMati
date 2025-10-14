@@ -49,6 +49,7 @@ const UpdateCardDetails: FC<Props> = props => {
   const [cardDetails, setCardDetails] = useState<CardDetails | null>(null)
   const [isLoadingCard, setIsLoadingCard] = useState(false)
   const formData = JSON.parse(localStorage.getItem('formData') || '{}')
+  const token = JSON.parse(localStorage.getItem('token') || '{}')
 
   // Fetch card details on dialog open using POST; loader added for the card area
   useEffect(() => {
@@ -56,9 +57,10 @@ const UpdateCardDetails: FC<Props> = props => {
       setIsLoadingCard(true)
       const fetchCardDetails = async () => {
         try {
+          console.log(token)
           const res = await fetch(`${API_URL}/get-card-details`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify({ paymentMethodId: formData.stripePayementId })
           })
           const data = await res.json()
@@ -87,7 +89,7 @@ const UpdateCardDetails: FC<Props> = props => {
 
       const result = await fetch(`${API_URL}/update-card-info`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({
           email: formData.email,
           customerId: formData.stripeCustomerId,

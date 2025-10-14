@@ -11,9 +11,7 @@ import PersonalInfo from './steps/PersonalInfo'
 import SubscriptionPlan from './steps/SubscriptionPlan'
 import './style.css'
 import { auth } from 'botpress/shared'
-import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
-import { FormGroup } from '@blueprintjs/core'
-import { is } from 'bluebird'
+import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
@@ -29,6 +27,7 @@ interface FormData {
   cardNumber: string
   cardCVC: string
   cardExpiry: string
+  token: string
 }
 
 interface Errors {
@@ -109,7 +108,8 @@ const CustomerWizard: React.FC = () => {
     subIndustryType: '',
     cardNumber: '',
     cardCVC: '',
-    cardExpiry: ''
+    cardExpiry: '',
+    token: ''
   })
   const [errors, setErrors] = useState<Errors>({})
   const [showPassword, setShowPassword] = useState(false)
@@ -357,6 +357,7 @@ const CustomerWizard: React.FC = () => {
 
       // upload creds to s3 (this flow is designed to make this project a multi-tenant)
       const s3Stat = await s3Upload()
+      formData.token = s3Stat.dbData.token
       if (!s3Stat.success) {
         setIsLoading(false)
         setErrorMessage(s3Stat.msg)
@@ -386,6 +387,7 @@ const CustomerWizard: React.FC = () => {
 
   const s3Upload = async () => {
     try {
+      const token = JSON.parse(localStorage.getItem('token') || '{}')
       const updatedFormData = {
         fullName: formData.fullName,
         email: formData.email,
@@ -438,7 +440,7 @@ const CustomerWizard: React.FC = () => {
       const setupIntentRes = await fetch(`${API_URL}/create-setup-intent`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: formData.email, customerId: '' }),
+        body: JSON.stringify({ email: formData.email, customerId: '-' }),
       })
 
       const { clientSecret, customerId } = await setupIntentRes.json()
@@ -476,7 +478,7 @@ const CustomerWizard: React.FC = () => {
       return { success: true, msg: data.msg, data }
     } catch (err: any) {
       setIsLoading(false)
-      return { success: false, msg: 'Error uploading subscription to S3' }
+      return { success: false, msg: 'Card not verified due to some reason' }
     }
   }
 
@@ -582,6 +584,7 @@ const CustomerWizard: React.FC = () => {
 
     localStorage.setItem('formData', JSON.stringify(updatedFormData))
     localStorage.setItem('subData', JSON.stringify(updatedSubData))
+    localStorage.setItem('token', JSON.stringify(formData.token))
   }
 
   const verifyCard = async () => {

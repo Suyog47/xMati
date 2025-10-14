@@ -16,6 +16,7 @@ const UpdatePassword: FC<Props> = props => {
   const [newPassword, setNewPassword] = useState<string>('')
   const [confirmPassword, setConfirmPassword] = useState<string>('')
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const token = JSON.parse(localStorage.getItem('token') || '{}')
 
   const loaderOverlayStyle: React.CSSProperties = {
     position: 'fixed',
@@ -50,7 +51,7 @@ const UpdatePassword: FC<Props> = props => {
     setIsLoading(true)
 
     const updatedFormData = { ...savedFormData, password: newPassword }
-    let res = await s3Call(updatedFormData)
+    const res = await s3Call(updatedFormData)
     setIsLoading(false)
 
     if (!res.success) {
@@ -68,14 +69,14 @@ const UpdatePassword: FC<Props> = props => {
 
   const s3Call = async (data) => {
     try {
-      const result = await fetch(`${API_URL}/user-auth`, {
+      const result = await fetch(`${API_URL}/update-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           data,
-          from: 'updatePass'
         }),
       })
 

@@ -67,9 +67,10 @@ const UpdateUserProfile: FC<Props> = props => {
   const [countryCode, setCountryCode] = useState<string>(countryOptions[0].code)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
+  const token = JSON.parse(localStorage.getItem('token') || '{}')
+  const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
 
   useEffect(() => {
-    const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
     setFullname(savedFormData.fullName || '')
     setEmail(savedFormData.email || '')
     setIndustryType(savedFormData.industryType || '')
@@ -130,7 +131,7 @@ const UpdateUserProfile: FC<Props> = props => {
 
     setIsLoading(true)
     try {
-      let res = await s3Call(formData)
+      const res = await s3Call(formData)
       if (!res.success) {
         toast.failure(res.msg)
         setIsLoading(false)
@@ -152,14 +153,14 @@ const UpdateUserProfile: FC<Props> = props => {
 
   const s3Call = async (data) => {
     try {
-      const result = await fetch(`${API_URL}/user-auth`, {
+      const result = await fetch(`${API_URL}/update-profile`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           data,
-          from: 'updateProfile'
         }),
       })
 

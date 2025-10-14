@@ -44,6 +44,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
 }) => {
   const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
   const savedSubData = JSON.parse(localStorage.getItem('subData') || '{}')
+  const token = JSON.parse(localStorage.getItem('token') || '{}')
 
   const stripe = useStripe()
   const elements = useElements()
@@ -78,7 +79,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
 
       const result = await fetch(`${API_URL}/save-subscription`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ key: email, name: fullName, subscription: selectedPlan, duration: selectedDuration, amount }),
       })
 
@@ -103,7 +104,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
 
       const result = await fetch(`${API_URL}/remove-nextsub`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ email }),
       })
 
@@ -127,7 +128,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
 
       const result = await fetch(`${API_URL}/failed-payment`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({
           email,
           name: fullName,
@@ -168,7 +169,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
       if (calculatedData?.refund && amount > 0) {
         const result = await fetch(`${API_URL}/refund-amount`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
           body: JSON.stringify({
             chargeId: savedSubData.transactionId,
             reason: '',
@@ -237,6 +238,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           email,
@@ -286,6 +288,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           email: savedFormData.email,

@@ -53,6 +53,7 @@ type Props = ConnectedProps<typeof connector> & RouteComponentProps
 class Bots extends Component<Props> {
   formData = JSON.parse(localStorage.getItem('formData') || '{}')
   subData = JSON.parse(localStorage.getItem('subData') || '{}')
+  token = JSON.parse(localStorage.getItem('token') || '{}')
   state = {
     isCreateBotModalOpen: false,
     isRollbackModalOpen: false,
@@ -102,7 +103,8 @@ class Bots extends Component<Props> {
       const response = await fetch(`${API_URL}/pro-suggestion-update`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.token}`
         },
         body: JSON.stringify({
           email,
@@ -197,8 +199,9 @@ class Bots extends Component<Props> {
       }
 
       this.state.numberOfBots = this.formData.numberOfBots || 0 // Initialize from localStorage
-      console.log(this.formData)
-      console.log(this.subData)
+      // console.log(this.formData)
+      // console.log(this.subData)
+      // console.log(this.token)
 
       // Check subscription expiry from localStorage
       let expiry

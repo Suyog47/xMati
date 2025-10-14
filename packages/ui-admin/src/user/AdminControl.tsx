@@ -20,6 +20,7 @@ const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
 const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
   const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
+  const token = JSON.parse(localStorage.getItem('token') || '{}')
   const maintenanceStatus = JSON.parse(localStorage.getItem('maintenance') || '{}')
   const [isDialogLoading, setDialogLoading] = useState(false)
   const [isMaintenanceActive, setMaintenanceActive] = useState(maintenanceStatus.status)
@@ -31,7 +32,7 @@ const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
     try {
       const response = await fetch(`${API_URL}/get-all-users-subscriptions`, {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       })
       const result = await response.json()
 
