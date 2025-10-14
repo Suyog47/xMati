@@ -57,7 +57,6 @@ const UpdateCardDetails: FC<Props> = props => {
       setIsLoadingCard(true)
       const fetchCardDetails = async () => {
         try {
-          console.log(token)
           const res = await fetch(`${API_URL}/get-card-details`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },

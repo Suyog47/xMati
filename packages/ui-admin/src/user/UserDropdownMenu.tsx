@@ -18,6 +18,7 @@ import { AppState } from '~/app/rootReducer'
 import BasicAuthentication from '~/auth/basicAuth'
 import ChangeLanguage from '~/user/ChangeLanguage'
 import AdminControl from './AdminControl'
+import LicenseAgreement from './LicenseAgreement'
 import { fetchProfile } from './reducer'
 import style from './style.scss'
 import Subscription from './Subscription-screens/Subscription'
@@ -37,6 +38,7 @@ const UserDropdownMenu: FC<Props> = props => {
   const [isCardOpen, setCardOpen] = useState(false)
   const [isPasswordOpen, setPasswordOpen] = useState(false)
   const [isLanguageOpen, setLanguageOpen] = useState(false)
+  const [isLicenseOpen, setLicenseOpen] = useState(false)
   const [isExpired, setExpiry] = useState(false)
 
 
@@ -73,6 +75,7 @@ const UserDropdownMenu: FC<Props> = props => {
   const toggleAdminControl = () => setAdminControl(!isAdminControl)
   const togglePassword = () => setPasswordOpen(!isPasswordOpen)
   const toggleLanguage = () => setLanguageOpen(!isLanguageOpen)
+  const toggleLicense = () => setLicenseOpen(!isLicenseOpen)
 
   const { email, fullName, strategyType, picture_url } = props.profile
   const canChangePassword = strategyType === 'basic'
@@ -104,6 +107,8 @@ const UserDropdownMenu: FC<Props> = props => {
           {canChangePassword && !isExpired && (
             <MenuItem id="btn-changepass" icon="key" text={lang.tr('admin.changePassword')} onClick={togglePassword} />
           )}
+
+          <MenuItem id="btn-license" icon="document" text={'License Agreement'} onClick={toggleLicense} />
 
           {/* {!isExpired && (<MenuItem
             id="btn-changeLanguage"
@@ -140,6 +145,11 @@ const UserDropdownMenu: FC<Props> = props => {
         isOpen={isAdminControl}
         toggle={toggleAdminControl}>
       </AdminControl>
+
+      <LicenseAgreement
+        isOpen={isLicenseOpen}
+        toggle={toggleLicense}
+      />
 
       {/* <VoiceRecorder
         isOpen={isGemini}

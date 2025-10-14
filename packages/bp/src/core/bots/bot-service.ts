@@ -693,7 +693,7 @@ export class BotService {
 
       for (const item of items) {
         const fullPath = path.join(dir, item.name)
-        if (item.isDirectory() && item.name !== 'models') {
+        if (item.isDirectory()) {
           fileList = fileList.concat(getFiles(fullPath)) // Recursively get files
         } else {
           fileList.push(fullPath)
@@ -823,7 +823,7 @@ export class BotService {
     const scopedGhost = this.ghostService.forBot(id)
     await scopedGhost.upsertFiles('/', files, { ignoreLock: true })
     await scopedGhost.upsertFile('/', BOT_CONFIG_FILENAME, stringify(mergedConfigs))
-    this._convertBot(`${owner}_${id}`, id)
+    void this._convertBot(`${owner}_${id}`, id)
   }
 
   private async _convertBot(key, id, from = 'user') {
