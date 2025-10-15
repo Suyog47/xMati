@@ -11,12 +11,17 @@ export const LoginForm: FC<Props> = props => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
   const onSubmit = async e => {
     e.preventDefault()
     setLoading(true)
     await props.onLogin(email.trim(), password.trim()) // Trim email here
     setLoading(false)
+  }
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword)
   }
 
   return (
@@ -37,8 +42,16 @@ export const LoginForm: FC<Props> = props => {
           tabIndex={2}
           value={password}
           onChange={e => setPassword(e.target.value)}
-          type="password"
+          type={showPassword ? 'text' : 'password'}
           id="password-login"
+          rightElement={
+            <Button
+              icon={showPassword ? 'eye-off' : 'eye-open'}
+              minimal={true}
+              onClick={togglePasswordVisibility}
+              tabIndex={-1}
+            />
+          }
         />
       </FormGroup>
 

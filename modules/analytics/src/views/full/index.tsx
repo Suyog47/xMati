@@ -51,7 +51,7 @@ interface State {
   shownSection: string
   disableAnalyticsFetching?: boolean
   topQnaQuestions: { id: string; question?: string; count: number; upVoteCount?: number; downVoteCount?: number }[]
-  unmatchedQuestions: { id: string; question?: string; count: number }[]
+  unmatchedQuestions: { id: string; question?: string; count: number; confidence?: number; language?: string }[]
 }
 
 interface ExportPeriod {
@@ -290,19 +290,101 @@ const Analytics: FC<any> = ({ bp }) => {
   }
 
   const fetchUnmatchedQuestions = async () => {
-    // Get messages that triggered 'none' intent (unmatched questions)
-    const noneIntentMetrics = orderMetrics(getMetric('msg_nlu_intent').filter(metric => metric.subMetric === 'none'))
+    try {
+      let misunderstoodMessages = []
 
-    const unmatchedQuestions = noneIntentMetrics.map(({ name: id, count }) => ({
-      id,
-      count,
-      question: 'Unmatched message (Intent: none)' // You might want to fetch actual message text if available
-    }))
+      // Try to get actual misunderstood messages from the misunderstood module if date range is available
+      if (state.dateRange?.[0] && state.dateRange?.[1]) {
+        try {
+          const startDate = moment(state.dateRange[0]).unix()
+          const endDate = moment(state.dateRange[1]).unix()
 
-    dispatch({
-      type: 'receivedUnmatchedQuestions',
-      data: { unmatchedQuestions }
-    })
+          const { data } = await bp.axios.get('mod/misunderstood/events/new', {
+            params: {
+              language: 'en', // You might want to make this dynamic based on bot language
+              start: startDate,
+              end: endDate
+            }
+          })
+          misunderstoodMessages = data || []
+        } catch (error) {
+          // Misunderstood module might not be available or enabled
+          // This is normal, we'll use fallback data
+        }
+      }
+
+      // Get basic metrics from analytics
+      const noneIntentMetrics = orderMetrics(getMetric('msg_nlu_intent').filter(metric => metric.subMetric === 'none'))
+
+      if (noneIntentMetrics.length === 0) {
+        dispatch({
+          type: 'receivedUnmatchedQuestions',
+          data: { unmatchedQuestions: [] }
+        })
+        return
+      }
+
+      // Combine both data sources for better information
+      const unmatchedQuestions = await Promise.all(
+        noneIntentMetrics.map(async ({ name: id, count }) => {
+          // Try to find corresponding misunderstood message
+          const misunderstoodMsg = misunderstoodMessages.find(msg =>
+            msg.id === id || msg.messageId === id
+          )
+
+          if (misunderstoodMsg && misunderstoodMsg.preview) {
+            // Clean up the preview text
+            let cleanPreview = misunderstoodMsg.preview.replace(/<[^>]*>?/gm, '').trim()
+            if (cleanPreview.length > 80) {
+              cleanPreview = cleanPreview.substring(0, 80) + '...'
+            }
+
+            return {
+              id,
+              count,
+              question: cleanPreview || 'Unmatched Message',
+              confidence: misunderstoodMsg.confidence,
+              language: misunderstoodMsg.language
+            }
+          }
+
+          // Fallback: Create more descriptive text based on available data
+          if (count > 1) {
+            return {
+              id,
+              count,
+              question: `Unmatched Messages (${count} similar occurrences)`
+            }
+          } else {
+            return {
+              id,
+              count,
+              question: 'Unmatched Message (no details available)'
+            }
+          }
+        })
+      )
+
+      dispatch({
+        type: 'receivedUnmatchedQuestions',
+        data: { unmatchedQuestions: unmatchedQuestions.slice(0, 15) } // Show top 15
+      })
+    } catch (error) {
+      // Fallback to basic display with error-safe handling
+      const noneIntentMetrics = orderMetrics(getMetric('msg_nlu_intent').filter(metric => metric.subMetric === 'none'))
+      const unmatchedQuestions = noneIntentMetrics.slice(0, 10).map(({ name: id, count }) => ({
+        id,
+        count,
+        question: count > 1
+          ? `${count} Unmatched Messages`
+          : 'Unmatched Message'
+      }))
+
+      dispatch({
+        type: 'receivedUnmatchedQuestions',
+        data: { unmatchedQuestions }
+      })
+    }
   }
 
   const handleChannelChange = async ({ target: { value: selectedChannel } }) => {
@@ -480,17 +562,29 @@ const Analytics: FC<any> = ({ bp }) => {
             label: q.question || renderDeletedQna(q.id),
             onClick: q.question ? navigateToElement(q.id, 'qna') : undefined
           }))}
-          className={cx(style.genericMetric, style.quarter, style.list)}
+          className={cx(style.genericMetric, style.threeQuarter, style.list)}
         />
-        {/* Add this new section for unmatched questions */}
+        {/* Enhanced section for unmatched questions */}
         <ItemsList
           name="Failed/Unmatched Questions"
-          items={state.unmatchedQuestions.map(q => ({
-            count: q.count,
-            label: q.question || `Unmatched Query (${q.id})`,
-            onClick: undefined // No navigation for unmatched questions
-          }))}
-          className={cx(style.genericMetric, style.quarter, style.list)}
+          items={state.unmatchedQuestions.map(q => {
+            let displayLabel = q.question || `Unmatched Query (${q.id})`
+
+            // Add confidence info if available
+            if (q.confidence !== undefined) {
+              displayLabel += ` (Confidence: ${(q.confidence * 100).toFixed(1)}%)`
+            }
+
+            return {
+              count: q.count,
+              label: displayLabel,
+              onClick: q.confidence !== undefined ? () => {
+                // Navigate to misunderstood module to see more details
+                window.postMessage({ action: 'navigate-url', payload: '/modules/misunderstood' }, '*')
+              } : undefined
+            }
+          })}
+          className={cx(style.genericMetric, style.threeQuarter, style.list)}
         />
       </div>
     )
@@ -540,7 +634,7 @@ const Analytics: FC<any> = ({ bp }) => {
 
     return (
       <div className={cx(style.metricsContainer, style.fullWidth)}>
-        <div className={cx(style.genericMetric, style.quarter)}>
+        {/* <div className={cx(style.genericMetric, style.quarter)}>
           <div>
             <p className={style.numberMetricValue}>{misunderstood.total}</p>
             <h3 className={style.metricName}>{lang.tr('module.analytics.misunderstoodMessages')}</h3>
@@ -557,7 +651,7 @@ const Analytics: FC<any> = ({ bp }) => {
               name={`${misunderstood.outside} outside flows`}
             />
           </div>
-        </div>
+        </div> */}
         <div className={cx(style.genericMetric, style.quarter)}>
           <div>
             <h3 className={style.metricName}>{lang.tr('module.analytics.messagesByLanguage')}</h3>

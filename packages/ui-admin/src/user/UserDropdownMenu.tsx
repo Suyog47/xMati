@@ -97,7 +97,7 @@ const UserDropdownMenu: FC<Props> = props => {
         <Menu>
           <MenuDivider title={lang.tr('admin.signedInAs', { name: savedFormData.email })} />
 
-          <MenuItem id="btn-subscription" icon="dollar" text={'Subscription'} onClick={toggleSubscription} />
+          {savedFormData.email !== 'xmatiservice@gmail.com' && (<MenuItem id="btn-subscription" icon="dollar" text={'Subscription'} onClick={toggleSubscription} />)}
 
           {/* <MenuItem id="btn-gemini" icon="user" text={'Gemini Speech'} onClick={toggleGemini} /> */}
 
@@ -105,7 +105,7 @@ const UserDropdownMenu: FC<Props> = props => {
 
           {!isExpired && (<MenuItem id="btn-profile" icon="user" text={lang.tr('admin.updateProfile')} onClick={toggleProfile} />)}
 
-          {!isExpired && (<MenuItem id="btn-card" icon="credit-card" text={'Update Payment Card'} onClick={toggleCard} />)}
+          {!isExpired && savedFormData.email !== 'xmatiservice@gmail.com' && (<MenuItem id="btn-card" icon="credit-card" text={'Update Payment Card'} onClick={toggleCard} />)}
 
           {canChangePassword && !isExpired && (
             <MenuItem id="btn-changepass" icon="key" text={lang.tr('admin.changePassword')} onClick={togglePassword} />
@@ -113,7 +113,7 @@ const UserDropdownMenu: FC<Props> = props => {
 
           <MenuItem id="btn-license" icon="document" text={'License Agreement'} onClick={toggleLicense} />
 
-          <MenuItem id="btn-enquiry" icon="help" text={'Submit Enquiry'} onClick={toggleEnquiry} />
+          {savedFormData.email !== 'xmatiservice@gmail.com' && (<MenuItem id="btn-enquiry" icon="help" text={'Submit Enquiry'} onClick={toggleEnquiry} />)}
 
           {/* {!isExpired && (<MenuItem
             id="btn-changeLanguage"
