@@ -18,6 +18,7 @@ import { AppState } from '~/app/rootReducer'
 import BasicAuthentication from '~/auth/basicAuth'
 import ChangeLanguage from '~/user/ChangeLanguage'
 import AdminControl from './AdminControl'
+import Enquiry from './Enquiry'
 import LicenseAgreement from './LicenseAgreement'
 import { fetchProfile } from './reducer'
 import style from './style.scss'
@@ -39,6 +40,7 @@ const UserDropdownMenu: FC<Props> = props => {
   const [isPasswordOpen, setPasswordOpen] = useState(false)
   const [isLanguageOpen, setLanguageOpen] = useState(false)
   const [isLicenseOpen, setLicenseOpen] = useState(false)
+  const [isEnquiryOpen, setEnquiryOpen] = useState(false)
   const [isExpired, setExpiry] = useState(false)
 
 
@@ -76,6 +78,7 @@ const UserDropdownMenu: FC<Props> = props => {
   const togglePassword = () => setPasswordOpen(!isPasswordOpen)
   const toggleLanguage = () => setLanguageOpen(!isLanguageOpen)
   const toggleLicense = () => setLicenseOpen(!isLicenseOpen)
+  const toggleEnquiry = () => setEnquiryOpen(!isEnquiryOpen)
 
   const { email, fullName, strategyType, picture_url } = props.profile
   const canChangePassword = strategyType === 'basic'
@@ -109,6 +112,8 @@ const UserDropdownMenu: FC<Props> = props => {
           )}
 
           <MenuItem id="btn-license" icon="document" text={'License Agreement'} onClick={toggleLicense} />
+
+          <MenuItem id="btn-enquiry" icon="help" text={'Submit Enquiry'} onClick={toggleEnquiry} />
 
           {/* {!isExpired && (<MenuItem
             id="btn-changeLanguage"
@@ -149,6 +154,11 @@ const UserDropdownMenu: FC<Props> = props => {
       <LicenseAgreement
         isOpen={isLicenseOpen}
         toggle={toggleLicense}
+      />
+
+      <Enquiry
+        isOpen={isEnquiryOpen}
+        toggle={toggleEnquiry}
       />
 
       {/* <VoiceRecorder

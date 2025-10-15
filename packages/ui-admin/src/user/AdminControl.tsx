@@ -3,6 +3,7 @@ import { toast } from 'botpress/shared'
 import ms from 'ms'
 import React, { FC, useEffect, useState } from 'react'
 import api from '~/app/api'
+import EnquiryDialog from './EnquiryDialog'
 import UserCard from './UserCard'
 
 interface Props {
@@ -15,7 +16,6 @@ interface UserData {
   [key: string]: any // Add more fields as needed
 }
 
-
 const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
 const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
@@ -25,7 +25,9 @@ const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
   const [isDialogLoading, setDialogLoading] = useState(false)
   const [isMaintenanceActive, setMaintenanceActive] = useState(maintenanceStatus.status)
   const [userList, setUserList] = useState<UserData[]>([])
+  const [isEnquiryDialogOpen, setEnquiryDialogOpen] = useState(false)
   const toggleMaintenance = () => setMaintenanceActive(prev => !prev)
+  const toggleEnquiryDialog = () => setEnquiryDialogOpen(prev => !prev)
 
   const getAllUsers = async () => {
     setDialogLoading(true)
@@ -53,6 +55,7 @@ const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
       void getAllUsers()
     }
   }, [isOpen])
+
 
   const handleBackup = async () => {
     setDialogLoading(true)
@@ -142,45 +145,46 @@ const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
         </div>
       )}
 
-      <div style={{ display: 'flex', height: '100%' }}>
+      <div style={{ display: 'flex', height: '95%' }}>
         {/* Left Panel - Admin Actions */}
         <div
           style={{
             width: '30%',
-            padding: '24px',
+            padding: '20px',
             paddingTop: 0,
             borderRight: '1px solid #eee',
             background: '#f9f9f9',
             display: 'flex',
             flexDirection: 'column',
-            gap: '18px',
+            gap: '14px',
+            overflowY: 'auto',
+            maxHeight: '100%',
           }}
         >
-          <h2 style={{ fontSize: '22px', marginBottom: '8px', fontWeight: 600 }}>Actions</h2>
+          <h2 style={{ fontSize: '20px', marginBottom: '6px', fontWeight: 600, marginTop: '10px' }}>Actions</h2>
 
           {/* Backup */}
           <Card elevation={Elevation.TWO}
             style={{
-              padding: '20px',
-              paddingTop: '5px',
-              borderRadius: '10px',
+              padding: '16px',
+              paddingTop: '8px',
+              borderRadius: '8px',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center'
             }}>
-            <h4 style={{ marginBottom: '12px' }}>Backup Bots to S3</h4>
+            <h4 style={{ marginBottom: '10px', fontSize: '14px' }}>Backup Bots to S3</h4>
             <Button
-              large
               fill
               icon="cloud-upload"
               intent="primary"
               onClick={handleBackup}
               disabled={isDialogLoading}
               style={{
-                height: '52px',
-                fontSize: '16px',
+                height: '40px',
+                fontSize: '14px',
                 fontWeight: 600,
-                borderRadius: '8px',
+                borderRadius: '6px',
               }}
             >
               Backup All Bots
@@ -190,26 +194,25 @@ const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
           {/* Retrieve */}
           <Card elevation={Elevation.TWO}
             style={{
-              padding: '20px',
-              paddingTop: '5px',
-              borderRadius: '10px',
+              padding: '16px',
+              paddingTop: '8px',
+              borderRadius: '8px',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center'
             }}>
-            <h4 style={{ marginBottom: '12px' }}>Restore Bots from S3</h4>
+            <h4 style={{ marginBottom: '10px', fontSize: '14px' }}>Restore Bots from S3</h4>
             <Button
-              large
               fill
               icon="cloud-download"
               intent="success"
               onClick={handleRetrieval}
               disabled={isDialogLoading}
               style={{
-                height: '52px',
-                fontSize: '16px',
+                height: '40px',
+                fontSize: '14px',
                 fontWeight: 600,
-                borderRadius: '8px',
+                borderRadius: '6px',
               }}
             >
               Retrieve Bots
@@ -219,26 +222,25 @@ const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
           {/* Maintenance */}
           <Card elevation={Elevation.TWO}
             style={{
-              padding: '20px',
-              paddingTop: '5px',
-              borderRadius: '10px',
+              padding: '16px',
+              paddingTop: '8px',
+              borderRadius: '8px',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center'
             }}>
-            <h4 style={{ marginBottom: '12px' }}>Toggle Maintenance Mode</h4>
+            <h4 style={{ marginBottom: '10px', fontSize: '14px' }}>Toggle Maintenance Mode</h4>
             <Button
-              large
               fill
               icon="wrench"
               intent="warning"
               onClick={handleMaintenance}
               disabled={isDialogLoading}
               style={{
-                height: '52px',
-                fontSize: '16px',
+                height: '40px',
+                fontSize: '14px',
                 fontWeight: 600,
-                borderRadius: '8px',
+                borderRadius: '6px',
               }}
             >
               {isMaintenanceActive ? 'Disable Maintenance' : 'Enable Maintenance'}
@@ -246,14 +248,43 @@ const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
 
             <div
               style={{
-                marginTop: '12px',
+                marginTop: '8px',
                 textAlign: 'center',
                 fontWeight: 500,
+                fontSize: '12px',
                 color: isMaintenanceActive ? 'green' : 'red',
               }}
             >
               Status: {isMaintenanceActive ? 'Active' : 'Inactive'}
             </div>
+          </Card>
+
+          {/* Check Queries */}
+          <Card elevation={Elevation.TWO}
+            style={{
+              padding: '16px',
+              paddingTop: '8px',
+              borderRadius: '8px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center'
+            }}>
+            <h4 style={{ marginBottom: '10px', fontSize: '14px' }}>View User Enquiries</h4>
+            <Button
+              fill
+              icon="chat"
+              intent="primary"
+              onClick={toggleEnquiryDialog}
+              disabled={isDialogLoading}
+              style={{
+                height: '40px',
+                fontSize: '14px',
+                fontWeight: 600,
+                borderRadius: '6px',
+              }}
+            >
+              Check Enquiries
+            </Button>
           </Card>
         </div>
 
@@ -304,6 +335,12 @@ const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
         </div>
 
       </div>
+
+      {/* Enquiries Dialog */}
+      <EnquiryDialog
+        isOpen={isEnquiryDialogOpen}
+        onClose={toggleEnquiryDialog}
+      />
     </Dialog>
   )
 }
