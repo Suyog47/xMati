@@ -622,7 +622,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
         style={{
           width: '98vw',
           maxWidth: '100vw',
-          height: 'auto', // Adjust height to fit content
+          height: 'auto',
           maxHeight: '97vh',
           margin: 0,
           borderRadius: 10,
@@ -642,7 +642,7 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
           }}
         >
           {/* Left: Subscription Plan Section */}
-          <div style={{ flex: 1.5, overflowY: 'auto' }}>
+          <div style={{ flex: 1.8, overflowY: 'auto' }}>
             <div
               style={{
                 marginBottom: '10px',
@@ -835,11 +835,12 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
           {/* Vertical Divider */}
           <div
             style={{
-              width: 1.5,
+              width: '2px',
+              minWidth: '2px',
               background: '#e0e0e0',
-              margin: '0 10px',
+              margin: '0 16px',
               height: '100%',
-              alignSelf: 'stretch',
+              flexShrink: 0,
             }}
           />
 
