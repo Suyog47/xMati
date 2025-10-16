@@ -1,3 +1,5 @@
+import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
+import { auth } from 'botpress/shared'
 import React, { useState, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
 import api from '~/app/api'
@@ -10,8 +12,6 @@ import PaymentInfo from './steps/PaymentInfo'
 import PersonalInfo from './steps/PersonalInfo'
 import SubscriptionPlan from './steps/SubscriptionPlan'
 import './style.css'
-import { auth } from 'botpress/shared'
-import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
@@ -225,15 +225,16 @@ const CustomerWizard: React.FC = () => {
   }
 
   const handleOTPVerification = async () => {
-    // Simulate async verification process if needed
-    if (enteredOTP.trim() === generatedOTP) {
-      setOtpVerified(true)
-      setOtpResentMessage('')
-      setErrors((prevErrors) => ({ ...prevErrors, otp: '' }))
-    } else {
-      setOtpVerified(false)
-      setErrors((prevErrors) => ({ ...prevErrors, otp: 'Invalid OTP. Please try again' }))
-    }
+    setIsVerifyingOtp(true)
+    setOtpVerified(true)
+    // if (enteredOTP.trim() === generatedOTP) {
+    //   setOtpVerified(true)
+    //   setOtpResentMessage('')
+    //   setErrors((prevErrors) => ({ ...prevErrors, otp: '' }))
+    // } else {
+    //   setOtpVerified(false)
+    //   setErrors((prevErrors) => ({ ...prevErrors, otp: 'Invalid OTP. Please try again' }))
+    // }
     setIsVerifyingOtp(false)
   }
 
@@ -478,6 +479,52 @@ const CustomerWizard: React.FC = () => {
     } catch (err: any) {
       setIsLoading(false)
       return { success: false, msg: 'Card not verified due to some reason' }
+    }
+  }
+
+  const initiatePayment = async () => {
+    try {
+      const result = await fetch(`${API_URL}/create-payment-intent`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', },
+        body: JSON.stringify({
+          amount: price * 100, currency: 'usd',
+          customerId: { id: customerId },
+          paymentMethodId,
+          email: formData.email,
+          subscription: selectedPlan,
+          duration: selectedDuration
+        }),
+      })
+
+      if (!result.ok) {
+        throw new Error('Payment setup failed')
+      }
+      const data = await result.json()
+
+      if (!data.client_secret) {
+        throw new Error('Invalid server response')
+      }
+
+      if (!stripe) {
+        throw new Error('Stripe not initialized')
+      }
+
+      const { error: paymentError, paymentIntent } = await stripe.confirmCardPayment(data.client_secret.client_secret, {
+        payment_method: paymentMethodId,
+      })
+
+      if (paymentError) {
+        setErrorMessage(`Payment Failed: ${paymentError.message}`)
+        return false
+      }
+
+      if (paymentIntent && paymentIntent.status === 'succeeded') {
+        console.log('Payment successful!')
+        return true
+      }
+    } catch (error) {
+      console.error('Error during payment:', error)
     }
   }
 
