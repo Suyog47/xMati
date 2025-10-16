@@ -1,15 +1,15 @@
-import React from 'react'
 import { FormGroup } from '@blueprintjs/core'
 import { CardElement } from '@stripe/react-stripe-js'
+import React from 'react'
 
 interface PaymentInfoProps {
   verifyCard: () => void
   isValidatingCard: boolean
   cardValidated: boolean
-  isLoading: boolean
+  isLoading?: boolean
   errorMessage: string | null
   cardErrorMessage: string | null
-  handleSubmit: () => void
+  nextStep: () => void
   prevStep: () => void
   clearErrorMessage: () => void
   clearCardErrorMessage: () => void
@@ -19,10 +19,8 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
   verifyCard,
   isValidatingCard,
   cardValidated,
-  isLoading,
-  errorMessage,
   cardErrorMessage,
-  handleSubmit,
+  nextStep,
   prevStep,
   clearErrorMessage,
   clearCardErrorMessage
@@ -80,30 +78,14 @@ const PaymentInfo: React.FC<PaymentInfoProps> = ({
       <div className='button-container'>
         <div className='buttons'>
           <button onClick={prevStep}>Back</button>
-          <button onClick={handleSubmit} disabled={isLoading}>
-            Submit
+          <button onClick={nextStep}>
+            Next
           </button>
         </div>
       </div>
-      {(isLoading || errorMessage || cardErrorMessage || isValidatingCard) && (
+      {(isValidatingCard || cardErrorMessage) && (
         <div className='modal-overlay'>
           <div className='modal-content'>
-            {isLoading ? (
-              <>
-                <div className='loader'></div>
-                <p>Your xMati account is getting created... Please wait...</p>
-              </>
-            ) : (
-              <>
-                {errorMessage && (
-                  <>
-                    <p>{errorMessage}</p>
-                    <button onClick={clearErrorMessage}>Close</button>
-                  </>
-                )}
-              </>
-            )}
-
             {isValidatingCard ? (
               <>
                 <div className='loader'></div>

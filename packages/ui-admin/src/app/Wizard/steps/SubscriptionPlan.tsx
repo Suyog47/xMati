@@ -6,8 +6,14 @@ interface SubscriptionPlanProps {
   selectedDuration: string
   setSelectedDuration: (duration: string) => void
   price: number
-  nextStep: () => void
+  handleSubmit: () => void
   prevStep: () => void
+  isLoading?: boolean
+  errorMessage?: string | null
+  cardErrorMessage?: string | null
+  isValidatingCard?: boolean
+  clearErrorMessage?: () => void
+  clearCardErrorMessage?: () => void
 }
 
 const SubscriptionPlan: React.FC<SubscriptionPlanProps> = ({
@@ -16,8 +22,14 @@ const SubscriptionPlan: React.FC<SubscriptionPlanProps> = ({
   selectedDuration,
   setSelectedDuration,
   price,
-  nextStep,
-  prevStep
+  handleSubmit,
+  prevStep,
+  isLoading = false,
+  errorMessage = null,
+  cardErrorMessage = null,
+  isValidatingCard = false,
+  clearErrorMessage,
+  clearCardErrorMessage
 }) => {
   return (
     <>
@@ -32,15 +44,16 @@ const SubscriptionPlan: React.FC<SubscriptionPlanProps> = ({
               let monthlyPrice
               if (selectedDuration === 'monthly') {
                 monthlyPrice = plan === 'Starter' ? 19 : 45
-              } else if (selectedDuration === 'half-yearly' && plan === 'Starter') {
-                monthlyPrice = 17
-              } else if (selectedDuration === 'half-yearly' && plan === 'Professional') {
-                monthlyPrice = 37
               } else if (selectedDuration === 'yearly' && plan === 'Starter') {
                 monthlyPrice = 16
               } else if (selectedDuration === 'yearly' && plan === 'Professional') {
                 monthlyPrice = 36
               }
+              //  else if (selectedDuration === 'half-yearly' && plan === 'Starter') {
+              //   monthlyPrice = 17
+              // } else if (selectedDuration === 'half-yearly' && plan === 'Professional') {
+              //   monthlyPrice = 37
+              // }
               return (
                 <div
                   key={plan}
@@ -111,7 +124,7 @@ const SubscriptionPlan: React.FC<SubscriptionPlanProps> = ({
               />
               Monthly
             </label>
-            <label style={{ fontSize: '1em', color: '#555' }}>
+            {/* <label style={{ fontSize: '1em', color: '#555' }}>
               <input
                 type='radio'
                 name='subscriptionDuration'
@@ -121,7 +134,7 @@ const SubscriptionPlan: React.FC<SubscriptionPlanProps> = ({
                 style={{ marginRight: '10px' }}
               />
               Half-Yearly
-            </label>
+            </label> */}
             <label style={{ fontSize: '1em', color: '#555' }}>
               <input
                 type='radio'
@@ -150,9 +163,36 @@ const SubscriptionPlan: React.FC<SubscriptionPlanProps> = ({
       <div className='button-container'>
         <div className='buttons'>
           <button onClick={prevStep}>Back</button>
-          <button onClick={nextStep}>Next</button>
+          <button onClick={handleSubmit} disabled={isLoading}>Submit</button>
         </div>
       </div>
+      {(isLoading || errorMessage || cardErrorMessage || isValidatingCard) && (
+        <div className='modal-overlay'>
+          <div className='modal-content'>
+            {isLoading ? (
+              <>
+                <div className='loader'></div>
+                <p>Your xMati account is getting created... Please wait...</p>
+              </>
+            ) : (
+              <>
+                {errorMessage && clearErrorMessage && (
+                  <>
+                    <p>{errorMessage}</p>
+                    <button onClick={clearErrorMessage}>Close</button>
+                  </>
+                )}
+                {cardErrorMessage && clearCardErrorMessage && (
+                  <>
+                    <p>{cardErrorMessage}</p>
+                    <button onClick={clearCardErrorMessage}>Close</button>
+                  </>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </>
   )
 }

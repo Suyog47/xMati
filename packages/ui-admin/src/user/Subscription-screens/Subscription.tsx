@@ -92,11 +92,12 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
 
     price = selectedTab === 'Starter' ? 1900 : 4500 // Monthly prices: $19 and $45 respectively
 
-    if (selectedDuration === 'half-yearly') {
-      price = selectedTab === 'Starter'
-        ? Math.ceil(1700 * 6)
-        : Math.ceil(3700 * 6)
-    } else if (selectedDuration === 'yearly') {
+    // if (selectedDuration === 'half-yearly') {
+    //   price = selectedTab === 'Starter'
+    //     ? Math.ceil(1700 * 6)
+    //     : Math.ceil(3700 * 6)
+    // } else
+    if (selectedDuration === 'yearly') {
       price = selectedTab === 'Starter'
         ? Math.ceil(1600 * 12)
         : Math.ceil(3600 * 12)
@@ -107,8 +108,8 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     if (subscription !== 'Trial' && !savedSubData.expired && !savedSubData.isCancelled && !savedFormData.nextSubs) {
       const durationOrder: { [key: string]: number } = {
         monthly: 1,
-        'half-yearly': 2,
-        yearly: 3,
+        // 'half-yearly': 2,
+        yearly: 2,
       }
 
       const currentPlan = savedSubData.subscription

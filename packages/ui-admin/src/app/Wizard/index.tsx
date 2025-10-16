@@ -50,8 +50,8 @@ const CustomerWizard: React.FC = () => {
     'Personal Info',
     'Email verification',
     'Company Info',
-    'Subscriptions',
-    'Payment'
+    'Payment',
+    'Subscriptions'
   ]
 
   const industryData = [
@@ -225,7 +225,6 @@ const CustomerWizard: React.FC = () => {
   }
 
   const handleOTPVerification = async () => {
-    setIsVerifyingOtp(true)
     // Simulate async verification process if needed
     if (enteredOTP.trim() === generatedOTP) {
       setOtpVerified(true)
@@ -732,17 +731,6 @@ const CustomerWizard: React.FC = () => {
             />
           )}
           {step === 4 && (
-            <SubscriptionPlan
-              selectedPlan={selectedPlan}
-              setSelectedPlan={setSelectedPlan}
-              selectedDuration={selectedDuration}
-              setSelectedDuration={setSelectedDuration}
-              price={price}
-              nextStep={nextStep}
-              prevStep={prevStep}
-            />
-          )}
-          {step === 5 && (
             <PaymentInfo
               verifyCard={verifyCard}
               isValidatingCard={isValidatingCard}
@@ -750,8 +738,25 @@ const CustomerWizard: React.FC = () => {
               isLoading={isLoading}
               errorMessage={errorMessage}
               cardErrorMessage={cardErrorMessage}
+              nextStep={nextStep}
+              prevStep={prevStep}
+              clearErrorMessage={() => setErrorMessage(null)}
+              clearCardErrorMessage={() => setCardErrorMessage(null)}
+            />
+          )}
+          {step === 5 && (
+            <SubscriptionPlan
+              selectedPlan={selectedPlan}
+              setSelectedPlan={setSelectedPlan}
+              selectedDuration={selectedDuration}
+              setSelectedDuration={setSelectedDuration}
+              price={price}
               handleSubmit={handleSubmit}
               prevStep={prevStep}
+              isLoading={isLoading}
+              errorMessage={errorMessage}
+              cardErrorMessage={cardErrorMessage}
+              isValidatingCard={isValidatingCard}
               clearErrorMessage={() => setErrorMessage(null)}
               clearCardErrorMessage={() => setCardErrorMessage(null)}
             />

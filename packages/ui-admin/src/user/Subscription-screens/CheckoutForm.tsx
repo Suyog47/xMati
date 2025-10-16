@@ -172,7 +172,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
           body: JSON.stringify({
             chargeId: savedSubData.transactionId,
-            reason: '',
+            reason: '-',
             amount: `$${amount / 100}`,
           }),
         })
@@ -510,7 +510,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
             >
               {[
                 { value: 'monthly', label: 'Monthly' },
-                { value: 'half-yearly', label: 'Half-yearly' },
+                //{ value: 'half-yearly', label: 'Half-yearly' },
                 { value: 'yearly', label: 'Yearly' },
               ].map((opt) => (
                 <label
@@ -623,9 +623,9 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
                   <div style={{ fontSize: '0.85em', color: '#777', marginTop: '2px' }}>
                     {selectedDuration === 'monthly'
                       ? 'per month'
-                      : selectedDuration === 'half-yearly'
-                        ? `($${(Math.ceil(amount / 6) / 100).toFixed(2)}/month)`
-                        : `($${(Math.ceil(amount / 12) / 100).toFixed(2)}/month)`}
+                      // : selectedDuration === 'half-yearly'
+                      //   ? `($${(Math.ceil(amount / 6) / 100).toFixed(2)}/month)`
+                      : `($${(Math.ceil(amount / 12) / 100).toFixed(2)}/month)`}
                   </div>
                 )}
               </div> :
