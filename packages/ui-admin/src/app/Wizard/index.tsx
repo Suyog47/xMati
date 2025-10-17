@@ -114,6 +114,7 @@ const CustomerWizard: React.FC = () => {
   const [errors, setErrors] = useState<Errors>({})
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false) // Big loader for 'Check User'
+  const [isPaymentLoading, setIsPaymentLoading] = useState(false) // Big loader for 'Check User'
   const [isValidatingCard, setIsValidatingCard] = useState(false) // Small loader for 'Validate Card'
   const [cardValidated, setCardValidated] = useState(false) // State to track card validation success
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -226,15 +227,14 @@ const CustomerWizard: React.FC = () => {
 
   const handleOTPVerification = async () => {
     setIsVerifyingOtp(true)
-    setOtpVerified(true)
-    // if (enteredOTP.trim() === generatedOTP) {
-    //   setOtpVerified(true)
-    //   setOtpResentMessage('')
-    //   setErrors((prevErrors) => ({ ...prevErrors, otp: '' }))
-    // } else {
-    //   setOtpVerified(false)
-    //   setErrors((prevErrors) => ({ ...prevErrors, otp: 'Invalid OTP. Please try again' }))
-    // }
+    if (enteredOTP.trim() === generatedOTP) {
+      setOtpVerified(true)
+      setOtpResentMessage('')
+      setErrors((prevErrors) => ({ ...prevErrors, otp: '' }))
+    } else {
+      setOtpVerified(false)
+      setErrors((prevErrors) => ({ ...prevErrors, otp: 'Invalid OTP. Please try again' }))
+    }
     setIsVerifyingOtp(false)
   }
 
@@ -328,25 +328,41 @@ const CustomerWizard: React.FC = () => {
   }
 
   const handleSubmit = async () => {
-    if (!paymentMethodId) {
-      setCardErrorMessage('Please validate your card before submitting.')
-      return
-    }
-
-    if (await validateStep()) {
-      if (formData && typeof formData === 'object') {
-        const status = await register()
-        setIsLoading(false)
-        if (status) {
-          await setLocalData()
-          history.push({
-            pathname: '/login',
-          })
-          history.replace('/home')
-        }
-      } else {
-        console.error('formData is not a valid object:', formData)
+    try {
+      setErrorMessage(null) // Clear any previous errors
+      if (!paymentMethodId) {
+        setCardErrorMessage('Please validate your card before submitting.')
+        return
       }
+
+      if (await validateStep()) {
+        if (formData && typeof formData === 'object') {
+          if (selectedPlan === 'Starter') {
+            const res = await initiatePayment()
+            if (!res) {
+              setIsLoading(false)
+              throw new Error('Payment failed')
+            }
+          }
+
+          const status = await register()
+          setIsLoading(false)
+          if (status) {
+            await setLocalData()
+            history.push({
+              pathname: '/login',
+            })
+            history.replace('/home')
+          }
+        } else {
+          setErrorMessage(`formData is not a valid object: ${formData}`)
+          console.error('formData is not a valid object:', formData)
+        }
+      }
+    } catch (err: any) {
+      setIsLoading(false)
+      setErrorMessage(`Error in form submission: ${err}`)
+      console.error('Error in form submission:', err)
     }
   }
 
@@ -356,7 +372,7 @@ const CustomerWizard: React.FC = () => {
       setErrorMessage(null)
 
       // upload creds to s3 (this flow is designed to make this project a multi-tenant)
-      const s3Stat = await s3Upload()
+      const s3Stat = await dbUpload()
       formData.token = s3Stat.dbData.token
       if (!s3Stat.success) {
         setIsLoading(false)
@@ -385,9 +401,8 @@ const CustomerWizard: React.FC = () => {
     }
   }
 
-  const s3Upload = async () => {
+  const dbUpload = async () => {
     try {
-      const token = JSON.parse(localStorage.getItem('token') || '{}')
       const updatedFormData = {
         fullName: formData.fullName,
         email: formData.email,
@@ -483,6 +498,7 @@ const CustomerWizard: React.FC = () => {
   }
 
   const initiatePayment = async () => {
+    setIsPaymentLoading(true)
     try {
       const result = await fetch(`${API_URL}/create-payment-intent`, {
         method: 'POST',
@@ -520,11 +536,13 @@ const CustomerWizard: React.FC = () => {
       }
 
       if (paymentIntent && paymentIntent.status === 'succeeded') {
-        console.log('Payment successful!')
         return true
       }
     } catch (error) {
-      console.error('Error during payment:', error)
+      setErrorMessage(`Error during payment: ${error}`)
+      return false
+    } finally {
+      setIsPaymentLoading(false)
     }
   }
 
@@ -598,31 +616,47 @@ const CustomerWizard: React.FC = () => {
       subIndustryType: formData.subIndustryType,
       stripeCustomerId: customerId,
       stripePayementId: paymentMethodId,
-      nextSubs: {
-        plan: selectedPlan,
-        duration: selectedDuration,
-        price,
-        suggested: false,
-        isDowngrade: false // Default to false
-      }
+      ...(selectedPlan !== 'Starter' && {
+        nextSubs: {
+          plan: selectedPlan,
+          duration: selectedDuration,
+          price,
+          suggested: false,
+          isDowngrade: false // Default to false
+        }
+      })
     }
 
     const currentUTC = new Date().toISOString().split('T')[0] // Always UTC
-    const tillDateUTC = new Date()
-    tillDateUTC.setDate(tillDateUTC.getDate() + 5) // Add 15 days
-
     const currentDate = new Date(currentUTC)
+
+    const tillDateUTC = new Date()
+
+    if (selectedPlan === 'Starter') {
+      if (selectedDuration === 'monthly') {
+        tillDateUTC.setMonth(currentDate.getMonth() + 1)
+      } else {
+        tillDateUTC.setFullYear(currentDate.getFullYear() + 1)
+      }
+    } else {
+      tillDateUTC.setDate(currentDate.getDate() + 5)
+    }
+
     const tillDate = new Date(tillDateUTC.toISOString().split('T')[0]) // Ensure it's in the same format
 
+    // Check the days remaining
+    const timeDifference = tillDate.getTime() - currentDate.getTime()
+    const daysRemaining = Math.ceil(timeDifference / (1000 * 60 * 60 * 24))
+
     const updatedSubData = {
-      subscription: 'Trial',
+      subscription: (selectedPlan === 'Starter') ? 'Starter' : 'Trial',
       createdAt: currentDate,
       till: tillDate,
       expired: false,
-      daysRemaining: 5,
+      daysRemaining,
       promptRun: false,  // set the prompt run to false
-      amount: 0,
-      duration: '5d',
+      amount: (selectedPlan === 'Starter') ? price : 0,
+      duration: (selectedPlan === 'Starter') ? selectedDuration : '5d',
       canCancel: true,
       subsChanged: false,
       isCancelled: false, // Default to false
@@ -800,6 +834,7 @@ const CustomerWizard: React.FC = () => {
               price={price}
               handleSubmit={handleSubmit}
               prevStep={prevStep}
+              isPaymentLoading={isPaymentLoading}
               isLoading={isLoading}
               errorMessage={errorMessage}
               cardErrorMessage={cardErrorMessage}

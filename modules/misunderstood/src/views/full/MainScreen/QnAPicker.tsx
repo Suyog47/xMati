@@ -101,12 +101,14 @@ class QnAPicker extends React.Component<Props, State> {
   }
 
   handleFilterChange = event => {
+    const query = event.target.value
     this.setState(
       {
-        filterQuestion: event.target.value
+        filterQuestion: query
       },
       async () => {
-        await this.fetchData()
+        // Reset to first page when searching
+        await this.fetchData(0)
       }
     )
   }
@@ -181,9 +183,9 @@ class QnAPicker extends React.Component<Props, State> {
     const title = questions.length
       ? questions[0]
       : id
-          .split('_')
-          .slice(1)
-          .join(' ')
+        .split('_')
+        .slice(1)
+        .join(' ')
 
     return (
       <Card
@@ -193,8 +195,8 @@ class QnAPicker extends React.Component<Props, State> {
           isSelected
             ? null
             : () => {
-                this.props.onSelect(id)
-              }
+              this.props.onSelect(id)
+            }
         }
         className={classnames(style.card, {
           [style.selectedCard]: isSelected

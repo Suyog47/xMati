@@ -236,7 +236,6 @@ const Login: FC<Props> = props => {
       canCancel = false
     }
 
-
     const updatedSubData = {
       subscription: subData.subscription,
       createdAt: subData.createdAt,

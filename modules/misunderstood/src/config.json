@@ -1,0 +1,23 @@
+{
+  "qnaFallback": {
+    "enabled": true,
+    "confidenceThreshold": 0.5,
+    "messages": {
+      "en": [
+        "Can you elaborate on your question?",
+        "Could you provide more details about what you're looking for?",
+        "I'd like to help you better. Can you rephrase your question?",
+        "Could you be more specific about what you need help with?",
+        "Let me help you find the right answer. Can you give me more context?"
+      ]
+    },
+    "excludedFlows": [
+      "skills/choice",
+      "error",
+      "timeout",
+      "main"
+    ],
+    "redirectToNode": null,
+    "redirectToFlow": null
+  }
+}

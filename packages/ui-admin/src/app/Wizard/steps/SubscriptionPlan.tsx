@@ -9,6 +9,7 @@ interface SubscriptionPlanProps {
   handleSubmit: () => void
   prevStep: () => void
   isLoading?: boolean
+  isPaymentLoading?: boolean
   errorMessage?: string | null
   cardErrorMessage?: string | null
   isValidatingCard?: boolean
@@ -25,6 +26,7 @@ const SubscriptionPlan: React.FC<SubscriptionPlanProps> = ({
   handleSubmit,
   prevStep,
   isLoading = false,
+  isPaymentLoading = false,
   errorMessage = null,
   cardErrorMessage = null,
   isValidatingCard = false,
@@ -166,6 +168,27 @@ const SubscriptionPlan: React.FC<SubscriptionPlanProps> = ({
           <button onClick={handleSubmit} disabled={isLoading}>Submit</button>
         </div>
       </div>
+      {(isPaymentLoading || errorMessage) && (
+        <div className='modal-overlay'>
+          <div className='modal-content'>
+            {isPaymentLoading ? (
+              <>
+                <div className='loader'></div>
+                <p>Your payment is being processed... Please wait...</p>
+              </>
+            ) : (
+              <>
+                {errorMessage && clearErrorMessage && (
+                  <>
+                    <p>{errorMessage}</p>
+                    <button onClick={clearErrorMessage}>Close</button>
+                  </>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      )}
       {(isLoading || errorMessage || cardErrorMessage || isValidatingCard) && (
         <div className='modal-overlay'>
           <div className='modal-content'>
