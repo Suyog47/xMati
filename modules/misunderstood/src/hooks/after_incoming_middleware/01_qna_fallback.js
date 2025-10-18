@@ -33,7 +33,7 @@ const isInSpecificFlow = (event) => {
     'main' // Add your main conversation flows here
   ]
 
-  return excludedFlows.some(flow => currentFlow?.includes(flow))
+  return excludedFlows.some(flow => currentFlow && currentFlow.includes(flow))
 }
 
 const hasQnAMatch = (event) => {
@@ -102,10 +102,12 @@ const provideFallbackResponse = async (event) => {
 }
 
 // Main hook execution - runs directly when hook is triggered
-try {
-  if (shouldProvideFallback(event)) {
-    await provideFallbackResponse(event)
+(async () => {
+  try {
+    if (shouldProvideFallback(event)) {
+      await provideFallbackResponse(event)
+    }
+  } catch (error) {
+    bp.logger.error('Error in QnA Fallback Hook:', error)
   }
-} catch (error) {
-  bp.logger.error('Error in QnA Fallback Hook:', error)
-}
+})()
