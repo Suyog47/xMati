@@ -546,46 +546,71 @@ const Analytics: FC<any> = ({ bp }) => {
 
   const renderInteractions = () => {
     return (
-      <div className={cx(style.metricsContainer, style.fullWidth)}>
-        <ItemsList
-          name={lang.tr('module.analytics.mostUsedWorkflows')}
-          items={getTopItems('enter_flow_count', 'workflow')}
-          itemLimit={10}
-          className={cx(style.genericMetric, style.quarter, style.list)}
-        />
-        <ItemsList
-          name={lang.tr('module.analytics.mostAskedQuestions')}
-          items={state.topQnaQuestions.map(q => ({
-            count: q.count,
-            upVoteCount: q.upVoteCount,
-            downVoteCount: q.downVoteCount,
-            label: q.question || renderDeletedQna(q.id),
-            onClick: q.question ? navigateToElement(q.id, 'qna') : undefined
-          }))}
-          className={cx(style.genericMetric, style.threeQuarter, style.list)}
-        />
-        {/* Enhanced section for unmatched questions */}
-        <ItemsList
-          name="Failed/Unmatched Questions"
-          items={state.unmatchedQuestions.map(q => {
-            let displayLabel = q.question || `Unmatched Query (${q.id})`
+      <div>
+        {/* First Row: Most Used Workflows and QnA Feedback */}
+        <div className={cx(style.metricsContainer, style.fullWidth)}>
+          <ItemsList
+            name={lang.tr('module.analytics.mostUsedWorkflows')}
+            items={getTopItems('enter_flow_count', 'workflow')}
+            itemLimit={10}
+            className={cx(style.genericMetric, style.quarter, style.list)}
+          />
+          {/* QnA Feedback beside workflows */}
+          <div className={cx(style.genericMetric, style.quarter)}>
+            <div>
+              <p className={style.numberMetricValue}>{getQNAFeedbackData().totalFeedback}</p>
+              <h3 className={style.metricName}>{lang.tr('module.analytics.totalQnaFeedback')}</h3>
+            </div>
+            <div>
+              <FlatProgressChart
+                value={getQNAFeedbackData().positivePercent}
+                color="#68A750"
+                name={lang.tr('module.analytics.positiveQnaFeedback', { nb: getQNAFeedbackData().positivePercent })}
+              />
+              <FlatProgressChart
+                value={getQNAFeedbackData().negativeFeedback}
+                color="#FF4F7D"
+                name={lang.tr('module.analytics.negativeQnaFeedback', { nb: getQNAFeedbackData().negativeFeedback })}
+              />
+            </div>
+          </div>
+        </div>
 
-            // Add confidence info if available
-            if (q.confidence !== undefined) {
-              displayLabel += ` (Confidence: ${(q.confidence * 100).toFixed(1)}%)`
-            }
-
-            return {
+        {/* Dedicated Questions Row with exact 15px gap */}
+        <div className={style['questions-horizontal-container']}>
+          <ItemsList
+            name="Top 10 Most Asked Questions"
+            items={state.topQnaQuestions.slice(0, 10).map(q => ({
               count: q.count,
-              label: displayLabel,
-              onClick: q.confidence !== undefined ? () => {
-                // Navigate to misunderstood module to see more details
-                window.postMessage({ action: 'navigate-url', payload: '/modules/misunderstood' }, '*')
-              } : undefined
-            }
-          })}
-          className={cx(style.genericMetric, style.threeQuarter, style.list)}
-        />
+              upVoteCount: q.upVoteCount,
+              downVoteCount: q.downVoteCount,
+              label: q.question || renderDeletedQna(q.id),
+              onClick: q.question ? navigateToElement(q.id, 'qna') : undefined
+            }))}
+            className={cx(style.genericMetric, style['questions-card'], style.list, 'enhanced')}
+          />
+          <ItemsList
+            name="Top 10 Unmatched Questions"
+            items={state.unmatchedQuestions.slice(0, 10).map(q => {
+              let displayLabel = q.question || `Unmatched Query (${q.id})`
+
+              // Add confidence info if available
+              if (q.confidence !== undefined) {
+                displayLabel += ` (Confidence: ${(q.confidence * 100).toFixed(1)}%)`
+              }
+
+              return {
+                count: q.count,
+                label: displayLabel,
+                onClick: q.confidence !== undefined ? () => {
+                  // Navigate to misunderstood module to see more details
+                  window.postMessage({ action: 'navigate-url', payload: '/modules/misunderstood' }, '*')
+                } : undefined
+              }
+            })}
+            className={cx(style.genericMetric, style['questions-card'], style.list, 'enhanced')}
+          />
+        </div>
       </div>
     )
   }
@@ -630,10 +655,10 @@ const Analytics: FC<any> = ({ bp }) => {
   const renderHandlingUnderstanding = () => {
     const misunderstood = getMisunderStoodData()
     const languages = getLanguagesData()
-    const feedback = getQNAFeedbackData()
 
     return (
       <div className={cx(style.metricsContainer, style.fullWidth)}>
+        {/* Commented out misunderstood messages container as requested */}
         {/* <div className={cx(style.genericMetric, style.quarter)}>
           <div>
             <p className={style.numberMetricValue}>{misunderstood.total}</p>
@@ -652,7 +677,8 @@ const Analytics: FC<any> = ({ bp }) => {
             />
           </div>
         </div> */}
-        <div className={cx(style.genericMetric, style.quarter)}>
+        {/* Commented out Messages by Language container as requested */}
+        {/* <div className={cx(style.genericMetric, style.quarter)}>
           <div>
             <h3 className={style.metricName}>{lang.tr('module.analytics.messagesByLanguage')}</h3>
           </div>
@@ -666,25 +692,7 @@ const Analytics: FC<any> = ({ bp }) => {
               />
             ))}
           </div>
-        </div>
-        <div className={cx(style.genericMetric, style.quarter)}>
-          <div>
-            <p className={style.numberMetricValue}>{feedback.totalFeedback}</p>
-            <h3 className={style.metricName}>{lang.tr('module.analytics.totalQnaFeedback')}</h3>
-          </div>
-          <div>
-            <FlatProgressChart
-              value={feedback.positivePercent}
-              color="#68A750"
-              name={lang.tr('module.analytics.positiveQnaFeedback', { nb: feedback.positivePercent })}
-            />
-            <FlatProgressChart
-              value={feedback.negativeFeedback}
-              color="#FF4F7D"
-              name={lang.tr('module.analytics.negativeQnaFeedback', { nb: feedback.negativeFeedback })}
-            />
-          </div>
-        </div>
+        </div> */}
         {isNDU && (
           <Fragment>
             <div className={cx(style.genericMetric, style.quarter, style.list, style.multiple)}>
@@ -694,13 +702,6 @@ const Analytics: FC<any> = ({ bp }) => {
                 itemLimit={3}
                 className={style.list}
               />
-              {/* <ItemsList
-                name={lang.tr('module.analytics.mostFailedQuestions')}
-                items={getTopItems('feedback_negative_qna', 'qna')}
-                itemLimit={3}
-                hasTooltip
-                className={style.list}
-              /> */}
             </div>
             <RadialMetric
               name={lang.tr('module.analytics.successfulWorkflowCompletions', {
@@ -872,14 +873,15 @@ const Analytics: FC<any> = ({ bp }) => {
             <h2>{lang.tr('module.analytics.conversations')}</h2>
             {renderConversations()}
           </div>
-          <div className={style.section}>
+          <div className={cx(style.section, style['enhanced-spacing'])}>
             <h2>{lang.tr('module.analytics.interactions')}</h2>
             {renderInteractions()}
           </div>
-          <div className={style.section}>
+          {/* Commented out Handling and Understanding section as requested */}
+          {/* <div className={style.section}>
             <h2>{lang.tr('module.analytics.handlingAndUnderstanding')}</h2>
             {renderHandlingUnderstanding()}
-          </div>
+          </div> */}
         </div>
         <input type="file" ref={loadJson} onChange={readFile} style={{ visibility: 'hidden' }}></input>
       </div>

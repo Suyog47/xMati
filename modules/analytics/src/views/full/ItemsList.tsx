@@ -10,15 +10,18 @@ interface Props {
   items: { label: string; count: number; upVoteCount?: number; downVoteCount?: number; onClick?: () => void }[]
   className: string
   itemLimit?: number
+  enhanced?: boolean
 }
 
 const ItemsList: FC<Props> = props => {
-  const { name, className, itemLimit } = props
+  const { name, className, itemLimit, enhanced = false } = props
   let { items } = props
 
   if (itemLimit) {
     items = items.slice(0, itemLimit)
   }
+
+  const isEnhanced = className.includes('enhanced')
 
   return (
     <div className={className}>
@@ -29,7 +32,13 @@ const ItemsList: FC<Props> = props => {
       <ol>
         {items.map((item, index) => (
           <li key={index}>
-            <a onClick={item.onClick} className={cx({ [style.disabled]: !item.onClick })}>
+            <a
+              onClick={item.onClick}
+              className={cx({
+                [style.disabled]: !item.onClick,
+                'enhanced-item': isEnhanced
+              })}
+            >
               <span>{item.label}</span>
               <span>
                 ({(item.upVoteCount || item.downVoteCount) && 'Total '} {item.count}

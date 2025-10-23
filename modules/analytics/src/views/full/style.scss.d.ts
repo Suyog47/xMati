@@ -11,6 +11,10 @@ interface CssExports {
   'disabled': string;
   'empty': string;
   'emptyState': string;
+  'enhanced': string;
+  'enhanced-layout': string;
+  'enhanced-spacing': string;
+  'enhancedItem': string;
   'exportButton': string;
   'filterItem': string;
   'filters': string;
@@ -19,6 +23,7 @@ interface CssExports {
   'fullWidth': string;
   'genericMetric': string;
   'half': string;
+  'half-with-gap': string;
   'header': string;
   'inline': string;
   'innerWrapper': string;
@@ -33,6 +38,9 @@ interface CssExports {
   'progressMetric': string;
   'progressMetricLabel': string;
   'quarter': string;
+  'questions-card': string;
+  'questions-horizontal-container': string;
+  'questions-row': string;
   'radialChart': string;
   'radialChartLabel': string;
   'section': string;
