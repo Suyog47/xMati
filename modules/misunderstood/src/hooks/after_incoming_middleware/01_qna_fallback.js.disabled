@@ -25,15 +25,42 @@ const FALLBACK_MESSAGES = {
 const isInSpecificFlow = (event) => {
   const { currentFlow, currentNode } = event.state.context
 
-  // Don't interfere if user is in specific flows
+  // Don't interfere if user is actively in ANY flow
+  if (currentFlow && currentNode) {
+    return true
+  }
+
+  // Check for specific flows that should never be interrupted
   const excludedFlows = [
     'skills/choice',
     'error',
     'timeout',
-    'main' // Add your main conversation flows here
+    'main'
   ]
 
   return excludedFlows.some(flow => currentFlow && currentFlow.includes(flow))
+}
+
+const hasFlowIntent = (event) => {
+  // Check if the detected intent should trigger a flow
+  const intent = event.nlu.intent
+  
+  // If there's a meaningful intent (not 'none') with decent confidence
+  if (intent.name !== 'none' && intent.confidence >= 0.3) {
+    return true
+  }
+  
+  // Check if there are any flow-based suggestions already queued
+  if (event.suggestions && event.suggestions.length > 0) {
+    return event.suggestions.some(s => 
+      s.source === 'flow' || 
+      s.source === 'dialog' || 
+      s.sourceDetails?.includes('flow') ||
+      s.sourceDetails?.includes('node')
+    )
+  }
+  
+  return false
 }
 
 const hasQnAMatch = (event) => {
@@ -55,16 +82,37 @@ const shouldProvideFallback = (event) => {
     return false
   }
 
-  // Don't interfere with specific flows
+  // PRIORITY 1: Don't interfere if user is in any active flow
   if (isInSpecificFlow(event)) {
     return false
   }
 
-  // Check if user intent is "none" or low confidence
+  // PRIORITY 2: Check if there's a flow intent that should be processed
+  // This handles the case where currentFlow/currentNode are undefined
+  // but the system should still process flow logic
+  if (hasFlowIntent(event)) {
+    return false
+  }
+
+  // PRIORITY 3: Check if there are any non-QnA suggestions
+  const hasFlowSuggestions = event.suggestions &&
+    event.suggestions.length > 0 &&
+    event.suggestions.some(s => s.source !== 'qna' && s.confidence >= 0.3)
+
+  if (hasFlowSuggestions) {
+    return false
+  }
+
+  // PRIORITY 4: Check if QnA found a good match
+  const hasGoodQnAMatch = hasQnAMatch(event)
+  if (hasGoodQnAMatch) {
+    return false
+  }
+
+  // PRIORITY 5: Only provide fallback if nothing else can handle it
   const hasLowConfidenceIntent = event.nlu.intent.name === 'none' ||
     event.nlu.intent.confidence < 0.3
 
-  // Check if QnA didn't find a good match
   const noQnAMatch = !hasQnAMatch(event)
 
   return hasLowConfidenceIntent && noQnAMatch
@@ -104,6 +152,21 @@ const provideFallbackResponse = async (event) => {
 // Main hook execution - runs directly when hook is triggered
 (async () => {
   try {
+    // Debug logging to understand execution flow
+    bp.logger.debug('QnA Fallback Hook - Analyzing event', {
+      botId: event.botId,
+      messageType: event.type,
+      currentFlow: event.state.context.currentFlow,
+      currentNode: event.state.context.currentNode,
+      intent: event.nlu.intent.name,
+      intentConfidence: event.nlu.intent.confidence,
+      hasFlowIntent: hasFlowIntent(event),
+      isInSpecificFlow: isInSpecificFlow(event),
+      suggestionsCount: event.suggestions ? event.suggestions.length : 0,
+      suggestionSources: event.suggestions ? event.suggestions.map(s => s.source) : [],
+      suggestionDetails: event.suggestions ? event.suggestions.map(s => s.sourceDetails) : []
+    })
+
     if (shouldProvideFallback(event)) {
       await provideFallbackResponse(event)
     }

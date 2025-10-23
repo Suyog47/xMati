@@ -1,0 +1,3067 @@
+{
+  "qnas": [
+    {
+      "id": "046dx9knm9_what_kind_of_support_is_available_for_users",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "We provide 24/7 support via email (support@xmati.ai) and a help center at www.xmati.ai/support with guides and FAQs. Premium users get priority assistance."
+          ]
+        },
+        "questions": {
+          "en": [
+            "What kind of support is available for users?",
+            "How do I get help with xmati?",
+            "Do you offer customer support?",
+            "Is there a knowledge base or FAQ?",
+            "What help resources exist?",
+            "Is support available 24/7?",
+            "Where can I find customer service?",
+            "What assistance options do you provide?",
+            "How can I contact your help desk?"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "062de6daef_what_are_the_differences_between_the_fre",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "The Professional plan ($41/month) includes 5 bots and all channels (WhatsApp, Web, Telegram, Slack, Facebook Messenger) .Starter ($17/month) limits to 3 bots and excludes WhatsApp. We offer discounts , please visit our 'Pricing' section to know more about it."
+          ]
+        },
+        "questions": {
+          "en": [
+            "What are the differences between the free and premium plans?",
+            "Compare free vs premium pricing plans",
+            "Free plan vs paid plan comparison",
+            "What features are included in premium?",
+            "How does the professional plan differ from starter?",
+            "What do I get with the paid subscription?",
+            "Plan comparison and pricing differences",
+            "Benefits of upgrading to premium",
+            "Features available in each pricing tier"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "063926c091_what_if_i_want_to_downgrade_back_to_free",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Downgrade anytime you want, but you may lose premium bots/channels after subs ends."
+          ]
+        },
+        "questions": {
+          "en": [
+            "What if I want to downgrade back to free?",
+            "Can I cancel my premium subscription?",
+            "How do I switch back to the free plan?",
+            "Is it possible to revert to free account?",
+            "What happens when I downgrade my plan?",
+            "Can I go back to starter plan from professional?",
+            "How to cancel paid subscription and return to free?",
+            "Will I lose data if I downgrade to free?",
+            "Process to move from premium back to free tier"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "08a6dklfgh_can_i_export_conversations",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Yes, you can export you conversation history, Open the chat interface, then on top click on the down arrow button. This will start the download of your chats. "
+          ]
+        },
+        "questions": {
+          "en": [
+            "Can I export conversations?",
+            "Is there an option to download my chat history?",
+            "How can I save my past conversations?",
+            "Can I export all chats to a file?",
+            "Does it allow chat backups or exports?",
+            "How do I download my conversations?",
+            "Export chat logs and conversation data",
+            "Save conversation history to computer",
+            "Download all my chatbot interactions"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "098ca294e5_greetings,_can_you_say_hi_back",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Greetings! Hi back—how can I assist today?"
+          ]
+        },
+        "questions": {
+          "en": [
+            "Greetings, can you say hi back?",
+            "Hello there, how are you?",
+            "Good day! Can you respond?",
+            "Hey, are you there?",
+            "Salutations! Can you greet me back?",
+            "Hi! Can you acknowledge my greeting?",
+            "Good morning/afternoon/evening!",
+            "Howdy! Can you reply to my hello?",
+            "Pleased to meet you, can you say hello?"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "0beeba33ac_what_email_do_i_need_to_sign_up",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Any valid business/personal email; we recommend work ones."
+          ]
+        },
+        "questions": {
+          "en": [
+            "What email do I need to sign up?",
+            "What type of email address is required for registration?",
+            "Can I use any email to create an account?",
+            "Do I need a business email to register?",
+            "What email requirements exist for signup?",
+            "Is personal email allowed for account creation?",
+            "Which email formats are accepted for registration?",
+            "Can I use Gmail or other free email services?",
+            "Email address requirements for xmati account"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "0in20s8nqw_is_xmati_ai_safe_to_use",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Absolutely safe, Starting from your registered data till the your chat conversations, everything is encrypted and saved securely."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Is xmati.ai safe to use?",
+            "Can I trust xmati.ai with my data?",
+            "Is it a secure and reliable platform?",
+            "Does xmati.ai follow data protection standards?",
+            "How safe is xmati.ai for users?",
+            "Are there any security risks using xmati.ai?",
+            "Is my personal information protected on xmati?",
+            "Does xmati have security certifications?",
+            "How secure is the xmati platform for business use?"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "1229f4f580_what_marketing_benefits",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Personalized campaigns, traffic insights via analytics."
+          ]
+        },
+        "questions": {
+          "en": [
+            "What marketing benefits does xmati provide?",
+            "How can xmati help with marketing campaigns?",
+            "What marketing advantages do I get?",
+            "Does xmati offer marketing insights and analytics?",
+            "How does the bot support marketing efforts?",
+            "What promotional benefits come with xmati?",
+            "Can xmati help improve marketing ROI?",
+            "Marketing tools and features available",
+            "How does xmati boost marketing performance?"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "1505fad584_how_does_the_bot_track_and_report",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Dashboard and Analytic metrics for optimisation. Visit the dashboard for more info."
+          ]
+        },
+        "questions": {
+          "en": [
+            "How does the bot track and report performance?",
+            "What analytics and reporting features are available?",
+            "Can I see bot conversation metrics and statistics?",
+            "How do I monitor chatbot performance data?",
+            "What tracking capabilities does the bot have?",
+            "Where can I view bot analytics and reports?",
+            "Does xmati provide conversation insights and metrics?",
+            "How to access dashboard analytics for bot activity?",
+            "What reporting tools are included with xmati?"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "15677bc3d0_what_makes_xmatai_different_from_other_b",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "The most prominent feature is the PROMPT based Bot creations rather than simple drag-and-drop approach (Obviously we have this option as well) But you can use the Prompt based for faster creations. Secondly, No-code focus for SMEs, multi-channel bots, affordable and deployable in less time."
+          ]
+        },
+        "questions": {
+          "en": [
+            "What makes xmati.ai different from other chatbots?",
+            "How is xmati unique compared to competitors?",
+            "What are xmati's key differentiating features?",
+            "Why should I choose xmati over other bot platforms?",
+            "What advantages does xmati have over similar tools?",
+            "How does xmati stand out from other chatbot services?",
+            "What unique features does xmati offer?",
+            "Competitive advantages of xmati platform",
+            "What sets xmati apart from other AI chatbot solutions?"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "15bxre1rgb_is_there_a_free_version_of_xmati_ai_available",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Yes, xmati.ai offers a free plan with full usage quotas. You can access to our AI tools free during trial. Check www.xmati.ai for details or upgrade to a premium plan for higher limits."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Is there a free version of xmati.ai available?",
+            "Does xmati have a free trial?",
+            "Can I test xmati for free?",
+            "What's included in the free plan?",
+            "Are there any no-cost options?",
+            "How long is the free period?",
+            "Free tier features and limitations",
+            "Trial version access and duration",
+            "Cost-free plan availability and benefits"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "1689dfd5f3_hello,_can_you_tell_me_about_yourself",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Hello! I'm here to help build and deploy bots fast. What's your question?"
+          ]
+        },
+        "questions": {
+          "en": [
+            "Hello, can you tell me about yourself?",
+            "Who are you and what can you do?",
+            "Introduce yourself please",
+            "What are your capabilities and functions?",
+            "Tell me more about your features",
+            "What kind of assistant are you?",
+            "Can you describe what you're designed for?",
+            "What services do you provide?",
+            "Give me an overview of your abilities"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "19dc0c229a_does_the_bot_support_multi-channel_integ",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Yes - Web, WhatsApp, Telegram, Slack and Facebook messenger."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Does the bot support multi-channel integration?",
+            "Can I use the bot on WhatsApp, Telegram, and other platforms?",
+            "What messaging channels are supported?",
+            "Does xmati work with Facebook Messenger and Slack?",
+            "Can I deploy the bot across multiple communication platforms?",
+            "Which social media and messaging apps does it integrate with?",
+            "Cross-platform bot deployment options",
+            "Available channels for bot integration",
+            "Multi-platform chatbot support and setup"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "21d6859cdf_what_are_the_main_features_of_the_free_p",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "5 bots, AI based bot creation, HITL, analytics, all channels for 30 days."
+          ]
+        },
+        "questions": {
+          "en": [
+            "What are the main features of the free plan?",
+            "What's included in the free tier?",
+            "Free plan benefits and limitations",
+            "What can I do with the free version?",
+            "Features available without payment",
+            "Free account capabilities and restrictions",
+            "What functionality comes with the trial version?",
+            "No-cost plan features and bot limits",
+            "Trial period features and access levels"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "24e7e90ef8_are_there_any_promo_codes_for_new_users",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Check our pricing section for discount codes; enter at signup."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Are there any promo codes for new users?",
+            "Do you have discount codes for first-time users?",
+            "Any special offers or coupons for new signups?",
+            "New user discounts and promotional deals available?",
+            "First-time user promo codes and special pricing?",
+            "Discount vouchers or coupon codes for beginners?",
+            "Special registration bonuses or signup incentives?",
+            "New customer promotional offers and savings?",
+            "Referral codes or welcome bonuses for new users?"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "25f33db050_how_does_billing_work_for_premium",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Monthly charges auto-renew; switch to yearly for discounts and it will auto-renew yearly. You can Cancel anytime."
+          ]
+        },
+        "questions": {
+          "en": [
+            "How does billing work for premium?",
+            "Premium subscription billing cycle and charges explained",
+            "When and how am I charged for the premium plan?",
+            "Automatic billing process for paid subscriptions",
+            "Payment schedule and renewal cycle for premium?",
+            "How often is my credit card charged for premium?",
+            "Premium plan billing frequency and payment dates",
+            "Subscription renewal and auto-billing system details",
+            "Premium membership payment structure and timing"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "2exg9og57v_do_you_store_my_login_info_securely",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Yes, your entire data is saved in encrypted manner inside xmati."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Do you store my login info securely?",
+            "How safe is my login information?",
+            "Is my password stored in encrypted form?",
+            "Do you protect my credentials properly?",
+            "How do you secure my account details?",
+            "Does xmati.ai follow secure login practices?",
+            "Are my account credentials encrypted and protected?",
+            "What security measures protect my login data?"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "2z2lgy8uyp_is_two_factor_authentication_available",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Nope, currently xMati has only email and password flow, but we are working on this feature as well."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Is two-factor authentication available?",
+            "Do you support 2FA for logins?",
+            "Can I enable extra security during sign-in?",
+            "Is two-step verification offered?",
+            "How do I turn on two-factor security?",
+            "Does xmati.ai have 2FA options?",
+            "Can I add multi-factor authentication to my account?",
+            "Are there additional security layers for login?"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "34b8544c88_how_easy_is_it_to_integrate_your_ai_bot_",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Super easy, Just click the 'Create Bot' button on dashboard, give name, select template or write prompt, select the web-chat channel and get the script to add it inside your website. Watch our Videos for more info."
+          ]
+        },
+        "questions": {
+          "en": [
+            "How easy is it to integrate your AI bot into my existing website?",
+            "Website integration process and difficulty level",
+            "Steps to add chatbot to my website",
+            "How do I embed the bot on my web pages?",
+            "Website integration tutorial and setup guide",
+            "Code implementation for website chat widget",
+            "Adding xmati bot to WordPress or other CMS",
+            "Web integration complexity and requirements",
+            "How to install chatbot on my business website?"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "37a3c1df97_in_what_ways_will_adding_your_bot_improv",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "24/7 instant replies, personalized chats—boosts response times by 90%. Train your bot for more accurate replies.You can see the improvements after each training .Watch your bot getting smarter after each trainings."
+          ]
+        },
+        "questions": {
+          "en": [
+            "In what ways will adding your bot improve customer satisfaction?",
+            "How does the chatbot enhance customer experience and happiness?",
+            "Benefits of AI bot for improving customer service quality",
+            "How will the bot help increase customer satisfaction rates?",
+            "Ways chatbot improves customer support and user experience",
+            "Customer satisfaction improvements with AI chatbot integration",
+            "How does automated chat support boost customer happiness?",
+            "AI bot benefits for better customer engagement and retention",
+            "Chatbot impact on customer service quality and satisfaction metrics"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "37b9dc694b_how_do_i_customize_the_bot's_appearance_",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Currently, our bots replies in a fixed general/formal tone and according to your trained data"
+          ]
+        },
+        "questions": {
+          "en": [
+            "How do I customize the bot's appearance and tone?",
+            "Can I change the chatbot's personality and visual design?",
+            "Bot customization options for branding and voice",
+            "How to modify chatbot appearance and communication style?",
+            "Personalizing bot responses and visual interface",
+            "Chatbot branding, colors, and conversation tone settings",
+            "Custom bot personality and appearance configuration",
+            "How to brand the chatbot with my company style?",
+            "Bot design customization and conversational tone options"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "3a2089d866_how_do_i_contact_support",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Email support (support@xmati.ai) or use our enquiry form."
+          ]
+        },
+        "questions": {
+          "en": [
+            "How do I contact support?",
+            "What's the customer service email address?",
+            "How can I reach your help team?",
+            "Where do I get technical assistance?",
+            "Support contact information and methods",
+            "How to get help from xmati customer service?",
+            "Ways to contact support team for issues",
+            "Customer support channels and contact details",
+            "How do I submit a support ticket or inquiry?"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "3d253a5d13_can_i_integrate_xmatai_with_my_website",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Yes, Easily!. Do checkout the tutorials videos in www.xmati.ai."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Can I integrate xmati.ai with my website?",
+            "How to add xmati chatbot to my website?",
+            "Website integration process and setup instructions",
+            "Embed xmati bot on my web pages and blog",
+            "Adding AI chat widget to my business website",
+            "Website chatbot integration tutorial and guide",
+            "How to install xmati chat on WordPress or HTML site?",
+            "Web integration code and implementation steps",
+            "Connect xmati bot to my website and landing pages"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "3fbihmdzgv_can_i_use_google_to_sign_up",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "No, currently we only have manually registration form to Sign up, but we are working on it."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Can I use Google to sign up?",
+            "Is Google sign-in available?",
+            "Can I log in with my Google account?",
+            "Does it support single sign-on via Google?",
+            "Can I register using Google credentials?",
+            "Is Gmail login supported?",
+            "Do you offer social media login options?",
+            "Can I connect my Google account for easier access?"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "3vapa2kkm6_what_s_the_email_for_customer_service",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "'support@xmati.ai' is the support email we have. You can send your queries/doubts or report bugs here."
+          ]
+        },
+        "questions": {
+          "en": [
+            "What's the email for customer service?",
+            "How can I contact your support team?",
+            "What’s your official support email?",
+            "Where do I send customer queries?",
+            "How can I reach you by email?",
+            "Who should I email for help?",
+            "What's the best email for technical support?",
+            "How do I email questions about my account?"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "4000bafff5_do_premium_users_get_priority_support",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Yes, Professional includes faster email/ticket responses."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Do premium users get priority support?",
+            "Is there faster support for paid subscribers?",
+            "Premium plan support benefits and priority assistance",
+            "Do professional users get better customer service?",
+            "Priority support queue for premium members?",
+            "Enhanced support features for paid plan users",
+            "Faster response times for premium subscribers?",
+            "VIP support access for professional plan members",
+            "Premium customer service benefits and advantages"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "41dcaf0950_how_long_is_the_free_trial_period",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "30 days, with full features to use and test everything."
+          ]
+        },
+        "questions": {
+          "en": [
+            "How long is the free trial period?",
+            "What's the duration of the free trial access?",
+            "Trial period length and expiration timeline",
+            "How many days do I get for free trial?",
+            "Free trial duration before subscription required",
+            "Length of time for testing xmati features free",
+            "Trial period limits and time restrictions",
+            "How long can I use xmati without paying?",
+            "Free access duration and trial expiry date"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "53bd9c647b_can_the_bot_qualify_leads",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Yes, targeted questions route hot leads. Train your bot for more accurate replies.You can see the improvements after each training .Watch your bot getting smarter after each trainings."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Can the bot qualify leads?",
+            "Does the chatbot help with lead generation and scoring?",
+            "AI bot for lead qualification and customer screening",
+            "How does the bot identify and qualify potential customers?",
+            "Lead qualification features and prospect filtering",
+            "Can the chatbot collect and score leads effectively?",
+            "Bot capabilities for sales lead assessment and routing",
+            "Automated lead qualification and customer profiling",
+            "How does the bot help with sales funnel and lead scoring?"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "54d79ecb7b_how_do_i_report_a_bug",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Send email to our support team (support@xmati.ai) with screenshots."
+          ]
+        },
+        "questions": {
+          "en": [
+            "How do I report a bug?",
+            "Bug reporting process and submission steps",
+            "Where to submit technical issues and glitches?",
+            "How to notify support about software problems?",
+            "Report errors, bugs, and technical difficulties",
+            "Bug tracking system and issue reporting method",
+            "Submit technical problems and platform issues",
+            "How to contact support for bugs and errors?",
+            "Technical issue reporting and bug submission process"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "54dfa0affa_hello",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Hello, I'm xMati , your AI bot at your service. how can I assist today?"
+          ]
+        },
+        "questions": {
+          "en": [
+            "Hello?",
+            "Hi there!",
+            "Hey, anyone there?",
+            "Good morning/afternoon/evening",
+            "Greetings and salutations",
+            "Hello, how are you doing?",
+            "Hi, can you hear me?",
+            "Hey there, are you online?",
+            "Hello, is anyone available to help?"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "553d005c0e_how_much_does_the_premium_plan_cost_per_",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Professional or premium plan costs $41/month ,but if you pay yearly it will cost you  $32/month .When paid Half-yearly will cost at $37/month. We offer half-yearly or yearly options for savings."
+          ]
+        },
+        "questions": {
+          "en": [
+            "How much does the premium plan cost per month?",
+            "What's the monthly price for the professional plan?",
+            "Premium subscription cost and pricing",
+            "How much is the paid plan monthly fee?",
+            "Professional plan pricing per month",
+            "What are the subscription rates for premium?",
+            "Monthly cost of upgrading to professional tier",
+            "Pricing for premium features and advanced plan",
+            "How much to pay for the full version monthly?"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "56f62d87bd_hi,_what’s_your_purpose",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "To make AI chatbots easy for your business—ask away!"
+          ]
+        },
+        "questions": {
+          "en": [
+            "Hi, what is your purpose?",
+            "What is your main function and objective?",
+            "Explain your role as an AI assistant",
+            "What are you designed to accomplish?",
+            "Your mission and core functionality",
+            "How do you help with AI chatbot solutions?",
+            "What's your goal in assisting users?",
+            "Describe your purpose for xmati platform",
+            "Your intended use case and benefits"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "59366009c5_how_long_does_support_take_to_respond",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "24-48 hours; priority for premium."
+          ]
+        },
+        "questions": {
+          "en": [
+            "How long does support take to respond?",
+            "What's the average support response time?",
+            "How quickly does customer service reply?",
+            "Support ticket response time and SLA",
+            "How fast do you answer support inquiries?",
+            "Expected wait time for customer support response",
+            "Average time to hear back from support team",
+            "Support response speed and reply timeframe",
+            "How long until I get a response from help desk?"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "5a21b8e87d_how_can_your_bot_handle_common_customer_",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "xMati bots has an accuracy of 80% via AI that will answer your customers query according to the trained data—frees your team."
+          ]
+        },
+        "questions": {
+          "en": [
+            "How can your bot handle common customer FAQs?",
+            "AI bot capabilities for answering frequent customer questions",
+            "Does the chatbot respond to common support queries?",
+            "How effectively does the bot handle customer inquiries?",
+            "Bot performance with frequently asked questions",
+            "Can the AI chatbot manage customer support tickets?",
+            "How does the bot handle repetitive customer questions?",
+            "AI chatbot FAQ management and response accuracy",
+            "Automated customer query handling and FAQ responses"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "5b3498deb2_can_i_speak_to_a_human_rep",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Yes, book via enquiry form or Contact support team."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Can I speak to a human rep?",
+            "Is there a way to talk to a real person?",
+            "How do I reach a human customer service agent?",
+            "Can I get live human support instead of bot?",
+            "Transfer me to a human representative please",
+            "Is human customer support available?",
+            "How to contact a live agent or support person?",
+            "Can I speak with someone from your team directly?",
+            "Human customer service contact and live chat options"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "5cedd77244_hi",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Hi, I'm xMati , your AI bot at your service. how can I assist today?"
+          ]
+        },
+        "questions": {
+          "en": [
+            "Hi?",
+            "Hello there!",
+            "Hey, how are you?",
+            "Good day!",
+            "Hi there, anyone around?",
+            "Hey hey!",
+            "Greetings!",
+            "Hi, is anyone available?",
+            "Hello, are you online?"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "5cfd1l7d0y_what_if_i_forget_my_username",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Currently, we don't have recovery system for forgotten username/email. If you forgot your username, you can simply create a new account and start using it "
+          ]
+        },
+        "questions": {
+          "en": [
+            "What if I forget my username?",
+            "How do I recover my username?",
+            "Can I retrieve my login name?",
+            "What should I do if I can’t remember my username?",
+            "Is there a way to find my account name?",
+            "How do I get back my forgotten username?",
+            "Username recovery options and assistance",
+            "Help with forgotten login credentials"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "6771bc5a8e_can_i_have_multiple_accounts",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Only One per email."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Can I have multiple accounts?",
+            "Is it possible to create several xmati accounts?",
+            "Multiple account registration with different emails",
+            "Can I register more than one xmati account?",
+            "Are multiple user accounts allowed per person?",
+            "Creating separate accounts for different projects",
+            "Multi-account setup and management options",
+            "Can I use different emails for multiple accounts?",
+            "Account limits and multiple registration policies"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "67e75fc623_is_there_a_yearly_discount_for_premium_s",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Yes, half-yearly and yearly billing reduce costs—check xmati.ai/pricing for exact rates."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Is there a yearly discount for premium subscriptions?",
+            "Annual subscription savings and pricing discounts",
+            "Do you offer discounts for yearly payment plans?",
+            "Annual vs monthly pricing comparison and savings",
+            "Yearly billing discount rates and cost savings",
+            "Long-term subscription benefits and reduced pricing",
+            "Annual payment plans with discounted rates",
+            "Yearly subscription cost reduction and pricing deals",
+            "Save money with annual premium subscription plans"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "6efs9y7e00_can_i_integrate_xmati_ai_with_other_software",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "xMati.ai Supports different Channels like Web-Chat, Telegram, Slack, Whatsapp etc. Explore documentation and access."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Can I integrate xmati.ai with other software?",
+            "Does xmati work with [CRM/ERP/etc]?",
+            "What integrations do you support?",
+            "Can I connect xmati to my existing tools?",
+            "Is there an API available?",
+            "Does it plug into other systems?",
+            "Third-party software integration capabilities",
+            "API access and external system connections"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "6f1g957njx_how_do_i_see_my_current_plan_details",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Once, you login into your account in app.xmati.ai, you will see your plan name written on top right section. Once you click on it, a dialog will open that will reveal all the details related to your plan."
+          ]
+        },
+        "questions": {
+          "en": [
+            "How do I see my current plan details?",
+            "Where can I check my active subscription?",
+            "How do I find out which plan I’m on?",
+            "Can I view my current plan information?",
+            "Where do I see my plan status and renewal date?",
+            "How can I access my subscription details?",
+            "Account dashboard plan information display",
+            "Subscription status and billing information access"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "735be66308_why_is_the_site_loading_slowly",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Check your connection; report bugs to support (support@xmati.ai)."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Why is the site loading slowly?",
+            "Website performance issues and slow loading times",
+            "xmati.ai site taking too long to load",
+            "Platform loading problems and connection issues",
+            "Slow website response and page load delays",
+            "Site speed issues and performance problems",
+            "Why does the xmati platform load so slowly?",
+            "Website optimization and loading speed concerns",
+            "Troubleshooting slow site performance and connectivity"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "794035c3a6_can_xmatai_help_with_data_analysis",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Yes, You can check for Analytics of your bots performance."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Can xmati.ai help with data analysis?",
+            "Data analytics and insights capabilities of xmati",
+            "Does xmati provide data analysis tools and features?",
+            "Analytics and data processing with xmati platform",
+            "How does xmati help analyze customer data and metrics?",
+            "Data visualization and analysis features available",
+            "Business intelligence and data insights with xmati",
+            "Customer data analysis and reporting capabilities",
+            "Does xmati offer analytics dashboard and data tools?"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "7998047725_does_the_bot_provide_analytics",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Yes, Visit the dashboard for more info."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Does the bot provide analytics?",
+            "Chatbot analytics and performance metrics available",
+            "Bot conversation analytics and reporting features",
+            "Can I see chatbot performance data and statistics?",
+            "Analytics dashboard for bot interactions and usage",
+            "Bot metrics, insights, and performance tracking",
+            "Conversation analytics and bot engagement statistics",
+            "How to access bot performance reports and data?",
+            "Chatbot analytics tools and measurement capabilities"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "7c4c6cc268_how_long_does_sign-up_take",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Under 2 minutes."
+          ]
+        },
+        "questions": {
+          "en": [
+            "How long does sign-up take?",
+            "Account registration time and signup duration",
+            "How fast is the xmati registration process?",
+            "Registration completion time and signup speed",
+            "Time required to create an xmati account",
+            "Quick signup process and account creation time",
+            "How many minutes to register for xmati?",
+            "Fast account setup and registration timeline",
+            "Registration process duration and signup efficiency"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "8619afa4b9_how_fast_are_the_responses",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Near-instant (under 2s) for most queries, thanks to our powerful AI."
+          ]
+        },
+        "questions": {
+          "en": [
+            "How fast are the responses?",
+            "Bot response speed and reply time",
+            "Chatbot response latency and performance speed",
+            "How quickly does the AI bot respond to queries?",
+            "Response time and conversation speed of xmati bot",
+            "AI chatbot reply speed and message processing time",
+            "Instant responses and real-time chat performance",
+            "Bot conversation speed and response efficiency",
+            "How fast does the chatbot answer questions?"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "895009887c_what_if_the_ai_gives_wrong_answers",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Our AI has an accuracy of 80% to 90% and further depends on the data your bot has been trained with."
+          ]
+        },
+        "questions": {
+          "en": [
+            "What if the AI gives wrong answers?",
+            "AI accuracy and incorrect response handling",
+            "What happens when the bot provides wrong information?",
+            "Handling bot errors and inaccurate responses",
+            "AI chatbot accuracy issues and error correction",
+            "Bot training and improving response accuracy",
+            "What to do when chatbot gives incorrect answers?",
+            "AI reliability and response quality management",
+            "Correcting bot mistakes and improving AI accuracy"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "8964e56983_is_sign-up_free",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Totally free—no commitments."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Is sign-up free?",
+            "Free registration and account creation costs",
+            "Does it cost anything to create an xmati account?",
+            "No-cost signup and free account registration",
+            "Is there a charge for creating an account?",
+            "Free account setup without registration fees",
+            "Cost-free signup process and account creation",
+            "Registration pricing and free account options",
+            "Do I need to pay to sign up for xmati?"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "8d73fd6735_hi,_who_are_you",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Hi! I'm xMati , your AI bot at your service."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Hi, who are you?",
+            "What's your name and identity?",
+            "Can you introduce yourself to me?",
+            "Who am I talking to right now?",
+            "Tell me about yourself and your role",
+            "What are you and how can you help?",
+            "Identify yourself and your purpose",
+            "Who is this AI assistant I'm chatting with?",
+            "Bot introduction and identity explanation"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "8e40gd2297_how_do_i_delete_my_account",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Currently, you don't have access/rights to delete or disable your account. You can simply leave it as it is if you don't want to use it."
+          ]
+        },
+        "questions": {
+          "en": [
+            "How do I delete my account?",
+            "What’s the process to remove my account?",
+            "Can I permanently delete my profile?",
+            "How do I close my xmat.ai account?",
+            "Is there an option to erase my data and account?",
+            "Can I deactivate or delete my account manually?",
+            "Account deletion policy and data removal",
+            "Permanent account closure and data cleanup"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "8ea9b432a3_can_i_switch_from_free_to_premium_anytim",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Absolutely! Upgrade seamlessly from your dashboard anytime during or after the trial."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Can I switch from free to premium anytime?",
+            "Upgrade from free plan to premium subscription",
+            "How to change from free tier to paid plan?",
+            "Switching plans and upgrading account benefits",
+            "Premium upgrade process from free account",
+            "Can I upgrade my account during the trial?",
+            "Plan migration from free to professional tier",
+            "Seamless upgrade to premium features anytime",
+            "Account upgrade flexibility and plan switching"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "8wpbnvoj12_what_file_types_can_i_upload_when_training_the_bot",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Currently for QnA training, you can upload json file."
+          ]
+        },
+        "questions": {
+          "en": [
+            "What file types can I upload when training the bot?",
+            "Which formats are supported for bot training?",
+            "Can I upload text, PDF, or CSV files?",
+            "What kinds of files can I use to train the bot?",
+            "Are there any restrictions on upload file types?",
+            "What file extensions does xmat.ai accept for training?",
+            "Supported training data formats and file sizes",
+            "File format requirements for bot training"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "919461cba5_hi,_what_do_you_do",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "I guide you through xMati.ai features, from trials to integrations."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Hi, what do you do?",
+            "What are your functions and capabilities?",
+            "Explain your role and services provided",
+            "What tasks can you help me with?",
+            "Describe your features and assistance options",
+            "What kind of support do you offer?",
+            "Your job description and primary functions",
+            "How can you assist with xmati platform?",
+            "What services and help do you provide users?"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "950033a570_can_i_pay_with_cryptocurrency",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Not yet, but we're exploring—stick to Debit/Credit Cards for now. Our Payment gateways are safe and secure."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Can I pay with cryptocurrency?",
+            "Do you accept bitcoin and crypto payments?",
+            "Cryptocurrency payment options available?",
+            "Can I use digital currency for billing?",
+            "Bitcoin payment method support",
+            "Crypto wallet payment integration",
+            "Digital asset payment acceptance",
+            "Alternative payment methods with blockchain",
+            "Cryptocurrency billing and subscription options"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "987d5e168e_what_happens_if_i_exceed_the_free_plan_l",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "You'll be prompted to upgrade; no data loss, but new bots/chats pause until you do."
+          ]
+        },
+        "questions": {
+          "en": [
+            "What happens if I exceed the free plan limits?",
+            "Free tier usage limit consequences and actions",
+            "Overuse of free plan quota restrictions",
+            "When you go beyond free tier allowances",
+            "Free plan overage policy and effects",
+            "Exceeding monthly free usage boundaries",
+            "What occurs after hitting free plan caps?",
+            "Free account limit breach notifications",
+            "Upgrade prompts when surpassing free quotas"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "9ce2b33d54_do_you_offer_tutorials_or_guides",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Yes, Visit our tutorial section in www.xmati.ai, we have youtube videos as well as documentation guide."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Do you offer tutorials or guides?",
+            "Learning resources and documentation available?",
+            "Training materials and setup instructions",
+            "Step-by-step guides and video tutorials",
+            "Educational content and how-to resources",
+            "YouTube videos and written documentation",
+            "Getting started guides and help materials",
+            "Tutorial section and learning platform access",
+            "Comprehensive guides for xmati setup and usage"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "a15d23a385_is_the_free_plan_really_unlimited,_or_ar",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "It's generous for trials (5 bots, full channels), for 30 days trial period."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Is the free plan really unlimited, or are there hidden quotas?",
+            "Free tier actual limits and restrictions explained",
+            "True boundaries of free account usage",
+            "Hidden constraints in free plan offerings",
+            "Real limitations behind free trial access",
+            "Actual quotas and caps on free version",
+            "Free plan honest usage boundaries",
+            "Transparent free tier restrictions and limits",
+            "No-cost plan genuine usage allowances"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "a306b42a57_what's_your_roadmap_for_new_features",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Watch our blog for that."
+          ]
+        },
+        "questions": {
+          "en": [
+            "What's your roadmap for new features?",
+            "Future development plans and upcoming features",
+            "Product roadmap and enhancement timeline",
+            "Planned improvements and new functionality",
+            "Upcoming releases and feature announcements",
+            "Development schedule for new capabilities",
+            "Innovation pipeline and feature updates",
+            "Future enhancements and platform evolution",
+            "Next version features and development priorities"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "a3cf93e35f_can_it_engage_visitors_with_conversation",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Yes, dynamic flows to guide conversions."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Can it engage visitors with conversational prompts?",
+            "Website visitor engagement through chat interactions",
+            "Proactive conversation starters for site visitors",
+            "Dynamic chat flows for visitor conversion",
+            "Interactive prompts to engage website users",
+            "Conversational triggers for visitor interaction",
+            "Automated engagement flows and chat sequences",
+            "Visitor conversion through guided conversations",
+            "Interactive chat experiences for website engagement"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "a4cd96ca2d_is_the_premium_plan_worth_it_for_casual_",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "For light use, stick to starter plan; premium shines for advanced uses."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Is the premium plan worth it for casual users?",
+            "Premium subscription value for occasional users",
+            "Cost-benefit analysis of paid plan for light usage",
+            "Should casual users upgrade to premium features?",
+            "Premium plan ROI for infrequent chatbot usage",
+            "Paid tier benefits vs free plan for casual needs",
+            "Premium subscription justification for light users",
+            "Value proposition of upgraded plan for sporadic use",
+            "Premium features worth cost for occasional usage?"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "a6df615108_does_it_support_real-time_collaboration",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "You can create a single account and give access of it to your team members so that they can edit/modify the bots."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Does it support real-time collaboration?",
+            "Team collaboration features and shared editing",
+            "Multi-user simultaneous bot development support",
+            "Collaborative workspace for team chatbot building",
+            "Real-time team editing and collaboration tools",
+            "Shared access and team management capabilities",
+            "Concurrent user support for bot modification",
+            "Team workspace and collaborative development",
+            "Multiple team member access and editing permissions"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "ab57237d12_do_you_have_a_faq_page",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Yes, at xmati.ai/faq—covers basics."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Do you have a FAQ page?",
+            "Frequently asked questions section available?",
+            "Common questions and answers resource",
+            "FAQ section with basic information coverage",
+            "Help documentation and common queries page",
+            "Question and answer resource center",
+            "Support documentation with frequent inquiries",
+            "Basic questions coverage and help section",
+            "Common issues and answers compilation page"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "adc1498342_are_there_video_demos",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Yes, on our tutorials section and YouTube inside www.xmati.ai"
+          ]
+        },
+        "questions": {
+          "en": [
+            "Are there video demos?",
+            "Video demonstrations and product walkthroughs available?",
+            "YouTube tutorials and demo videos provided",
+            "Platform demonstration videos and tutorials",
+            "Visual guides and video explanations offered",
+            "Video content for product demonstration",
+            "Tutorial videos and live demonstrations",
+            "Product showcase videos and how-to guides",
+            "YouTube channel with demo content and tutorials"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "add5c037ca_hey_there,_what’s_your_name",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Hey! my name is xMati —what's up?"
+          ]
+        },
+        "questions": {
+          "en": [
+            "Hey there, what is your name?",
+            "What should I call you AI assistant?",
+            "Bot identification and name introduction",
+            "Your chatbot name and identity",
+            "How do you introduce yourself?",
+            "AI assistant name and persona details",
+            "What are you called on xmati platform?",
+            "Bot name and character identification",
+            "Your digital identity and name information"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "b39034cd6f_how_do_i_reset_my_password",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Click \"Forgot Password\" on login and follow the procedure."
+          ]
+        },
+        "questions": {
+          "en": [
+            "How do I reset my password?",
+            "Forgot password recovery process and steps",
+            "Password reset procedure and instructions",
+            "Account password recovery and reset method",
+            "Forgotten password reset link and process",
+            "Login password recovery options available",
+            "Reset forgotten account access credentials",
+            "Password change and recovery assistance",
+            "Account access restoration and password reset"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "b55bb9f71c_can_i_customize_the_ai's_personality",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Nope, as of now. Currently it uses generalised tone."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Can I customize the AI's personality?",
+            "AI personality customization and tone settings",
+            "Bot character modification and persona options",
+            "Chatbot personality traits and behavior settings",
+            "AI tone customization and character development",
+            "Bot personality configuration and style options",
+            "Custom AI behavior and communication style",
+            "Chatbot persona personalization features",
+            "AI character traits and personality adjustment"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "b56fb253ef_can_i_use_it_for_commercial_purposes",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Absolutely—designed for business automation."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Can I use it for commercial purposes?",
+            "Business and commercial usage licensing terms",
+            "Commercial application and business automation use",
+            "Enterprise and business deployment permissions",
+            "Commercial licensing and business use cases",
+            "Business automation and commercial implementation",
+            "Corporate usage rights and commercial applications",
+            "Commercial deployment and business integration",
+            "Business-grade usage and commercial licensing"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "b9163daa2a_what's_the_price_for_teams_or_businesses",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "We offer Business starter and Professional plans. Visit our pricing to get more details."
+          ]
+        },
+        "questions": {
+          "en": [
+            "What's the price for teams or businesses?",
+            "Business and team pricing plans available",
+            "Corporate subscription costs and business rates",
+            "Team collaboration pricing and enterprise plans",
+            "Business starter and professional plan costs",
+            "Team licensing fees and corporate pricing",
+            "Enterprise pricing structure and business plans",
+            "Corporate subscription rates and team costs",
+            "Business-grade pricing and team plan options"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "bc2e339033_how_do_i_create_an_account_on_xmatai",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Visit app.xmati.ai, click Register, enter required details —done under 5 mins."
+          ]
+        },
+        "questions": {
+          "en": [
+            "How do I create an account on xmat.ai?",
+            "Account registration process and signup steps",
+            "New user registration on xmati platform",
+            "Sign up procedure for xmati.ai account",
+            "Account creation instructions and registration",
+            "Getting started with xmati account setup",
+            "User registration and account activation process",
+            "New account creation and signup requirements",
+            "Platform registration steps and account setup"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "bf5d2b33e0_what_kind_of_ai_models_does_xmatai_use",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "We leverage Generative AI for natural, adaptive responses. And as for Prompt based bot creations is concerned , we use  DeepSeek AI system."
+          ]
+        },
+        "questions": {
+          "en": [
+            "What kind of AI models does xmati.ai use?",
+            "AI technology stack and machine learning models",
+            "Generative AI and DeepSeek system specifications",
+            "AI engine technology and model architecture",
+            "Machine learning models and AI framework used",
+            "AI system technology and model specifications",
+            "Natural language processing and AI model details",
+            "Conversational AI technology and model information",
+            "AI infrastructure and machine learning implementation"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "bsus6lduji_what_payment_methods_do_you_accept",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Currently, you can pay with Credit/Debit cards. More payment options will be available soon."
+          ]
+        },
+        "questions": {
+          "en": [
+            "What payment methods do you accept?",
+            "Which payment options are available?",
+            "Can I pay using PayPal or a credit card?",
+            "Do you support UPI or digital wallets?",
+            "What are the accepted payment types?",
+            "How can I pay for my subscription?",
+            "Available billing and payment options",
+            "Credit card and debit card payment support",
+            "International payment methods accepted"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "c153d600a4_what's_the_cheapest_way_to_start_using_x",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Our free 30-day trial—zero cost to build and deploy 5 bots."
+          ]
+        },
+        "questions": {
+          "en": [
+            "What's the cheapest way to start using xmat.ai?",
+            "Most affordable entry option and free trial",
+            "Cost-effective startup options and free access",
+            "Budget-friendly way to begin with xmati platform",
+            "Free trial and low-cost starting options",
+            "Minimum cost entry and trial period access",
+            "Economical startup method and free tier",
+            "No-cost trial and affordable onboarding options",
+            "Free 30-day trial and cheapest pricing plan"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "c4bc24ae9f_hello,_are_you_from_xmatai",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Hello! Straight from xMati.ai—let's get started."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Hello, are you from xmat.ai?",
+            "xMati platform representative and AI assistant",
+            "Are you affiliated with xmati.ai company?",
+            "xMati.ai chatbot and platform identification",
+            "Company representative and AI assistant verification",
+            "xMati platform AI and official chatbot confirmation",
+            "Are you the official xmati assistant?",
+            "Platform identification and xmati.ai verification",
+            "Official xMati AI assistant and company chatbot"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "cbd953c7af_how_do_i_give_feedback",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Reply to our support email (support@xmati.ai)."
+          ]
+        },
+        "questions": {
+          "en": [
+            "How do I give feedback?",
+            "Feedback submission process and methods",
+            "How to send suggestions and comments",
+            "Customer feedback and review submission",
+            "Product feedback and improvement suggestions",
+            "Support team feedback and communication",
+            "User experience feedback and bug reports",
+            "Feature request and feedback channels",
+            "Contact support for feedback and suggestions"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "cde78038f3_do_you_offer_enterprise_pricing",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Yes,contact our support team."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Do you offer enterprise pricing?",
+            "Corporate pricing plans and enterprise discounts",
+            "Large organization pricing and bulk rates",
+            "Enterprise-grade pricing and corporate plans",
+            "Business enterprise pricing and volume discounts",
+            "Corporate subscription rates and enterprise solutions",
+            "Large-scale deployment pricing and enterprise options",
+            "Enterprise contract pricing and corporate rates",
+            "Custom enterprise pricing and business volume plans"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "cm2rlxkh5i_how_do_i_sign_up_for_xmati_ai_s_services",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "You can sign up by visiting www.app.xmati.ai and creating an account. Follow the prompts to register with your email and start exploring our services."
+          ]
+        },
+        "questions": {
+          "en": [
+            "How do I sign up for xmati.ai’s services?",
+            "How do I create an xmati account?",
+            "Where do I register for xmati?",
+            "What's the signup process?",
+            "Can I join xmati online?",
+            "How to become an xmati user?",
+            "Registration process steps and requirements",
+            "New user onboarding and account setup"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "d3d6b14415_will_it_help_retain_customers",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Yes, it may help to retain your customers by resolving doubts."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Will it help retain customers...?",
+            "Customer retention benefits and engagement improvement",
+            "How chatbots increase customer loyalty and satisfaction",
+            "Customer retention strategies with AI assistance",
+            "Improving customer experience and reducing churn",
+            "Customer service quality and retention rates",
+            "Building customer loyalty through instant support",
+            "Reducing customer attrition with automated help",
+            "Customer satisfaction and retention enhancement tools"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "dbc13b9570_what_cost_savings_can_i_expect",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "50-70% on support staff with 24/7 automation."
+          ]
+        },
+        "questions": {
+          "en": [
+            "What cost savings can I expect...?",
+            "Support staff cost reduction and automation savings",
+            "ROI and cost benefits of chatbot implementation",
+            "Operational cost savings with AI automation",
+            "Staff reduction savings and efficiency gains",
+            "24/7 support cost optimization and savings",
+            "Customer service cost reduction with bots",
+            "Automated support financial benefits and savings",
+            "Personnel cost savings through AI implementation"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "dd22e54708_is_there_a_search_history_feature",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Yes, conversation logs inside chatbot settings."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Is there a search history feature?",
+            "Conversation logs and chat history tracking",
+            "Search history and conversation record keeping",
+            "Chat logs and interaction history storage",
+            "Conversation history and search tracking features",
+            "Chatbot interaction logs and history access",
+            "Previous conversation search and retrieval",
+            "Message history and conversation analytics",
+            "Chat record keeping and search functionality"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "dlez24j4ai_does_it_support_math_and_calculations",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "No, as of now"
+          ]
+        },
+        "questions": {
+          "en": [
+            "Does it support math and calculations?",
+            "Can the bot solve math problems?",
+            "Does xmati.ai understand arithmetic queries?",
+            "Can it perform basic or complex calculations?",
+            "Is there built-in math logic support?",
+            "Can I ask it to calculate numbers or percentages?",
+            "Mathematical computation capabilities",
+            "Numerical analysis and calculation features"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "dyxrhff6bv_does_it_have_plugins_or_extensions",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Currently, we don't support any plugins or extensions."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Does it have plugins or extensions?",
+            "Can I add third-party plugins?",
+            "Does xmati.ai support extensions?",
+            "Are there any add-ons I can install?",
+            "Is there an integration store or marketplace?",
+            "Can I extend functionality with plugins?",
+            "Add-on functionality and extensibility options",
+            "Third-party plugin marketplace availability"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "ee0caa1291_how_do_i_measure_the_roi",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Analytics track QnA saved, conversions gained."
+          ]
+        },
+        "questions": {
+          "en": [
+            "How do I measure the ROI...?",
+            "ROI calculation and return on investment metrics",
+            "Analytics tracking for chatbot performance ROI",
+            "Measuring conversion gains and cost savings",
+            "ROI analytics and performance measurement tools",
+            "Chatbot effectiveness and investment return tracking",
+            "Business impact measurement and ROI calculation",
+            "Performance analytics and financial return assessment",
+            "QnA tracking and conversion measurement metrics"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "eee72484fc_can_i_train_it_on_my_own_data",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Yes, upload all the frequently asked as well as custom data for custom training."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Can I train it on my own data?",
+            "Custom data training and personalized AI model",
+            "Upload custom training data and FAQ content",
+            "Personalized bot training with company data",
+            "Custom knowledge base training and data upload",
+            "Train AI on specific business data and content",
+            "Proprietary data integration and custom training",
+            "Business-specific training data and customization",
+            "Custom AI training with uploaded company information"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "f5a17c4920_good_morning,_who_am_i_talking_to",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Good morning! xMati, ready to chat about bots or plans."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Good morning, who am I talking to?",
+            "Morning greeting and AI assistant identification",
+            "Who is this chatbot and what's your name?",
+            "AI assistant introduction and identity",
+            "Bot identification and morning conversation starter",
+            "Good morning chatbot name and service introduction",
+            "AI assistant greeting and platform identification",
+            "Morning chat and virtual assistant introduction",
+            "xMati AI assistant morning greeting and identity"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "f9ecf7c837_hi,_are_you_a_bot",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Yep, a smart one! Powered by xMati.ai for real business help."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Hi, are you a bot?",
+            "Are you an AI assistant or chatbot?",
+            "Bot identification and artificial intelligence confirmation",
+            "Chatbot verification and AI assistant status",
+            "Are you automated or a real person?",
+            "AI bot confirmation and smart assistant identification",
+            "Virtual assistant and chatbot identity verification",
+            "Artificial intelligence bot and automation confirmation",
+            "xMati AI-powered bot and intelligent assistant verification"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "hi7xo6fdr3_is_there_a_mobile_app_for_xmati_ai",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "No, currently we have website for xMati."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Is there a mobile app for xmati.ai?",
+            "Can I download an app version of xmati.ai?",
+            "Is xmati.ai available on Android or iOS?",
+            "Do you have a mobile application?",
+            "Can I use xmati.ai on my phone?",
+            "Is there a smartphone version of this bot?",
+            "Mobile application development plans",
+            "Smartphone and tablet compatibility"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "hpi6xhenlh_how_often_is_xmati_ai_s_ai_updated",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Our AI models are regularly updated to improve performance and accuracy. Updates are seamless, ensuring you always access the latest capabilities."
+          ]
+        },
+        "questions": {
+          "en": [
+            "How often is xmati.ai’s AI updated?",
+            "Do you improve your AI regularly?",
+            "How current is your AI technology?",
+            "When was your last model update?",
+            "Is the chatbot always learning?",
+            "How frequently do upgrades happen?",
+            "AI model update frequency and improvements",
+            "System updates and feature enhancement schedule"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "ixgq3va8wp_how_do_i_reset_my_password_or_recover_my_account",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Go to www.app.xmati.ai/login and click “Forgot Password” to reset your password. For more, email support@xmati.ai with your details."
+          ]
+        },
+        "questions": {
+          "en": [
+            "How do I reset my password or recover my account?",
+            "I forgot my password – help!",
+            "How to change my login?",
+            "Can't access my account – what now?",
+            "Where's the password reset option?",
+            "How do I recover a locked account?",
+            "Account recovery process and assistance",
+            "Password reset troubleshooting and support"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "jeh02fgpvg_do_you_have_a_money_back_guarantee_for_premium",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "You will get a refund on your subscription plan if you can cancel it in midway or before expiry. But make sure you check the documentation for the exact calculation rules for refund."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Do you have a money-back guarantee for premium?",
+            "Can I get a refund if I don’t like the premium plan?",
+            "Is there a money-back policy for premium users?",
+            "Do you offer refunds on premium subscriptions?",
+            "What happens if I cancel my premium—will I get my money back?",
+            "Does your premium plan include a satisfaction guarantee?",
+            "Premium plan refund policy and conditions",
+            "Satisfaction guarantee and cancellation terms"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "jhijrfneqd_do_i_need_to_verify_my_phone_number",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Currently, during registration, Only the verification of your email is required, not the phone number."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Do I need to verify my phone number?",
+            "Is phone verification required?",
+            "Why do I need to verify my number?",
+            "Can I skip phone verification?",
+            "Is verifying my mobile mandatory?",
+            "How do I confirm my phone number?",
+            "Phone verification requirements and process",
+            "Mobile number confirmation for account security"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "m0uqmwazvo_does_xmati_ai_have_voice_input",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "No, currently we support only text based inputs, But we are working on voice inputs as well."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Does xmati.ai have voice input?",
+            "Can I talk to xmati.ai using my voice?",
+            "Does it support speech recognition?",
+            "Is voice chat available in xmati.ai?",
+            "Can I use a microphone to interact with it?",
+            "Does xmat.ai accept voice commands?",
+            "Speech recognition development and availability",
+            "Voice command integration plans and timeline"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "m1bae8g5ww_how_does_the_bot_handle_sensitive_data",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Our xMati bots are equipped with encryption based chatting system that can encrypt your messages (including sensitive datas), thus protecting your data. So stress of any data leaks whatsoever."
+          ]
+        },
+        "questions": {
+          "en": [
+            "How does the bot handle sensitive data?",
+            "How is my private data protected by the bot?",
+            "What’s your policy for confidential information?",
+            "Does the bot encrypt sensitive information?",
+            "How secure is my personal data with xmat.ai?",
+            "What measures protect sensitive user data?",
+            "In what ways does xmati.ai keep my data safe?",
+            "How do you secure user data from leaks?",
+            "How is my data safeguarded from unauthorized access?",
+            "How can I trust that my data is safe here?"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "m585iilhz3_what_can_i_do_with_xmati_ai_chatbot",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Our AI tools enable tasks like data analysis, reply to questions from customers and more automation. Engage Customers Instantly in your website - Respond to inquiries in real-time, boosting customer satisfaction."
+          ]
+        },
+        "questions": {
+          "en": [
+            "What can I do with xmati.ai chatbot?",
+            "What tasks can xmati handle",
+            "How can I use your chatbot?",
+            "What's possible with xmati's AI?",
+            "Give me examples of chatbot uses",
+            "Can it automate customer replies?",
+            "Chatbot capabilities and use case examples",
+            "Business automation and customer service features"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "mu61meaxb0_what_industries_can_benefit_from_xmati_ai",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "xmati.ai serves industries like education, research, healthcare, and business, offering tools for data insights, automation, and productivity enhancement."
+          ]
+        },
+        "questions": {
+          "en": [
+            "What industries can benefit from xmati.ai?",
+            "Who is xmati best for?",
+            "Can [healthcare/education] use this?",
+            "What sectors need your chatbot?",
+            "Is this suitable for small businesses?",
+            "Which fields get the most value?",
+            "Industry-specific applications and solutions",
+            "Vertical market use cases and implementations"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "my7hjy00dp_what_resources_and_time_are_required_to_set_up",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Setup of the bots can be done easily and in less time. For a basic bot, it should take around 30min (max) depending upon the channel type. And If you want to build complex bots then it may take couple hours of time. "
+          ]
+        },
+        "questions": {
+          "en": [
+            "What resources and time are required to set up?",
+            "How long does setup usually take?",
+            "What are the system requirements for setup?",
+            "How many resources are needed to get started?",
+            "Can I deploy it quickly or does it take time?",
+            "What setup effort should I expect?",
+            "Implementation timeline and resource planning",
+            "Setup requirements and deployment assistance"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "nk3m8949yg_does_it_support_multiple_languages",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "No, Currently we support only english. We are working on supporting other languages as well."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Does it support multiple languages?",
+            "Can I use this bot in other languages?",
+            "Is multilingual support available?",
+            "Does xmat.ai work with non-English users?",
+            "Can I chat in Hindi, Spanish, or other languages?",
+            "Is language translation built into the bot?",
+            "Multilingual support development roadmap",
+            "International language expansion plans"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "o6m0vkugfc_what_is_xmati_ai_and_what_does_it_offer",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "xmati.ai is a chatbot powered by advanced AI to accelerate your business. This AI chatbot transforms your website into a two-way communication powerhouse.We offer AI tools for research, data analysis, and task automation."
+          ]
+        },
+        "questions": {
+          "en": [
+            "What is xmati.ai and what does it offer?",
+            "Can you explain xmati.ai?",
+            "What does xmati do?",
+            "What features does xmati provide?",
+            "Tell me about xmati's capabilities",
+            "Why should I use xmati?",
+            "Platform overview and core value proposition",
+            "AI-powered business solutions and features"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "ql9c5kp4wl_how_can_your_bot_help_increase_sales",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "xMati bots are designed to resolve as much problems/queries of your customers  as possible by providing accurate data, thus making sure os customer satisfaction and increased sales."
+          ]
+        },
+        "questions": {
+          "en": [
+            "How can your bot help increase sales?",
+            "In what ways can this bot boost sales?",
+            "Can it help with lead generation?",
+            "How does xmati.ai improve conversions?",
+            "Can your bot assist in customer engagement for sales?",
+            "How does automation contribute to higher sales?",
+            "Sales automation and lead generation features",
+            "Customer conversion and revenue optimization"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "qqe5z09gue_how_does_xmati_ai_protect_my_privacy",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "We prioritize data privacy with encryption and secure processing, and compliance with industry standards. For our privacy policy, contact us "
+          ]
+        },
+        "questions": {
+          "en": [
+            "How does xmati.ai protect my privacy?",
+            "Is my data safe with xmati?",
+            "What security measures do you use?",
+            "How do you handle user privacy?",
+            "Is xmati GDPR/CCPA compliant?",
+            "Where can I see your security policy?",
+            "Data protection standards and compliance",
+            "Privacy policy and user data security measures"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "r46b909usb_can_it_analyse_pdfs_or_documents",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "You can upload for QnA feature in json format."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Can it analyse PDFs or documents?",
+            "Can I upload a PDF for analysis?",
+            "Does the bot read documents or files?",
+            "Is document understanding supported?",
+            "Can xmati.ai extract data from PDFs?",
+            "Can I give it a document to analyze?",
+            "Document processing capabilities and formats",
+            "File analysis and data extraction features"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "s5e4w1frkv_can_i_change_my_email_address",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "No, You can't change your email as it is set as the primary data for identification of your account"
+          ]
+        },
+        "questions": {
+          "en": [
+            "Can I change my email address?",
+            "How do I update my registered email?",
+            "Is it possible to modify my email ID?",
+            "Can I use a new email for my account?",
+            "How do I switch to another email?",
+            "Can I replace my old email with a new one?",
+            "Email address modification policy",
+            "Account email update procedures and limitations"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "wq7hh2g60z_can_your_bot_connect_with_my_crm_system",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "Nope, as of now but we are working on it."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Can your bot connect with my CRM system?",
+            "Does xmati.ai integrate with CRM tools?",
+            "Can it sync data with my existing CRM?",
+            "Does it support Salesforce or HubSpot integration?",
+            "How do I link my CRM to xmati.ai?",
+            "Can it automatically connect with external systems?",
+            "CRM integration development status",
+            "Customer relationship management system compatibility"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    },
+    {
+      "id": "za5srlkr4p_who_owns_xmat_ai",
+      "data": {
+        "action": "text",
+        "contexts": [
+          "global"
+        ],
+        "enabled": true,
+        "answers": {
+          "en": [
+            "xMati platform is developed by Mist Global for SMEs."
+          ]
+        },
+        "questions": {
+          "en": [
+            "Who owns xmat.ai",
+            "Who is behind xmat.ai?",
+            "Which company developed xmat.ai?",
+            "Who created this platform?",
+            "Who runs or manages xmat.ai?",
+            "Which organization built xmat.ai?",
+            "Company ownership and management information",
+            "Corporate structure and development team details"
+          ]
+        },
+        "redirectFlow": "",
+        "redirectNode": ""
+      }
+    }
+  ],
+  "contentElements": []
+}
