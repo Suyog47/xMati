@@ -29,9 +29,8 @@ const ConversationContainer: FC<Props> = ({ api, bp }) => {
         toasterProps: { position: Position.TOP }
       })
 
-      toast.success(lang.tr('module.hitlnext.handoff.assigned', { id: handoff.id }), '', {
-        toasterProps: { position: Position.TOP }
-      })
+      // Reload the screen after successful assignment
+      window.location.reload()
     } catch (error) {
       dispatch({ type: 'setError', payload: error })
     }
@@ -43,6 +42,9 @@ const ConversationContainer: FC<Props> = ({ api, bp }) => {
       toast.success(lang.tr('module.hitlnext.handoff.resolved', { id: handoff.id }), '', {
         toasterProps: { position: Position.TOP }
       })
+
+      // Reload the screen after successful resolution
+      window.location.reload()
     } catch (error) {
       dispatch({ type: 'setError', payload: error })
     }

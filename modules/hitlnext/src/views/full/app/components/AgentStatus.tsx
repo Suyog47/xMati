@@ -19,6 +19,7 @@ const AgentStatus: FC<Props> = ({ setOnline, online, loading }) => {
       label: lang.tr(`module.hitlnext.agent.${online ? 'getOffline' : 'getOnline'}`),
       action: () => {
         setOnline(!online)
+        window.location.reload()
       }
     }
   ]

@@ -46,7 +46,7 @@ export default (state = initialState, action): VersionState => {
 export const fetchCurrentVersion = (): AppThunk => {
   return async dispatch => {
     try {
-      const { data } = await axios.get('/version', { baseURL: process.env.REACT_APP_API_URL })
+      const { data } = await axios.get('/version', { baseURL: 'https://app.xmati.ai' })
       dispatch({
         type: RECEIVE_CURRENT_VERSION,
         payload: { version: data }
