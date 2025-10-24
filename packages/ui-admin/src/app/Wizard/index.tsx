@@ -337,32 +337,40 @@ const CustomerWizard: React.FC = () => {
 
       if (await validateStep()) {
         if (formData && typeof formData === 'object') {
+          setIsLoading(true)
+
+          // Step 1: Register user first (this is easier to rollback)
+          const registrationResult = await register()
+          if (!registrationResult) {
+            throw new Error('Registration failed')
+          }
+
+          // Step 2: Process payment if needed
           if (selectedPlan === 'Starter') {
-            const res = await initiatePayment()
-            if (!res) {
-              setIsLoading(false)
-              throw new Error('Payment failed')
+            const paymentResult = await initiatePayment()
+            if (paymentResult) {
+              // If payment fails, rollback the registration
+              await rollbackRegistration()
+              throw new Error('Payment failed. Registration has been cancelled.')
             }
           }
 
-          const status = await register()
-          setIsLoading(false)
-          if (status) {
-            await setLocalData()
-            history.push({
-              pathname: '/login',
-            })
-            history.replace('/home')
-          }
+          // Step 3: Complete setup
+          await setLocalData()
+          history.push({
+            pathname: '/login',
+          })
+          history.replace('/home')
         } else {
           setErrorMessage(`formData is not a valid object: ${formData}`)
           console.error('formData is not a valid object:', formData)
         }
       }
     } catch (err: any) {
-      setIsLoading(false)
-      setErrorMessage(`Error in form submission: ${err}`)
+      setErrorMessage(`Error in form submission: ${err.message || err}`)
       console.error('Error in form submission:', err)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -703,6 +711,31 @@ const CustomerWizard: React.FC = () => {
       setCardErrorMessage(`An error occurred while verifying the card: ${err.message || 'Please try again later.'}`)
     } finally {
       setIsValidatingCard(false) // Hide small loader
+    }
+  }
+
+  const rollbackRegistration = async () => {
+    try {
+      const result = await fetch(`${API_URL}/rollback-registration`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email
+        }),
+      })
+
+      if (!result.status) {
+        console.error('Rollback API call failed:', result.status, result.statusText)
+        return false
+      }
+
+      const data = await result.json()
+      return data.success
+    } catch (error) {
+      console.error('Rollback failed:', error)
+      return false
     }
   }
 
