@@ -17,11 +17,11 @@ export const ChangePassword: React.FC = () => {
   const [error, setError] = useState<string>()
   //const { email, password, loginUrl } = props.location.state
 
-  const updatePassword = async (newPassword: string, confirmPassword: string) => {
-    if (newPassword !== confirmPassword) {
-      return setError(lang.tr('admin.passwordsDontMatch'))
-    }
-  }
+  // const updatePassword = async (newPassword: string, confirmPassword: string) => {
+  //   if (newPassword !== confirmPassword) {
+  //     return setError(lang.tr('admin.passwordsDontMatch'))
+  //   }
+  // }
 
   return (
     <div className='parent-wizard-container' style={{

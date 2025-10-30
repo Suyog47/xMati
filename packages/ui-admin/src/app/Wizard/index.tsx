@@ -227,15 +227,14 @@ const CustomerWizard: React.FC = () => {
 
   const handleOTPVerification = async () => {
     setIsVerifyingOtp(true)
-    setOtpVerified(true)
-    // if (enteredOTP.trim() === generatedOTP) {
-    //   setOtpVerified(true)
-    //   setOtpResentMessage('')
-    //   setErrors((prevErrors) => ({ ...prevErrors, otp: '' }))
-    // } else {
-    //   setOtpVerified(false)
-    //   setErrors((prevErrors) => ({ ...prevErrors, otp: 'Invalid OTP. Please try again' }))
-    // }
+    if (enteredOTP.trim() === generatedOTP) {
+      setOtpVerified(true)
+      setOtpResentMessage('')
+      setErrors((prevErrors) => ({ ...prevErrors, otp: '' }))
+    } else {
+      setOtpVerified(false)
+      setErrors((prevErrors) => ({ ...prevErrors, otp: 'Invalid OTP. Please try again' }))
+    }
     setIsVerifyingOtp(false)
   }
 

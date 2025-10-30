@@ -318,7 +318,7 @@ export const ChangePasswordForm: FC<Props> = props => {
         {isOtpValid && (
           <>
             <div className='stepSubtitle' style={{ marginBottom: '20px' }}>Create New Password</div>
-            <div className='input-container' style={{ marginBottom: '15px' }}>
+            <div className='input-container'>
               <Icon icon="lock" className="input-icon" style={{ marginRight: '10px' }} />
               <input
                 className='custom-input'
@@ -334,12 +334,12 @@ export const ChangePasswordForm: FC<Props> = props => {
               />
             </div>
             {passwordError && (
-              <div className="error" style={{ marginBottom: '15px' }}>
+              <div className="error" style={{ marginBottom: '10px' }}>
                 {passwordError}
               </div>
             )}
 
-            <div className='input-container' style={{ marginBottom: '15px' }}>
+            <div className='input-container'>
               <Icon icon="lock" className="input-icon" style={{ marginRight: '10px' }} />
               <input
                 className='custom-input'
