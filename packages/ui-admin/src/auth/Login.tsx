@@ -8,10 +8,14 @@ import { ExtendedHistory } from '~/app/history'
 import BasicAuthentication, { setActiveWorkspace, setChatUserAuth } from '~/auth/basicAuth'
 import { fetchBots } from '~/workspace/bots/reducer'
 import { GhostService } from '../../../bp/dist/core/bpfs'
+import bgImage from '../assets/images/background.jpg'
+import logo from '../assets/images/xmati.png'
 
 import { AuthMethodPicker } from './AuthMethodPicker'
 import LoginContainer from './LoginContainer'
 import { LoginForm } from './LoginForm'
+import '../app/Wizard/style.css'
+
 
 type RouterProps = RouteComponentProps<
   { strategy: string; workspace: string },
@@ -257,13 +261,62 @@ const Login: FC<Props> = props => {
 
 
   return (
-    <LoginContainer title={lang.tr('admin.login')} error={error} poweredBy={true}>
-      {loginUrl ? (
-        <LoginForm onLogin={loginUser} />
-      ) : (
-        <AuthMethodPicker strategies={strategies} onStrategySelected={updateUrlStrategy} />
-      )}
-    </LoginContainer>
+    <div className='parent-wizard-container' style={{
+      backgroundImage: `url(${bgImage})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+      width: '100%',
+      minHeight: '100vh',
+    }}>
+      <div className='wizard-header-container' style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '10px 20px',
+        whiteSpace: 'nowrap'
+      }}>
+        <img src={logo} alt='logo' className='wizard-header-logo' />
+        <h3 style={{
+          flex: 1,
+          textAlign: 'center',
+          color: 'white',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap'
+        }}>
+          Login
+        </h3>
+        <div style={{ width: '45px' }}></div>
+      </div>
+      <div className='auth-wizard-container' style={{ width: '50%', maxWidth: '500px', minWidth: '400px' }}>
+        <div className='auth-wizard-body'>
+          <div className='auth-step'>
+            <div style={{
+              textAlign: 'center',
+              fontSize: '28px',
+              fontWeight: 'bold',
+              marginBottom: '10px',
+              fontFamily: 'Lato, sans-serif',
+              color: '#333'
+            }}>
+              Welcome Back
+            </div>
+            <div className='stepSubtitle' style={{ textAlign: 'center', marginBottom: '30px' }}>Please sign in to your account</div>
+            {error && (
+              <div className='error' style={{ marginBottom: '20px', textAlign: 'center' }}>
+                {error}
+              </div>
+            )}
+            {loginUrl ? (
+              <LoginForm onLogin={loginUser} />
+            ) : (
+              <AuthMethodPicker strategies={strategies} onStrategySelected={updateUrlStrategy} />
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }
 

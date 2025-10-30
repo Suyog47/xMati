@@ -1,7 +1,8 @@
-import { Button, FormGroup, InputGroup, Intent, Spinner, SpinnerSize } from '@blueprintjs/core'
+import { Button, FormGroup, InputGroup, Intent, Spinner, SpinnerSize, Icon } from '@blueprintjs/core'
 import { lang } from 'botpress/shared'
 import React, { FC, useState, useRef, useEffect } from 'react' // added useEffect
 import { useHistory } from 'react-router-dom'
+import '../app/Wizard/style.css'
 
 interface Props { }
 
@@ -190,143 +191,199 @@ export const ChangePasswordForm: FC<Props> = props => {
   }, [resendCountdown])
 
   return (
-    <div className="form-container" style={{ position: 'relative' }}>
-      <form onSubmit={onSubmit}>
-        <FormGroup label={'Email'}>
-          <InputGroup
+    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <form onSubmit={onSubmit} style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <div className='input-container' style={{ marginBottom: '15px' }}>
+          <Icon icon="envelope" className="input-icon" style={{ marginRight: '10px' }} />
+          <input
+            className='custom-input'
             tabIndex={1}
+            type="email"
+            placeholder="Enter your email"
             value={email}
             onChange={e => setEmail(e.target.value)}
-            type="email"
             name="email"
             id="email"
             disabled={isLoading || isEmailValid}
             autoFocus={true}
           />
-          {emailChecked && !isEmailValid && (
-            <div className="error-message" style={{ color: 'red', marginTop: '5px' }}>
-              This email is not registered
-            </div>
-          )}
-        </FormGroup>
+        </div>
+        {emailChecked && !isEmailValid && (
+          <div className="error" style={{ marginBottom: '10px' }}>
+            This email is not registered
+          </div>
+        )}
 
         {!isEmailValid && (
-          <Button
-            tabIndex={2}
-            type="submit"
-            text="Check Email"
-            id="btn-check-email"
-            disabled={isLoading || !email}
-            intent={Intent.WARNING}
-            rightIcon={isLoading ? <Spinner size={SpinnerSize.SMALL} /> : null}
-          />
+          <div className='button-container' style={{ width: '80%' }}>
+            <button
+              tabIndex={2}
+              type="submit"
+              id="btn-check-email"
+              disabled={isLoading || !email}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px'
+              }}
+            >
+              {isLoading && <div className="loader" style={{ width: '16px', height: '16px', margin: '0' }}></div>}
+              Check Email
+            </button>
+          </div>
         )}
 
         {isEmailValid && !isOtpValid && (
           <>
-            <div style={{ marginBottom: '10px', color: 'green' }}>{otpSentMessage}</div>
-            <FormGroup label={'OTP'}>
-              <div style={{ display: 'flex', gap: '10px' }}>
-                {otp.map((value, index) => (
-                  <InputGroup
-                    key={index}
-                    value={value}
-                    onChange={e => handleOtpChange(index, e.target.value)}
-                    type="text"
-                    maxLength={1}
-                    style={{ width: '50px', textAlign: 'center' }}
-                    disabled={isLoading}
-                    inputRef={el => (otpRefs.current[index] = el!)} // Assign ref to each input
-                  />
-                ))}
+            <div className='stepSubtitle' style={{ color: 'green', marginBottom: '20px', textAlign: 'center' }}>{otpSentMessage}</div>
+            <div className='stepSubtitle' style={{ marginBottom: '10px' }}>Enter the 4-digit OTP</div>
+            <div style={{ display: 'flex', gap: '15px', marginBottom: '20px' }}>
+              {otp.map((value, index) => (
+                <input
+                  key={index}
+                  className='custom-input'
+                  value={value}
+                  onChange={e => handleOtpChange(index, e.target.value)}
+                  type="text"
+                  maxLength={1}
+                  style={{
+                    width: '50px',
+                    height: '50px',
+                    textAlign: 'center',
+                    fontSize: '18px',
+                    fontWeight: 'bold',
+                    borderRadius: '8px',
+                    border: '1px solid #f2f2f2',
+                    backgroundColor: '#f9f9f9'
+                  }}
+                  disabled={isLoading}
+                  ref={el => (otpRefs.current[index] = el!)}
+                />
+              ))}
+            </div>
+            {otpChecked && !isOtpValid && (
+              <div className="error" style={{ marginBottom: '10px' }}>
+                Invalid OTP
               </div>
-              {otpChecked && !isOtpValid && (
-                <div className="error-message" style={{ color: 'red', marginTop: '5px' }}>
-                  Invalid OTP
-                </div>
-              )}
-              {resendCountdown > 0 && ( // timer display
-                <div style={{ marginTop: '5px' }}>
-                  Resend OTP available in <strong>{resendCountdown}</strong> second{resendCountdown !== 1 ? 's' : ''}
-                </div>
-              )}
-            </FormGroup>
+            )}
+            {resendCountdown > 0 && (
+              <div className='stepSubtitleSmall' style={{ marginBottom: '20px', textAlign: 'center' }}>
+                Resend OTP available in <strong>{resendCountdown}</strong> second{resendCountdown !== 1 ? 's' : ''}
+              </div>
+            )}
 
-            <Button
-              tabIndex={4}
-              type="submit"
-              text="Validate OTP"
-              id="btn-validate-otp"
-              disabled={isLoading || otp.some(value => value === '')}
-              intent={Intent.WARNING}
-              rightIcon={isLoading ? <Spinner size={SpinnerSize.SMALL} /> : null}
-            />
+            <div className='button-container' style={{ width: '80%', marginBottom: '10px' }}>
+              <button
+                tabIndex={4}
+                type="submit"
+                id="btn-validate-otp"
+                disabled={isLoading || otp.some(value => value === '')}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '10px'
+                }}
+              >
+                {isLoading && <div className="loader" style={{ width: '16px', height: '16px', margin: '0' }}></div>}
+                Validate OTP
+              </button>
+            </div>
 
-            <Button
-              tabIndex={5}
-              text="Resend OTP"
-              id="btn-resend-otp"
-              onClick={() => checkEmail(true)}
-              disabled={isLoading || resendCountdown > 0} // disable while timer is active
-              intent={Intent.PRIMARY}
-              style={{ marginTop: '10px' }}
-            />
+            <div className='button-container' style={{ width: '80%' }}>
+              <button
+                tabIndex={5}
+                type="button"
+                id="btn-resend-otp"
+                onClick={() => checkEmail(true)}
+                disabled={isLoading || resendCountdown > 0}
+                style={{
+                  width: '100%',
+                  backgroundColor: resendCountdown > 0 ? '#ccc' : '#6c757d',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '10px'
+                }}
+              >
+                Resend OTP
+              </button>
+            </div>
           </>
         )}
 
         {isOtpValid && (
           <>
-            <FormGroup label={lang.tr('admin.newPassword')}>
-              <InputGroup
+            <div className='stepSubtitle' style={{ marginBottom: '20px' }}>Create New Password</div>
+            <div className='input-container' style={{ marginBottom: '15px' }}>
+              <Icon icon="lock" className="input-icon" style={{ marginRight: '10px' }} />
+              <input
+                className='custom-input'
                 tabIndex={6}
+                type="password"
+                placeholder="Enter new password"
                 value={newPassword}
                 onChange={e => handlePasswordChange(e.target.value)}
-                type="password"
                 name="newPassword"
                 id="newPassword"
                 autoFocus
                 disabled={isLoading}
               />
-              {passwordError && (
-                <div className="error-message" style={{ color: 'red', marginTop: '5px' }}>
-                  {passwordError}
-                </div>
-              )}
-            </FormGroup>
+            </div>
+            {passwordError && (
+              <div className="error" style={{ marginBottom: '15px' }}>
+                {passwordError}
+              </div>
+            )}
 
-            <FormGroup label={lang.tr('admin.confirmPassword')}>
-              <InputGroup
+            <div className='input-container' style={{ marginBottom: '15px' }}>
+              <Icon icon="lock" className="input-icon" style={{ marginRight: '10px' }} />
+              <input
+                className='custom-input'
                 tabIndex={7}
+                type="password"
+                placeholder="Confirm new password"
                 value={confirmPassword}
                 onChange={e => setConfirmPassword(e.target.value)}
-                type="password"
                 name="confirmPassword"
                 id="confirmPassword"
                 disabled={isLoading}
               />
-            </FormGroup>
+            </div>
 
             {newPassword && confirmPassword && newPassword !== confirmPassword && (
-              <div className="error-message" style={{ color: 'red' }}>
+              <div className="error" style={{ marginBottom: '10px' }}>
                 Passwords don't match
               </div>
             )}
 
             {!passSuccess && passChecked && (
-              <div className="error-message" style={{ color: 'red', marginTop: '5px' }}>
+              <div className="error" style={{ marginBottom: '10px' }}>
                 Password failed to update
               </div>
             )}
 
-            <Button
-              tabIndex={8}
-              type="submit"
-              text={lang.tr('admin.change')}
-              id="btn-change-pass"
-              disabled={!newPassword || !confirmPassword || newPassword !== confirmPassword || !!passwordError}
-              intent={Intent.WARNING}
-              rightIcon={isLoading ? <Spinner size={SpinnerSize.SMALL} /> : null}
-            />
+            <div className='button-container' style={{ width: '80%' }}>
+              <button
+                tabIndex={8}
+                type="submit"
+                id="btn-change-pass"
+                disabled={!newPassword || !confirmPassword || newPassword !== confirmPassword || !!passwordError}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '10px'
+                }}
+              >
+                {isLoading && <div className="loader" style={{ width: '16px', height: '16px', margin: '0' }}></div>}
+                Update Password
+              </button>
+            </div>
           </>
         )}
       </form>

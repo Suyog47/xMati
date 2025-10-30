@@ -1,7 +1,8 @@
-import { Button, FormGroup, InputGroup, Intent, Spinner, SpinnerSize } from '@blueprintjs/core'
+import { Button, FormGroup, InputGroup, Intent, Spinner, SpinnerSize, Icon } from '@blueprintjs/core'
 import { lang } from 'botpress/shared'
 import React, { FC, useState } from 'react'
 import { Link } from 'react-router-dom'
+import '../app/Wizard/style.css'
 
 interface Props {
   onLogin: (email, password) => Promise<void>
@@ -25,68 +26,118 @@ export const LoginForm: FC<Props> = props => {
   }
 
   return (
-    <form onSubmit={onSubmit}>
-      <FormGroup label={lang.tr('email')}>
-        <InputGroup
+    <form onSubmit={onSubmit} style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div className='input-container' style={{ marginBottom: '20px' }}>
+        <Icon icon="envelope" className="input-icon" style={{ marginRight: '10px' }} />
+        <input
+          className='custom-input'
           tabIndex={1}
+          type="email"
+          placeholder="Enter your email"
           value={email}
           onChange={e => setEmail(e.target.value)}
-          type="text"
           id="email-login"
           autoFocus={true}
+          disabled={loading}
         />
-      </FormGroup>
+      </div>
 
-      <FormGroup label={lang.tr('admin.password')}>
-        <InputGroup
+      <div className='input-container' style={{ marginBottom: '15px' }}>
+        <Icon icon="lock" className="input-icon" style={{ marginRight: '10px' }} />
+        <input
+          className='custom-input'
           tabIndex={2}
+          type={showPassword ? 'text' : 'password'}
+          placeholder="Enter your password"
           value={password}
           onChange={e => setPassword(e.target.value)}
-          type={showPassword ? 'text' : 'password'}
           id="password-login"
-          rightElement={
-            <Button
-              icon={showPassword ? 'eye-off' : 'eye-open'}
-              minimal={true}
-              onClick={togglePasswordVisibility}
-              tabIndex={-1}
-            />
-          }
+          disabled={loading}
         />
-      </FormGroup>
+        <Icon
+          icon={showPassword ? 'eye-off' : 'eye-open'}
+          className="eye-icon"
+          onClick={togglePasswordVisibility}
+          style={{ cursor: 'pointer' }}
+        />
+      </div>
 
-      <Link
-        to="/changePassword"
-        onClick={e => loading && e.preventDefault()} // Prevent navigation if loading is true
-        style={{
-          pointerEvents: loading ? 'none' : 'auto', // Disable interaction when loading
-          color: loading ? 'gray' : '#04A9E1', // Change color to indicate disabled state
-          textDecoration: loading ? 'none' : 'underline', // Optional: visually indicate disabled state
-        }}
-      >
-        Forgot password?
-      </Link>
-
-      <Button
-        tabIndex={3}
-        type="submit"
-        id="btn-signin"
-        text={lang.tr('admin.signIn')}
-        disabled={!email || !password || loading}
-        intent={Intent.WARNING}
-        rightIcon={loading ? <Spinner size={SpinnerSize.SMALL} /> : null}
-      /> <br />
-
-      <p>
-        Don't have an account?
-        <Link to="/botCreation"
-          onClick={e => loading && e.preventDefault()} // Prevent navigation if loading is true
+      <div style={{ width: '80%', display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
+        <Link
+          to="/changePassword"
+          onClick={e => loading && e.preventDefault()}
           style={{
-            pointerEvents: loading ? 'none' : 'auto', // Disable interaction when loading
-            color: loading ? 'gray' : '#04A9E1', // Change color to indicate disabled state
-            textDecoration: loading ? 'none' : 'underline', // Optional: visually indicate disabled state
-          }}> Register</Link>
-      </p>
+            pointerEvents: loading ? 'none' : 'auto',
+            color: loading ? 'gray' : '#04A9E1',
+            textDecoration: loading ? 'none' : 'underline',
+            fontSize: '13px',
+            fontFamily: 'Lato, sans-serif'
+          }}
+        >
+          Forgot password?
+        </Link>
+      </div>
+
+      <div className='button-container' style={{ width: '80%' }}>
+        <button
+          tabIndex={3}
+          type="submit"
+          id="btn-signin"
+          disabled={!email || !password || loading}
+          style={{
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '10px'
+          }}
+        >
+          {loading && <div className="loader" style={{ width: '16px', height: '16px', margin: '0' }}></div>}
+          Sign In
+        </button>
+      </div>
+
+      <div style={{
+        width: '80%',
+        textAlign: 'center',
+        marginTop: '15px',
+        marginBottom: '15px',
+        fontFamily: 'Lato, sans-serif',
+        fontSize: '13px',
+        color: '#666'
+      }}>
+        or
+      </div>
+
+      <div className='button-container' style={{ width: '80%' }}>
+        <Link
+          to="/botCreation"
+          onClick={e => loading && e.preventDefault()}
+          style={{
+            pointerEvents: loading ? 'none' : 'auto',
+            textDecoration: 'none',
+            width: '100%'
+          }}
+        >
+          <button
+            type="button"
+            disabled={loading}
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '10px',
+              backgroundColor: loading ? '#ccc' : 'transparent',
+              border: `1px solid ${loading ? '#ccc' : '#05a8e1'}`,
+              color: loading ? '#666' : '#05a8e1',
+              cursor: loading ? 'not-allowed' : 'pointer'
+            }}
+          >
+            Create Account
+          </button>
+        </Link>
+      </div>
     </form>
   )
 }

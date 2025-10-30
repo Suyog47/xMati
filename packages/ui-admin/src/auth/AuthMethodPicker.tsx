@@ -2,6 +2,7 @@ import { Button } from '@blueprintjs/core'
 import { lang } from 'botpress/shared'
 import { AuthStrategyConfig } from 'common/typings'
 import React, { FC } from 'react'
+import '../app/Wizard/style.css'
 
 interface Props {
   strategies: AuthStrategyConfig[]
@@ -14,7 +15,7 @@ export const AuthMethodPicker: FC<Props> = props => {
   }
 
   return (
-    <div>
+    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
       {props.strategies.map((config: AuthStrategyConfig) => {
         const { strategyType, strategyId, label } = config
 
@@ -24,12 +25,15 @@ export const AuthMethodPicker: FC<Props> = props => {
             : lang.tr('admin.signInWithUserPass')
 
         return (
-          <Button
-            key={strategyId}
-            id={`btn-${strategyId}-signin`}
-            text={label ? lang.tr('admin.signInWithLabel', { label }) : defaultLabel}
-            onClick={() => props.onStrategySelected(strategyId)}
-          />
+          <div key={strategyId} className='button-container' style={{ width: '80%' }}>
+            <button
+              id={`btn-${strategyId}-signin`}
+              onClick={() => props.onStrategySelected(strategyId)}
+              style={{ width: '100%' }}
+            >
+              {label ? lang.tr('admin.signInWithLabel', { label }) : defaultLabel}
+            </button>
+          </div>
         )
       })}
     </div>

@@ -11,13 +11,45 @@
 .wizard-container {
   font-family: 'Lato', sans-serif;
   background-color: white;
-  min-height: 430px;
+  min-height: 500px;
   width: 70%;
   margin: 70px auto 20px auto;
   border: none;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border: 1px solid #dee0e1;
+}
+
+/* Auth-specific container styles */
+.auth-wizard-container {
+  font-family: 'Lato', sans-serif;
+  background-color: white;
+  min-height: 550px;
+  width: 70%;
+  margin: 70px auto 20px auto;
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #dee0e1;
+}
+
+.auth-wizard-body {
+  flex-grow: 1;
+  min-height: 450px;
+  max-height: 700px;
+  overflow-y: auto;
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.auth-step {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+  padding: 30px 20px;
+  min-height: 400px;
 }
 
 .wizard-header {
@@ -61,7 +93,7 @@
 
 .wizard-body {
   flex-grow: 1;
-  max-height: 520px;
+  max-height: 650px;
   overflow-y: auto;
   background-color: #fff;
   border-radius: 8px;
@@ -524,7 +556,13 @@ button:hover {
   .wizard-container {
     display: flex;
     margin: 70px auto 20px auto;
-    min-height: 300px;
+    min-height: 400px;
+  }
+  
+  .auth-wizard-container {
+    display: flex;
+    margin: 70px auto 20px auto;
+    min-height: 500px;
   }
 
   .stepper-steps {
@@ -573,7 +611,12 @@ button:hover {
   }
 
   .wizard-body {
-    max-height: 370px;
+    max-height: 520px;
+  }
+  
+  .auth-wizard-body {
+    min-height: 450px;
+    max-height: 600px;
   }
 }
 
