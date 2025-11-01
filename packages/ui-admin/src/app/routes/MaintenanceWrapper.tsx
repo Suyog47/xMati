@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom'
 
 import api from '~/app/api'
 import packageJson from '../../../../../package.json'
-import logo from './xmati.png' // Make sure this path is correct
+import logo from './xmati.png'
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 const CURRENT_VERSION = packageJson.version
@@ -12,6 +12,20 @@ const CURRENT_VERSION = packageJson.version
 const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [isMaintenance, setIsMaintenance] = useState(true)
+  const [isVersionIncompatible, setIsVersionIncompatible] = useState(() => {
+    // Check localStorage on initial load
+    const savedVersionState = localStorage.getItem('versionIncompatible')
+    return savedVersionState ? JSON.parse(savedVersionState).isIncompatible : false
+  })
+  const [versionInfo, setVersionInfo] = useState(() => {
+    // Restore version info from localStorage on initial load
+    const savedVersionState = localStorage.getItem('versionIncompatible')
+    if (savedVersionState) {
+      const parsed = JSON.parse(savedVersionState)
+      return parsed.versionInfo || { server: '', client: CURRENT_VERSION }
+    }
+    return { server: '', client: CURRENT_VERSION }
+  })
   const location = useLocation()
   const versionCheckTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const lastVersionCheckRef = useRef<number>(0)
@@ -19,18 +33,14 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Function to compare semantic versions
   const compareVersions = (version1: string, version2: string): number => {
-    const v1Parts = version1.split('.').map(Number)
-    const v2Parts = version2.split('.').map(Number)
+    const v1Parts = version1.split('.').map(Number) // server version
+    const v2Parts = version2.split('.').map(Number) // current version
 
-    console.log(v1Parts, v2Parts)
     for (let i = 0; i < Math.max(v1Parts.length, v2Parts.length); i++) {
       const v1Part = v1Parts[i] || 0
       const v2Part = v2Parts[i] || 0
 
-      if (v1Part > v2Part) {
-        return 1
-      }
-      if (v1Part < v2Part) {
+      if (v1Part > v2Part || v1Part < v2Part) {
         return -1
       }
     }
@@ -65,9 +75,22 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
         //   comparison: compareVersions(serverVersion, currentProjectVersion)
         // })
 
-        // If server's child-node version is less than current project version, show alert
+        // If version comparison returns < 0, show incompatibility screen
         if (compareVersions(serverVersion, currentProjectVersion) < 0) {
-          alert(`⚠️ Version Mismatch Warning!\n\nServer Child-Node Version: ${serverVersion}\nCurrent Project Version: ${currentProjectVersion}\n\nThe server's child-node version (${serverVersion}) is older than your current project version (${currentProjectVersion}). Some features may not work as expected.`)
+          const versionData = { server: serverVersion, client: currentProjectVersion }
+          setVersionInfo(versionData)
+          setIsVersionIncompatible(true)
+
+          // Save to localStorage to persist across page reloads
+          localStorage.setItem('versionIncompatible', JSON.stringify({
+            isIncompatible: true,
+            versionInfo: versionData,
+            timestamp: Date.now()
+          }))
+        } else {
+          // If versions are compatible, clear any previous incompatibility state
+          localStorage.removeItem('versionIncompatible')
+          setIsVersionIncompatible(false)
         }
       }
     } catch (error) {
@@ -124,6 +147,24 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
     //   }
     // }
   }, [])
+
+  // Check for stale version incompatibility state (optional: auto-clear after some time)
+  useEffect(() => {
+    if (isVersionIncompatible) {
+      const savedVersionState = localStorage.getItem('versionIncompatible')
+      if (savedVersionState) {
+        const parsed = JSON.parse(savedVersionState)
+        const timestamp = parsed.timestamp || 0
+        const now = Date.now()
+
+        // Optional: Auto-clear incompatibility state after 30 minutes
+        if (now - timestamp > 30 * 60 * 1000) {
+          localStorage.removeItem('versionIncompatible')
+          setIsVersionIncompatible(false)
+        }
+      }
+    }
+  }, [isVersionIncompatible])
 
   useEffect(() => {
     const checkMaintenanceStatus = async () => {
@@ -210,6 +251,72 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
         }}
       >
         Loading xMati...
+      </div>
+    )
+  }
+
+  if (isVersionIncompatible) {
+    return (
+      <div
+        style={{
+          height: '100vh',
+          width: '100vw',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          background: 'linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%)',
+          textAlign: 'center',
+          padding: 24,
+          boxSizing: 'border-box',
+        }}
+      >
+        <img
+          src={logo}
+          alt='xMati Logo'
+          style={{ width: 120, height: 'auto', marginBottom: 32, userSelect: 'none' }}
+          draggable={false}
+        />
+        <div
+          style={{
+            fontSize: 28,
+            fontWeight: 700,
+            color: '#c53030',
+            marginBottom: 16,
+          }}
+        >
+          ⚠️ Version Incompatible
+        </div>
+        <div
+          style={{
+            fontSize: 20,
+            fontWeight: 500,
+            color: '#2d3748',
+            width: '80%',
+            maxWidth: 600,
+            lineHeight: 1.6,
+            marginBottom: 24,
+          }}
+        >
+          Your current frontend version is incompatible with the server version.
+        </div>
+        <div
+          style={{
+            background: 'rgba(255, 255, 255, 0.8)',
+            borderRadius: 8,
+            padding: 20,
+            marginBottom: 24,
+            fontSize: 16,
+            color: '#4a5568',
+          }}
+        >
+          <div style={{ marginBottom: 8 }}>
+            <strong>Server Version:</strong> {versionInfo.server}
+          </div>
+          <div>
+            <strong>Current Version:</strong> {versionInfo.client}
+          </div>
+        </div>
       </div>
     )
   }
