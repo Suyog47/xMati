@@ -4,6 +4,7 @@ import { UserProfile } from 'common/typings'
 import React, { FC, useState } from 'react'
 import api from '~/app/api'
 import { PasswordStrengthMeter } from '~/auth/PasswordStrengthMeter/PasswordStrengthMeter'
+import packageJson from '../../../../package.json'
 
 interface Props {
   isOpen: boolean
@@ -65,6 +66,7 @@ const UpdatePassword: FC<Props> = props => {
     localStorage.setItem('formData', JSON.stringify(updatedFormData))
   }
 
+  const CURRENT_VERSION = packageJson.version
   const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
   const s3Call = async (data) => {
@@ -73,7 +75,8 @@ const UpdatePassword: FC<Props> = props => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'X-App-Version': CURRENT_VERSION
         },
         body: JSON.stringify({
           data,

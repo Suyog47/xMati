@@ -1,6 +1,7 @@
 import { Dialog, Button, Spinner, Card, Elevation } from '@blueprintjs/core'
 import { toast } from 'botpress/shared'
 import React, { FC, useState } from 'react'
+import packageJson from '../../../../package.json'
 
 interface Enquiry {
   id: string
@@ -14,6 +15,7 @@ interface Props {
   onClose: () => void
 }
 
+const CURRENT_VERSION = packageJson.version
 const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
 const EnquiryDialog: FC<Props> = ({ isOpen, onClose }) => {
@@ -26,7 +28,11 @@ const EnquiryDialog: FC<Props> = ({ isOpen, onClose }) => {
     try {
       const response = await fetch(`${API_URL}/get-enquiries`, {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'X-App-Version': CURRENT_VERSION
+        },
       })
       const result = await response.json()
 

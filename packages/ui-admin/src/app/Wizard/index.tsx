@@ -3,6 +3,7 @@ import { auth } from 'botpress/shared'
 import React, { useState, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
 import api from '~/app/api'
+import packageJson from '../../../../../package.json'
 import bgImage from '../../assets/images/background.jpg'
 import Check from '../../assets/images/check.png'
 import logo from '../../assets/images/xmati.png'
@@ -13,6 +14,7 @@ import PersonalInfo from './steps/PersonalInfo'
 import SubscriptionPlan from './steps/SubscriptionPlan'
 import './style.css'
 
+const CURRENT_VERSION = packageJson.version
 const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
 interface FormData {
@@ -435,6 +437,7 @@ const CustomerWizard: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-App-Version': CURRENT_VERSION
         },
         body: JSON.stringify({
           data: updatedFormData,
@@ -462,7 +465,7 @@ const CustomerWizard: React.FC = () => {
 
       const setupIntentRes = await fetch(`${API_URL}/create-setup-intent`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-App-Version': CURRENT_VERSION },
         body: JSON.stringify({ email: formData.email, customerId: '-' }),
       })
 
@@ -483,7 +486,7 @@ const CustomerWizard: React.FC = () => {
       if (typeof res.setupIntent.payment_method === 'string' && res.setupIntent.payment_method) {
         result = await fetch(`${API_URL}/attach-payment-method`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', 'X-App-Version': CURRENT_VERSION },
           body: JSON.stringify({ email: formData.email, paymentMethodId: res.setupIntent.payment_method || '', customerId: { id: customerId || '' } }),
         })
       } else {
@@ -510,7 +513,7 @@ const CustomerWizard: React.FC = () => {
     try {
       const result = await fetch(`${API_URL}/create-payment-intent`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', },
+        headers: { 'Content-Type': 'application/json', 'X-App-Version': CURRENT_VERSION},
         body: JSON.stringify({
           amount: price * 100, currency: 'usd',
           customerId: { id: customerId },
@@ -561,6 +564,7 @@ const CustomerWizard: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-App-Version': CURRENT_VERSION
         },
         body: JSON.stringify({
           email: formData.email,
@@ -592,7 +596,7 @@ const CustomerWizard: React.FC = () => {
       setGeneratedOTP(otp)
       await fetch(`${API_URL}/send-email-otp`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-App-Version': CURRENT_VERSION },
         body: JSON.stringify({
           fullName: formData.fullName,
           email: formData.email,
@@ -720,6 +724,7 @@ const CustomerWizard: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-App-Version': CURRENT_VERSION
         },
         body: JSON.stringify({
           email: formData.email

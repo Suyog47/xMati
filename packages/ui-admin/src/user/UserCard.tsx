@@ -1,6 +1,7 @@
 import { Card, Elevation, Icon, Dialog, Button, Spinner, Divider } from '@blueprintjs/core'
 import { confirmDialog, lang, toast } from 'botpress/shared'
 import React, { useEffect, useState } from 'react'
+import packageJson from '../../../../package.json'
 import api from '~/app/api'
 import TransactionHistory from './Subscription-screens/TransactionHistory'
 
@@ -40,6 +41,7 @@ interface UserCardProps {
   botsData: BotsData[]
 }
 
+const CURRENT_VERSION = packageJson.version
 const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
 const UserCard: React.FC<UserCardProps> = ({ email, userData, subscriptionData, botsData }) => {
@@ -57,7 +59,11 @@ const UserCard: React.FC<UserCardProps> = ({ email, userData, subscriptionData, 
     try {
       const res = await fetch(`${API_URL}/get-stripe-transactions`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'X-App-Version': CURRENT_VERSION
+        },
         body: JSON.stringify({ email })
       })
 
@@ -92,7 +98,11 @@ const UserCard: React.FC<UserCardProps> = ({ email, userData, subscriptionData, 
 
     const res = await fetch(`${API_URL}/download-csv`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+        'X-App-Version': CURRENT_VERSION
+      },
       body: JSON.stringify({ data: transactions, email }),
     })
 

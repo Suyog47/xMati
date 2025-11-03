@@ -3,6 +3,7 @@ import { lang } from 'botpress/shared'
 import React, { FC, useState, useRef, useEffect } from 'react' // added useEffect
 import { useHistory } from 'react-router-dom'
 import '../app/Wizard/style.css'
+import packageJson from '../../../../package.json'
 
 interface Props { }
 
@@ -29,6 +30,7 @@ export const ChangePasswordForm: FC<Props> = props => {
 
   const otpRefs = useRef<HTMLInputElement[]>([]) // Refs for OTP input fields
 
+  const CURRENT_VERSION = packageJson.version
   const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
   const validatePassword = (password: string) => {
@@ -85,6 +87,7 @@ export const ChangePasswordForm: FC<Props> = props => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-App-Version': CURRENT_VERSION
         },
         body: JSON.stringify({
           email: email.trim(),
@@ -138,6 +141,7 @@ export const ChangePasswordForm: FC<Props> = props => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-App-Version': CURRENT_VERSION
         },
         body: JSON.stringify({
           email: email.trim(),

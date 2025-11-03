@@ -3,8 +3,10 @@ import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
 import { lang, toast } from 'botpress/shared'
 import React, { FC, useState, useEffect } from 'react'
+import packageJson from '../../../../package.json'
 import CardForm from './CardForm'
 
+const CURRENT_VERSION = packageJson.version
 const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PROMISE || 'pk_live_51RPPI0EncrURrNgDF2LNkLrh5Wf53SIe3WjqPqjtzqbJWDGfDFeG4VvzUXuC4nCmrPTNOTeFENuAqRBw1mvbNJg600URDxPnuc')
@@ -59,7 +61,11 @@ const UpdateCardDetails: FC<Props> = props => {
         try {
           const res = await fetch(`${API_URL}/get-card-details`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+              'X-App-Version': CURRENT_VERSION
+            },
             body: JSON.stringify({ paymentMethodId: formData.stripePayementId })
           })
           const data = await res.json()
@@ -88,7 +94,11 @@ const UpdateCardDetails: FC<Props> = props => {
 
       const result = await fetch(`${API_URL}/update-card-info`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'X-App-Version': CURRENT_VERSION
+        },
         body: JSON.stringify({
           email: formData.email,
           customerId: formData.stripeCustomerId,

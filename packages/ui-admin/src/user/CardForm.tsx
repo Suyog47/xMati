@@ -1,6 +1,7 @@
 import React, { FC, useState } from 'react'
 import { Spinner } from '@blueprintjs/core'
 import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js'
+import packageJson from '../../../../package.json'
 
 interface CardFormProps {
   onCardValidated: (paymentMethodId: string) => void
@@ -14,6 +15,7 @@ const CardForm: FC<CardFormProps> = ({ onCardValidated }) => {
   const [cardValidated, setCardValidated] = useState(false)
   const [cardErrorMessage, setCardErrorMessage] = useState<string | null>(null)
 
+  const CURRENT_VERSION = packageJson.version
   const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
   const verifyCard = async () => {
@@ -54,7 +56,10 @@ const CardForm: FC<CardFormProps> = ({ onCardValidated }) => {
       // 1. Create SetupIntent on your backend
       const setupIntentRes = await fetch(`${API_URL}/create-setup-intent`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-App-Version': CURRENT_VERSION
+        },
         body: JSON.stringify({ email: formData.email, customerId: { id: formData.stripeCustomerId } }),
       })
 

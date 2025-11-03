@@ -3,6 +3,7 @@ import { toast } from 'botpress/shared'
 import ms from 'ms'
 import React, { FC, useEffect, useState } from 'react'
 import api from '~/app/api'
+import packageJson from '../../../../package.json'
 import EnquiryDialog from './EnquiryDialog'
 import UserCard from './UserCard'
 
@@ -16,6 +17,7 @@ interface UserData {
   [key: string]: any // Add more fields as needed
 }
 
+const CURRENT_VERSION = packageJson.version
 const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
 const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
@@ -92,7 +94,7 @@ const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
     try {
       const response = await fetch(`${API_URL}/set-maintenance`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-App-Version': CURRENT_VERSION },
         body: JSON.stringify({ status: !isMaintenanceActive }),
       })
       const result = await response.json()

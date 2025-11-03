@@ -34,6 +34,7 @@ import replace from 'replace-in-file'
 import tmp from 'tmp'
 import { VError } from 'verror'
 import zlib from 'zlib'
+import packageJson from '../../../../../package.json'
 
 const BOT_DIRECTORIES = ['actions', 'flows', 'entities', 'content-elements', 'intents', 'qna']
 const BOT_CONFIG_FILENAME = 'bot.config.json'
@@ -48,12 +49,15 @@ const DEFAULT_BOT_CONFIGS = {
   details: {}
 }
 
+
 const STATUS_REFRESH_INTERVAL = ms('15s')
 const STATUS_EXPIRY = ms('20s')
 const DEFAULT_BOT_HEALTH: BotHealth = { status: 'disabled', errorCount: 0, warningCount: 0, criticalCount: 0 }
 
 const getBotStatusKey = (serverId: string) => makeRedisKey(`bp_server_${serverId}_bots`)
 const debug = DEBUG('services:bots')
+
+const CURRENT_VERSION = packageJson.version
 
 // Localhost url
 const API_URL = 'http://localhost:8000'
@@ -194,7 +198,8 @@ export class BotService {
       let result = await axios(`${API_URL}/get-bots`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'X-App-Version': CURRENT_VERSION
         },
         data: JSON.stringify({
           email
@@ -238,6 +243,7 @@ export class BotService {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          'X-App-Version': CURRENT_VERSION
         },
       })
 
@@ -666,6 +672,7 @@ export class BotService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-App-Version': CURRENT_VERSION
         },
         data: {
           fullName,
@@ -927,7 +934,8 @@ export class BotService {
       const result = await axios(`${API_URL}/save-bot`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'X-App-Version': CURRENT_VERSION
         },
         data: {
           fullName: BotService.fullName,

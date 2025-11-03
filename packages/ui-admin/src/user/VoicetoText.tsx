@@ -1,6 +1,7 @@
 import { Dialog } from '@blueprintjs/core'
 import React, { useState } from 'react'
 import { useReactMediaRecorder } from 'react-media-recorder'
+import packageJson from '../../../../package.json'
 
 interface VoiceRecorderProps {
   isOpen: boolean
@@ -45,6 +46,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ isOpen, toggle }) => {
     },
   })
 
+  const CURRENT_VERSION = packageJson.version
   const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
   const sendAudioToServer = async (audioBlob: Blob) => {
@@ -54,6 +56,9 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ isOpen, toggle }) => {
 
       const response = await fetch(`${API_URL}/gemini-voice`, {
         method: 'POST',
+        headers: {
+          'X-App-Version': CURRENT_VERSION
+        },
         body: formData,
       })
 

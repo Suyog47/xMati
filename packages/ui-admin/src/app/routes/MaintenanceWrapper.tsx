@@ -12,11 +12,14 @@ const CURRENT_VERSION = packageJson.version
 const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [isMaintenance, setIsMaintenance] = useState(true)
+
   const [isVersionIncompatible, setIsVersionIncompatible] = useState(() => {
     // Check localStorage on initial load
     const savedVersionState = localStorage.getItem('versionIncompatible')
     return savedVersionState ? JSON.parse(savedVersionState).isIncompatible : false
   })
+  //  const [isVersionIncompatible, setIsVersionIncompatible] = useState(false)
+
   const [versionInfo, setVersionInfo] = useState(() => {
     // Restore version info from localStorage on initial load
     const savedVersionState = localStorage.getItem('versionIncompatible')
@@ -66,20 +69,13 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
 
       if (data.success && data.data && data.data['child-node']) {
         const serverVersion = data.data['child-node'] // Version from server response
-        const currentProjectVersion = CURRENT_VERSION // Version from package.json (0.0.1)
-
-        // Log version check for debugging (remove in production)
-        // console.log('Version Check:', {
-        //   serverChildNodeVersion: serverVersion,
-        //   currentProjectVersion,
-        //   comparison: compareVersions(serverVersion, currentProjectVersion)
-        // })
+        const currentProjectVersion = CURRENT_VERSION // Version from package.json
 
         // If version comparison returns < 0, show incompatibility screen
         if (compareVersions(serverVersion, currentProjectVersion) < 0) {
           const versionData = { server: serverVersion, client: currentProjectVersion }
-          setVersionInfo(versionData)
-          setIsVersionIncompatible(true)
+          // setVersionInfo(versionData)
+          // setIsVersionIncompatible(true)
 
           // Save to localStorage to persist across page reloads
           localStorage.setItem('versionIncompatible', JSON.stringify({
@@ -110,42 +106,9 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
     }, 10000) // Check every 10 seconds (faster detection)
   }
 
-  // Enhanced API interceptor for version checking
+  // Start the recursive version checking
   useEffect(() => {
-    // const originalFetch = window.fetch
-
-    // window.fetch = async (...args) => {
-    //   try {
-    //     const response = await originalFetch(...args)
-
-    //     // Check if this is an API call to our backend
-    //     const url = args[0] as string
-    //     if (typeof url === 'string' && url.includes(API_URL)) {
-    //       // Schedule version check after any API response (success or failure)
-    //       setTimeout(() => void checkServerVersion(), 1000) // Delay to avoid overwhelming the server
-    //     }
-
-    //     return response
-    //   } catch (error) {
-    //     // Even on API failure, check version
-    //     const url = args[0] as string
-    //     if (typeof url === 'string' && url.includes(API_URL)) {
-    //       setTimeout(() => void checkServerVersion(), 1000)
-    //     }
-    //     throw error
-    //   }
-    // }
-
-    // Start the recursive version checking
     scheduleVersionCheck()
-
-    // // Cleanup function
-    // return () => {
-    //   window.fetch = originalFetch
-    //   if (versionCheckTimeoutRef.current) {
-    //     clearTimeout(versionCheckTimeoutRef.current)
-    //   }
-    // }
   }, [])
 
   // Check for stale version incompatibility state (optional: auto-clear after some time)
@@ -171,7 +134,7 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
       try {
         const response = await fetch(`${API_URL}/get-maintenance`, {
           method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', 'X-App-Version': CURRENT_VERSION },
         })
         const data = await response.json()
         setIsMaintenance(data.data) // Set the maintenance status

@@ -2,7 +2,9 @@ import { Button } from '@blueprintjs/core'
 import { useStripe, useElements } from '@stripe/react-stripe-js'
 import { toast } from 'botpress/shared'
 import React, { useState, useEffect } from 'react'
+import packageJson from '../../../../../package.json'
 
+const CURRENT_VERSION = packageJson.version
 const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
 interface CheckoutFormProps {
@@ -79,7 +81,11 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
 
       const result = await fetch(`${API_URL}/save-subscription`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'X-App-Version': CURRENT_VERSION
+        },
         body: JSON.stringify({ key: email, name: fullName, subscription: selectedPlan, duration: selectedDuration, amount }),
       })
 
@@ -104,7 +110,11 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
 
       const result = await fetch(`${API_URL}/remove-nextsub`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'X-App-Version': CURRENT_VERSION
+        },
         body: JSON.stringify({ email }),
       })
 
@@ -128,7 +138,11 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
 
       const result = await fetch(`${API_URL}/failed-payment`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'X-App-Version': CURRENT_VERSION
+        },
         body: JSON.stringify({
           email,
           name: fullName,
@@ -169,7 +183,11 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
       if (calculatedData?.refund && amount > 0) {
         const result = await fetch(`${API_URL}/refund-amount`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'X-App-Version': CURRENT_VERSION
+          },
           body: JSON.stringify({
             chargeId: savedSubData.transactionId,
             reason: '-',
@@ -238,7 +256,8 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'X-App-Version': CURRENT_VERSION
         },
         body: JSON.stringify({
           email,
@@ -288,7 +307,8 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'X-App-Version': CURRENT_VERSION
         },
         body: JSON.stringify({
           email: savedFormData.email,

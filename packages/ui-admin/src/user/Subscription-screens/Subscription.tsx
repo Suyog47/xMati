@@ -8,6 +8,7 @@ import {
 import { loadStripe, PaymentRequest } from '@stripe/stripe-js'
 import { toast } from 'botpress/shared'
 import React, { FC, useState, useEffect, useMemo, useCallback, useRef } from 'react'
+import packageJson from '../../../../../package.json'
 import BasicAuthentication from '~/auth/basicAuth'
 import CheckoutForm from './CheckoutForm'
 import CancellationFailedDialog from './dialogs/CancellationFailedDialog'
@@ -23,6 +24,7 @@ interface Props {
   toggle: () => void
 }
 
+const CURRENT_VERSION = packageJson.version
 const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PROMISE || 'pk_live_51RPPI0EncrURrNgDF2LNkLrh5Wf53SIe3WjqPqjtzqbJWDGfDFeG4VvzUXuC4nCmrPTNOTeFENuAqRBw1mvbNJg600URDxPnuc')
@@ -192,7 +194,11 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
       savedFormData = JSON.parse(localStorage.getItem('formData') || '{}') // reinitializing to get the latest data
       const result = await fetch(`${API_URL}/create-payment-intent`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'X-App-Version': CURRENT_VERSION
+        },
         body: JSON.stringify({
           amount: amt, currency: 'usd',
           customerId: { id: savedFormData.stripeCustomerId },
@@ -252,7 +258,11 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
     try {
       const res = await fetch(`${API_URL}/get-stripe-transactions`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'X-App-Version': CURRENT_VERSION
+        },
         body: JSON.stringify({ email: savedFormData.email })
       })
 
@@ -287,7 +297,11 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
 
     const res = await fetch(`${API_URL}/download-csv`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+        'X-App-Version': CURRENT_VERSION
+      },
       body: JSON.stringify({ data: transactions, email }),
     })
 
@@ -313,7 +327,8 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${token}`,
+            'X-App-Version': CURRENT_VERSION
           },
           body: JSON.stringify({ chargeId: savedSubData.transactionId, reason: '', email, fullName, subscription, amount, refundDetails }),
         })
@@ -322,7 +337,8 @@ const Subscription: FC<Props> = ({ isOpen, toggle }) => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${token}`,
+            'X-App-Version': CURRENT_VERSION
           },
           body: JSON.stringify({ email }),
         })

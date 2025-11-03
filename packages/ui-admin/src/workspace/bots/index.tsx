@@ -35,7 +35,7 @@ import { fetchModules } from '~/management/modules/reducer'
 import Subscription from '~/user/Subscription-screens/Subscription'
 import { fetchBotHealth, fetchBots, fetchBotNLULanguages } from '~/workspace/bots/reducer'
 import { filterList } from '~/workspace/util'
-
+import packageJson from '../../../../../package.json'
 import BotItemCompact from './BotItemCompact'
 import BotItemPipeline from './BotItemPipeline'
 import CreateBotModal from './CreateBot-screens/CreateBotModal'
@@ -44,6 +44,7 @@ import ImportBotModal from './ImportBotModal'
 import RollbackBotModal from './RollbackBotModal'
 import style from './style.scss'
 
+const CURRENT_VERSION = packageJson.version
 const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
 const botFilterFields = ['name', 'id', 'description']
@@ -104,7 +105,8 @@ class Bots extends Component<Props> {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.token}`
+          'Authorization': `Bearer ${this.token}`,
+          'X-App-Version': CURRENT_VERSION
         },
         body: JSON.stringify({
           email,

@@ -7,6 +7,7 @@ import api from '~/app/api'
 import { ExtendedHistory } from '~/app/history'
 import BasicAuthentication, { setActiveWorkspace, setChatUserAuth } from '~/auth/basicAuth'
 import { fetchBots } from '~/workspace/bots/reducer'
+import packageJson from '../../../../package.json'
 import { GhostService } from '../../../bp/dist/core/bpfs'
 import bgImage from '../assets/images/background.jpg'
 import logo from '../assets/images/xmati.png'
@@ -15,7 +16,6 @@ import { AuthMethodPicker } from './AuthMethodPicker'
 import LoginContainer from './LoginContainer'
 import { LoginForm } from './LoginForm'
 import '../app/Wizard/style.css'
-
 
 type RouterProps = RouteComponentProps<
   { strategy: string; workspace: string },
@@ -32,6 +32,7 @@ interface AuthConfigResponse {
   }
 }
 
+const CURRENT_VERSION = packageJson.version
 const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
 const Login: FC<Props> = props => {
@@ -171,6 +172,7 @@ const Login: FC<Props> = props => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-App-Version': CURRENT_VERSION
         },
         body: JSON.stringify({
           data: {
@@ -182,7 +184,7 @@ const Login: FC<Props> = props => {
       })
       return result.json()
     } catch (error) {
-      return { success: false, msg: 'Error uploading credentials to S3' }
+      return { success: false, msg: 'Error while login' }
     }
   }
 
@@ -192,6 +194,7 @@ const Login: FC<Props> = props => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-App-Version': CURRENT_VERSION
         },
         body: JSON.stringify({
           key: email,
@@ -304,7 +307,19 @@ const Login: FC<Props> = props => {
             </div>
             <div className='stepSubtitle' style={{ textAlign: 'center', marginBottom: '30px' }}>Please sign in to your account</div>
             {error && (
-              <div className='error' style={{ marginBottom: '20px', textAlign: 'center' }}>
+              <div style={{
+                marginBottom: '20px',
+                textAlign: 'center',
+                color: '#ff0000',
+                fontWeight: 'bold',
+                fontSize: '14px',
+                display: 'block',
+                width: '100%',
+                padding: '10px',
+                backgroundColor: '#ffe6e6',
+                border: '1px solid #ff9999',
+                borderRadius: '4px'
+              }}>
                 {error}
               </div>
             )}

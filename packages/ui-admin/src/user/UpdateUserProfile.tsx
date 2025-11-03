@@ -3,6 +3,7 @@ import { FormFields, lang, toast } from 'botpress/shared'
 import { UserProfile } from 'common/typings'
 import React, { FC, useEffect, useState } from 'react'
 import api from '~/app/api'
+import packageJson from '../../../../package.json'
 
 interface Props {
   isOpen: boolean
@@ -55,6 +56,7 @@ const loaderTextStyle: React.CSSProperties = {
   color: 'black'
 }
 
+const CURRENT_VERSION = packageJson.version
 const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
 const UpdateUserProfile: FC<Props> = props => {
@@ -157,7 +159,8 @@ const UpdateUserProfile: FC<Props> = props => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'X-App-Version': CURRENT_VERSION
         },
         body: JSON.stringify({
           data,

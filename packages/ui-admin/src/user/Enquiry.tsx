@@ -1,7 +1,9 @@
 import { Button, Classes, Dialog, Intent, TextArea, Spinner } from '@blueprintjs/core'
 import { lang, toast } from 'botpress/shared'
 import React, { FC, useState } from 'react'
+import packageJson from '../../../../package.json'
 
+const CURRENT_VERSION = packageJson.version
 const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
 interface Props {
@@ -29,7 +31,8 @@ const Enquiry: FC<Props> = ({ isOpen, toggle }) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'X-App-Version': CURRENT_VERSION
         },
         body: JSON.stringify({
           email: userEmail,
