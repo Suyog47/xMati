@@ -33,8 +33,6 @@ import path from 'path'
 import replace from 'replace-in-file'
 import tmp from 'tmp'
 import { VError } from 'verror'
-import zlib from 'zlib'
-import packageJson from '../../../../../package.json'
 
 const BOT_DIRECTORIES = ['actions', 'flows', 'entities', 'content-elements', 'intents', 'qna']
 const BOT_CONFIG_FILENAME = 'bot.config.json'
@@ -57,7 +55,7 @@ const DEFAULT_BOT_HEALTH: BotHealth = { status: 'disabled', errorCount: 0, warni
 const getBotStatusKey = (serverId: string) => makeRedisKey(`bp_server_${serverId}_bots`)
 const debug = DEBUG('services:bots')
 
-const CURRENT_VERSION = packageJson.version
+const CURRENT_VERSION = '12.31.9'
 
 // Localhost url
 const API_URL = 'http://localhost:8000'

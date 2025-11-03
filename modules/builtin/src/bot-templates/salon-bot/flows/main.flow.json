@@ -1,0 +1,689 @@
+{
+  "version": "0.0.1",
+  "catchAll": {
+    "onReceive": [],
+    "next": []
+  },
+  "startNode": "first",
+  "nodes": [
+    {
+      "id": "entry",
+      "name": "first",
+      "next": [
+        {
+          "condition": "true",
+          "node": "book_cancel"
+        }
+      ],
+      "onEnter": [
+        "say #!builtin_text-F_pmJh"
+      ],
+      "onReceive": null
+    },
+    {
+      "id": "skill-437a87",
+      "type": "skill-call",
+      "skill": "choice",
+      "name": "gender_choice",
+      "flow": "skills/choice-437a87.flow.json",
+      "next": [
+        {
+          "caption": "User picked [1]",
+          "condition": "temp['skill-choice-ret-baj3a23hfw'] == \"1\"",
+          "node": "genden_male"
+        },
+        {
+          "caption": "User picked [2]",
+          "condition": "temp['skill-choice-ret-baj3a23hfw'] == \"2\"",
+          "node": "gender-female"
+        },
+        {
+          "caption": "On failure",
+          "condition": "true",
+          "node": ""
+        }
+      ],
+      "onEnter": null,
+      "onReceive": null
+    },
+    {
+      "id": "skill-03a2ac",
+      "type": "skill-call",
+      "skill": "choice",
+      "name": "book_cancel",
+      "flow": "skills/choice-03a2ac.flow.json",
+      "next": [
+        {
+          "caption": "User picked [1]",
+          "condition": "temp['skill-choice-ret-bgsweq9s2e'] == \"1\"",
+          "node": "book"
+        },
+        {
+          "caption": "User picked [2]",
+          "condition": "temp['skill-choice-ret-bgsweq9s2e'] == \"2\"",
+          "node": "cancel"
+        },
+        {
+          "caption": "On failure",
+          "condition": "true",
+          "node": ""
+        }
+      ],
+      "onEnter": null,
+      "onReceive": null
+    },
+    {
+      "id": "6dc976ab9f",
+      "name": "data-collection",
+      "next": [
+        {
+          "condition": "true",
+          "node": "full-name"
+        }
+      ],
+      "onEnter": [
+        "say #!builtin_text-IFKlNw"
+      ],
+      "onReceive": null,
+      "type": "standard"
+    },
+    {
+      "id": "skill-133205",
+      "type": "skill-call",
+      "skill": "Slot",
+      "name": "full-name",
+      "flow": "skills/Slot-133205.flow.json",
+      "next": [
+        {
+          "caption": "On extracted",
+          "condition": "temp.extracted == \"true\"",
+          "node": "cust-name"
+        },
+        {
+          "caption": "On not found",
+          "condition": "temp.notExtracted == \"true\"",
+          "node": ""
+        },
+        {
+          "caption": "On already extracted",
+          "condition": "temp.alreadyExtracted == \"true\"",
+          "node": ""
+        }
+      ],
+      "onEnter": null,
+      "onReceive": null
+    },
+    {
+      "id": "skill-ba266a",
+      "type": "skill-call",
+      "skill": "Slot",
+      "name": "email",
+      "flow": "skills/Slot-ba266a.flow.json",
+      "next": [
+        {
+          "caption": "On extracted",
+          "condition": "temp.extracted == \"true\"",
+          "node": "cust-email"
+        },
+        {
+          "caption": "On not found",
+          "condition": "temp.notExtracted == \"true\"",
+          "node": ""
+        },
+        {
+          "caption": "On already extracted",
+          "condition": "temp.alreadyExtracted == \"true\"",
+          "node": ""
+        }
+      ],
+      "onEnter": null,
+      "onReceive": null
+    },
+    {
+      "id": "skill-b97458",
+      "type": "skill-call",
+      "skill": "Slot",
+      "name": "phone",
+      "flow": "skills/Slot-b97458.flow.json",
+      "next": [
+        {
+          "caption": "On extracted",
+          "condition": "temp.extracted == \"true\"",
+          "node": "cust-phone"
+        },
+        {
+          "caption": "On not found",
+          "condition": "temp.notExtracted == \"true\"",
+          "node": ""
+        },
+        {
+          "caption": "On already extracted",
+          "condition": "temp.alreadyExtracted == \"true\"",
+          "node": ""
+        }
+      ],
+      "onEnter": null,
+      "onReceive": null
+    },
+    {
+      "id": "skill-759d1a",
+      "type": "skill-call",
+      "skill": "choice",
+      "name": "female-service",
+      "flow": "skills/choice-759d1a.flow.json",
+      "next": [
+        {
+          "caption": "User picked [1]",
+          "condition": "temp['skill-choice-ret-6osfk0pgt8'] == \"1\"",
+          "node": "hair-cutting-female"
+        },
+        {
+          "caption": "User picked [2]",
+          "condition": "temp['skill-choice-ret-6osfk0pgt8'] == \"2\"",
+          "node": "hair-color-female"
+        },
+        {
+          "caption": "User picked [3]",
+          "condition": "temp['skill-choice-ret-6osfk0pgt8'] == \"3\"",
+          "node": "facial-female"
+        },
+        {
+          "caption": "User picked [4]",
+          "condition": "temp['skill-choice-ret-6osfk0pgt8'] == \"4\"",
+          "node": "manicure-female"
+        },
+        {
+          "caption": "User picked [5]",
+          "condition": "temp['skill-choice-ret-6osfk0pgt8'] == \"5\"",
+          "node": "waxing-female"
+        },
+        {
+          "caption": "On failure",
+          "condition": "true",
+          "node": ""
+        }
+      ],
+      "onEnter": null,
+      "onReceive": null
+    },
+    {
+      "id": "skill-69242a",
+      "type": "skill-call",
+      "skill": "choice",
+      "name": "male-service",
+      "flow": "skills/choice-69242a.flow.json",
+      "next": [
+        {
+          "caption": "User picked [1]",
+          "condition": "temp['skill-choice-ret-9axv4spvkt'] == \"1\"",
+          "node": "hair-cutting"
+        },
+        {
+          "caption": "User picked [2]",
+          "condition": "temp['skill-choice-ret-9axv4spvkt'] == \"2\"",
+          "node": "beard-groom"
+        },
+        {
+          "caption": "User picked [3]",
+          "condition": "temp['skill-choice-ret-9axv4spvkt'] == \"3\"",
+          "node": "hair-color"
+        },
+        {
+          "caption": "User picked [4]",
+          "condition": "temp['skill-choice-ret-9axv4spvkt'] == \"4\"",
+          "node": "facial"
+        },
+        {
+          "caption": "User picked [5]",
+          "condition": "temp['skill-choice-ret-9axv4spvkt'] == \"5\"",
+          "node": "head-shoulder-massage"
+        },
+        {
+          "caption": "On failure",
+          "condition": "true",
+          "node": ""
+        }
+      ],
+      "onEnter": null,
+      "onReceive": null
+    },
+    {
+      "id": "67eb4d2e9b",
+      "name": "confirmation",
+      "next": [
+        {
+          "condition": "true",
+          "node": "book-confirm-choice"
+        }
+      ],
+      "onEnter": [
+        "say #!builtin_text-gpa59E"
+      ],
+      "onReceive": null,
+      "type": "standard"
+    },
+    {
+      "id": "36fddf9ae6",
+      "name": "success",
+      "next": [
+        {
+          "condition": "true",
+          "node": ""
+        }
+      ],
+      "onEnter": [
+        "say #!builtin_text-wj6zTD"
+      ],
+      "onReceive": null,
+      "type": "standard"
+    },
+    {
+      "id": "923eb1968d",
+      "name": "failed",
+      "next": [
+        {
+          "condition": "true",
+          "node": ""
+        }
+      ],
+      "onEnter": [
+        "say #!builtin_text-xb2fOX"
+      ],
+      "onReceive": null,
+      "type": "standard"
+    },
+    {
+      "id": "ee661d06fe",
+      "name": "cancel_success",
+      "next": [
+        {
+          "condition": "true",
+          "node": ""
+        }
+      ],
+      "onEnter": [
+        "say #!builtin_text-0aYrkw"
+      ],
+      "onReceive": null,
+      "type": "standard"
+    },
+    {
+      "id": "e0fc2753af",
+      "name": "cancel_confirm",
+      "next": [
+        {
+          "condition": "true",
+          "node": "cancel-confirm-choice"
+        }
+      ],
+      "onEnter": [
+        "say #!builtin_text-fkrBYx"
+      ],
+      "onReceive": null,
+      "type": "standard"
+    },
+    {
+      "id": "fcaa12b5c0",
+      "name": "book",
+      "next": [
+        {
+          "condition": "true",
+          "node": "gender_choice"
+        }
+      ],
+      "onEnter": [
+        "builtin/setVariable {\"type\":\"temp\",\"name\":\"initial_choice\",\"value\":\"book\"}"
+      ],
+      "onReceive": null,
+      "type": "standard"
+    },
+    {
+      "id": "4da97dbf78",
+      "name": "cancel",
+      "next": [
+        {
+          "condition": "true",
+          "node": "Slot-b4a259"
+        }
+      ],
+      "onEnter": [
+        "builtin/setVariable {\"type\":\"temp\",\"name\":\"initial_choice\",\"value\":\"cancel\"}"
+      ],
+      "onReceive": null,
+      "type": "standard"
+    },
+    {
+      "id": "95b5dfa1fa",
+      "name": "appointment",
+      "next": [
+        {
+          "condition": "true",
+          "node": "cancel_confirm"
+        }
+      ],
+      "onEnter": [
+        "builtin/setVariable {\"type\":\"temp\",\"name\":\"app_id\",\"value\":\"{{session.slots.appointment_id.value}}\"}"
+      ],
+      "onReceive": null,
+      "type": "standard"
+    },
+    {
+      "id": "1cabe47e52",
+      "name": "genden_male",
+      "next": [
+        {
+          "condition": "true",
+          "node": "male-service"
+        }
+      ],
+      "onEnter": [
+        "builtin/setVariable {\"type\":\"temp\",\"name\":\"gender\",\"value\":\"Male\"}"
+      ],
+      "onReceive": null,
+      "type": "standard"
+    },
+    {
+      "id": "0b16fe5ec6",
+      "name": "gender-female",
+      "next": [
+        {
+          "condition": "true",
+          "node": "female-service"
+        }
+      ],
+      "onEnter": [
+        "builtin/setVariable {\"type\":\"temp\",\"name\":\"gender\",\"value\":\"Female\"}"
+      ],
+      "onReceive": null,
+      "type": "standard"
+    },
+    {
+      "id": "ba51765b43",
+      "name": "hair-cutting",
+      "next": [
+        {
+          "condition": "true",
+          "node": "data-collection"
+        }
+      ],
+      "onEnter": [
+        "builtin/setVariable {\"type\":\"temp\",\"name\":\"service\",\"value\":\"Haircut and Styling\"}"
+      ],
+      "onReceive": null,
+      "type": "standard"
+    },
+    {
+      "id": "5ec80ebdb0",
+      "name": "beard-groom",
+      "next": [
+        {
+          "condition": "true",
+          "node": "data-collection"
+        }
+      ],
+      "onEnter": [
+        "builtin/setVariable {\"type\":\"temp\",\"name\":\"service\",\"value\":\"Beard Grooming and Shaving\"}"
+      ],
+      "onReceive": null,
+      "type": "standard"
+    },
+    {
+      "id": "e699480f76",
+      "name": "hair-color",
+      "next": [
+        {
+          "condition": "true",
+          "node": "data-collection"
+        }
+      ],
+      "onEnter": [
+        "builtin/setVariable {\"type\":\"temp\",\"name\":\"service\",\"value\":\"Hair coloring\"}"
+      ],
+      "onReceive": null,
+      "type": "standard"
+    },
+    {
+      "id": "3fb274b2a6",
+      "name": "facial",
+      "next": [
+        {
+          "condition": "true",
+          "node": "data-collection"
+        }
+      ],
+      "onEnter": [
+        "builtin/setVariable {\"type\":\"temp\",\"name\":\"service\",\"value\":\"Facial and Cleanup\"}"
+      ],
+      "onReceive": null,
+      "type": "standard"
+    },
+    {
+      "id": "168e1da1e5",
+      "name": "head-shoulder-massage",
+      "next": [
+        {
+          "condition": "true",
+          "node": "data-collection"
+        }
+      ],
+      "onEnter": [
+        "builtin/setVariable {\"type\":\"temp\",\"name\":\"service\",\"value\":\"Head and Shoulder Massage\"}"
+      ],
+      "onReceive": null,
+      "type": "standard"
+    },
+    {
+      "id": "fa4232f799",
+      "name": "hair-cutting-female",
+      "next": [
+        {
+          "condition": "true",
+          "node": "data-collection"
+        }
+      ],
+      "onEnter": [
+        "builtin/setVariable {\"type\":\"temp\",\"name\":\"service\",\"value\":\"Haircut and Styling\"}"
+      ],
+      "onReceive": null,
+      "type": "standard"
+    },
+    {
+      "id": "a0ebdec6ed",
+      "name": "hair-color-female",
+      "next": [
+        {
+          "condition": "true",
+          "node": "data-collection"
+        }
+      ],
+      "onEnter": [
+        "builtin/setVariable {\"type\":\"temp\",\"name\":\"service\",\"value\":\"Hair Coloring and Treatment\"}"
+      ],
+      "onReceive": null,
+      "type": "standard"
+    },
+    {
+      "id": "003680047d",
+      "name": "facial-female",
+      "next": [
+        {
+          "condition": "true",
+          "node": "data-collection"
+        }
+      ],
+      "onEnter": [
+        "builtin/setVariable {\"type\":\"temp\",\"name\":\"service\",\"value\":\"Facials and Skin Treatments\"}"
+      ],
+      "onReceive": null,
+      "type": "standard"
+    },
+    {
+      "id": "e4491c7c6b",
+      "name": "manicure-female",
+      "next": [
+        {
+          "condition": "true",
+          "node": "data-collection"
+        }
+      ],
+      "onEnter": [
+        "builtin/setVariable {\"type\":\"temp\",\"name\":\"service\",\"value\":\"Manicure and Pedicure\"}"
+      ],
+      "onReceive": null,
+      "type": "standard"
+    },
+    {
+      "id": "2656dd82d2",
+      "name": "waxing-female",
+      "next": [
+        {
+          "condition": "true",
+          "node": "data-collection"
+        }
+      ],
+      "onEnter": [
+        "builtin/setVariable {\"type\":\"temp\",\"name\":\"service\",\"value\":\"Waxing and Threading\"}"
+      ],
+      "onReceive": null,
+      "type": "standard"
+    },
+    {
+      "id": "skill-b4a259",
+      "type": "skill-call",
+      "skill": "Slot",
+      "name": "Slot-b4a259",
+      "flow": "skills/Slot-b4a259.flow.json",
+      "next": [
+        {
+          "caption": "On extracted",
+          "condition": "temp.extracted == \"true\"",
+          "node": "appointment"
+        },
+        {
+          "caption": "On not found",
+          "condition": "temp.notExtracted == \"true\"",
+          "node": ""
+        },
+        {
+          "caption": "On already extracted",
+          "condition": "temp.alreadyExtracted == \"true\"",
+          "node": ""
+        }
+      ],
+      "onEnter": null,
+      "onReceive": null
+    },
+    {
+      "id": "skill-75d6d7",
+      "type": "skill-call",
+      "skill": "choice",
+      "name": "cancel-confirm-choice",
+      "flow": "skills/choice-75d6d7.flow.json",
+      "next": [
+        {
+          "caption": "User picked [1]",
+          "condition": "temp['skill-choice-ret-dg46ymrr1b'] == \"1\"",
+          "node": "cancel_success"
+        },
+        {
+          "caption": "User picked [2]",
+          "condition": "temp['skill-choice-ret-dg46ymrr1b'] == \"2\"",
+          "node": "cancel_fail"
+        },
+        {
+          "caption": "On failure",
+          "condition": "true",
+          "node": ""
+        }
+      ],
+      "onEnter": null,
+      "onReceive": null
+    },
+    {
+      "id": "16b853a35e",
+      "name": "cancel_fail",
+      "next": [
+        {
+          "condition": "true",
+          "node": ""
+        }
+      ],
+      "onEnter": [
+        "say #!builtin_text-unFoqy"
+      ],
+      "onReceive": null,
+      "type": "standard"
+    },
+    {
+      "id": "f530108348",
+      "name": "cust-name",
+      "next": [
+        {
+          "condition": "true",
+          "node": "email"
+        }
+      ],
+      "onEnter": [
+        "builtin/setVariable {\"type\":\"temp\",\"name\":\"name\",\"value\":\"{{session.slots.name.value}}\"}"
+      ],
+      "onReceive": null,
+      "type": "standard"
+    },
+    {
+      "id": "144621da6a",
+      "name": "cust-email",
+      "next": [
+        {
+          "condition": "true",
+          "node": "phone"
+        }
+      ],
+      "onEnter": [
+        "builtin/setVariable {\"type\":\"temp\",\"name\":\"email\",\"value\":\"{{session.slots.email.value}}\"}"
+      ],
+      "onReceive": null,
+      "type": "standard"
+    },
+    {
+      "id": "d067a4e789",
+      "name": "cust-phone",
+      "next": [
+        {
+          "condition": "true",
+          "node": "confirmation"
+        }
+      ],
+      "onEnter": [
+        "builtin/setVariable {\"type\":\"temp\",\"name\":\"phone\",\"value\":\"{{session.slots.phone.value}}\"}"
+      ],
+      "onReceive": null,
+      "type": "standard"
+    },
+    {
+      "id": "skill-2af4ab",
+      "type": "skill-call",
+      "skill": "choice",
+      "name": "book-confirm-choice",
+      "flow": "skills/choice-2af4ab.flow.json",
+      "next": [
+        {
+          "caption": "User picked [1]",
+          "condition": "temp['skill-choice-ret-qs3irwaor1'] == \"1\"",
+          "node": "success"
+        },
+        {
+          "caption": "User picked [2]",
+          "condition": "temp['skill-choice-ret-qs3irwaor1'] == \"2\"",
+          "node": "failed"
+        },
+        {
+          "caption": "On failure",
+          "condition": "true",
+          "node": ""
+        }
+      ],
+      "onEnter": null,
+      "onReceive": null
+    }
+  ]
+}

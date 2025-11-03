@@ -1,0 +1,112 @@
+{
+  "version": "0.0.1",
+  "catchAll": {
+    "next": []
+  },
+  "startNode": "entry",
+  "skillData": {
+    "randomId": "f3vvsahkld",
+    "contentId": "builtin_single-choice-3RVhQN",
+    "invalidContentId": "",
+    "keywords": {
+      "1": [
+        "1",
+        "Haircut and Styling"
+      ],
+      "2": [
+        "2",
+        "Beard Grooming and Shaving"
+      ],
+      "3": [
+        "3",
+        "Hair coloring"
+      ],
+      "4": [
+        "4",
+        "Facial and Cleanup"
+      ],
+      "5": [
+        "5",
+        "Head and Shoulder massage"
+      ]
+    },
+    "config": {
+      "nbMaxRetries": 3,
+      "repeatChoicesOnInvalid": false,
+      "variableName": ""
+    }
+  },
+  "nodes": [
+    {
+      "name": "entry",
+      "onEnter": [
+        "builtin/setVariable {\"type\":\"temp\",\"name\":\"skill-choice-invalid-count-f3vvsahkld\",\"value\": 0}",
+        "builtin/setVariable {\"type\":\"temp\",\"name\":\"skill-choice-valid-f3vvsahkld\",\"value\": null}",
+        "builtin/setVariable {\"type\":\"temp\",\"name\":\"skill-choice-ret-f3vvsahkld\",\"value\": null}",
+        "say #!builtin_single-choice-3RVhQN {\"skill\":\"choice\"}"
+      ],
+      "next": [
+        {
+          "condition": "true",
+          "node": "parse"
+        }
+      ],
+      "id": "503008"
+    },
+    {
+      "name": "parse",
+      "onReceive": [
+        "basic-skills/choice_parse_answer {\"randomId\":\"f3vvsahkld\",\"contentId\":\"builtin_single-choice-3RVhQN\",\"invalidContentId\":\"\",\"keywords\":{\"1\":[\"1\",\"Haircut and Styling\"],\"2\":[\"2\",\"Beard Grooming and Shaving\"],\"3\":[\"3\",\"Hair coloring\"],\"4\":[\"4\",\"Facial and Cleanup\"],\"5\":[\"5\",\"Head and Shoulder massage\"]},\"config\":{\"nbMaxRetries\":3,\"repeatChoicesOnInvalid\":false,\"variableName\":\"\"}}"
+      ],
+      "next": [
+        {
+          "condition": "temp['skill-choice-valid-f3vvsahkld'] === true",
+          "node": "#"
+        },
+        {
+          "condition": "true",
+          "node": "invalid"
+        }
+      ],
+      "triggers": [
+        {
+          "conditions": [
+            {
+              "id": "always"
+            }
+          ]
+        }
+      ],
+      "onEnter": [],
+      "id": "151766"
+    },
+    {
+      "name": "invalid",
+      "onEnter": [
+        "basic-skills/choice_invalid_answer {\"randomId\":\"f3vvsahkld\"}"
+      ],
+      "next": [
+        {
+          "condition": "Number(temp['skill-choice-invalid-count-f3vvsahkld']) > Number(3)",
+          "node": "#"
+        },
+        {
+          "condition": "true",
+          "node": "sorry"
+        }
+      ],
+      "id": "082956"
+    },
+    {
+      "name": "sorry",
+      "onEnter": [],
+      "next": [
+        {
+          "condition": "true",
+          "node": "parse"
+        }
+      ],
+      "id": "257454"
+    }
+  ]
+}

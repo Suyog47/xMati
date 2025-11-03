@@ -1,0 +1,170 @@
+[
+  {
+    "id": "builtin_single-choice-3RVhQN",
+    "formData": {
+      "dropdownPlaceholder$en": "Select...",
+      "choices$en": [
+        {
+          "title": "Haircut and Styling",
+          "value": "1"
+        },
+        {
+          "title": "Beard Grooming and Shaving",
+          "value": "2"
+        },
+        {
+          "title": "Hair coloring",
+          "value": "3"
+        },
+        {
+          "title": "Facial and Cleanup",
+          "value": "4"
+        },
+        {
+          "title": "Head and Shoulder massage",
+          "value": "5"
+        }
+      ],
+      "markdown$en": false,
+      "disableFreeText$en": true,
+      "displayInMessage$en": true,
+      "typing$en": true,
+      "text$en": "Please select any one of the service"
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-09-25T10:05:43.838Z",
+    "modifiedOn": "2025-09-25T13:36:42.295Z"
+  },
+  {
+    "id": "builtin_single-choice-_ql63R",
+    "formData": {
+      "dropdownPlaceholder$en": "Select...",
+      "choices$en": [
+        {
+          "title": "Haircut and Styling",
+          "value": "1"
+        },
+        {
+          "title": "Hair Coloring and Treatment",
+          "value": "2"
+        },
+        {
+          "title": "Facials and Skin Treatments",
+          "value": "3"
+        },
+        {
+          "title": "Manicure and Pedicure",
+          "value": "4"
+        },
+        {
+          "title": "Waxing and Threading",
+          "value": "5"
+        }
+      ],
+      "markdown$en": false,
+      "disableFreeText$en": true,
+      "displayInMessage$en": true,
+      "typing$en": true,
+      "text$en": "Please select any one of the service"
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-09-25T10:08:59.163Z",
+    "modifiedOn": "2025-09-25T13:36:51.827Z"
+  },
+  {
+    "id": "builtin_single-choice-ZSzl2m",
+    "formData": {
+      "dropdownPlaceholder$en": "Select...",
+      "choices$en": [
+        {
+          "title": "Male",
+          "value": "1"
+        },
+        {
+          "title": "Female",
+          "value": "2"
+        }
+      ],
+      "markdown$en": false,
+      "disableFreeText$en": true,
+      "displayInMessage$en": true,
+      "typing$en": true,
+      "text$en": "Are you a "
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-09-25T10:09:36.649Z",
+    "modifiedOn": "2025-09-25T13:32:49.623Z"
+  },
+  {
+    "id": "builtin_single-choice-RnpNrF",
+    "formData": {
+      "dropdownPlaceholder$en": "Select...",
+      "choices$en": [
+        {
+          "title": "Book an appointment",
+          "value": "1"
+        },
+        {
+          "title": "Cancel an appointment",
+          "value": "2"
+        }
+      ],
+      "markdown$en": false,
+      "disableFreeText$en": true,
+      "displayInMessage$en": false,
+      "typing$en": true,
+      "text$en": "Select your action"
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-10-24T06:52:45.147Z",
+    "modifiedOn": "2025-10-24T06:52:45.147Z"
+  },
+  {
+    "id": "builtin_single-choice-KDOU7w",
+    "formData": {
+      "dropdownPlaceholder$en": "Select...",
+      "choices$en": [
+        {
+          "title": "Yes",
+          "value": "1"
+        },
+        {
+          "title": "No",
+          "value": "2"
+        }
+      ],
+      "markdown$en": false,
+      "disableFreeText$en": true,
+      "displayInMessage$en": true,
+      "typing$en": true,
+      "text$en": "Are you sure you want to cancel"
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-10-29T10:42:56.115Z",
+    "modifiedOn": "2025-10-29T10:45:31.924Z"
+  },
+  {
+    "id": "builtin_single-choice-65DfOy",
+    "formData": {
+      "dropdownPlaceholder$en": "Select...",
+      "choices$en": [
+        {
+          "title": "Yes",
+          "value": "1"
+        },
+        {
+          "title": "No",
+          "value": "2"
+        }
+      ],
+      "markdown$en": false,
+      "disableFreeText$en": true,
+      "displayInMessage$en": true,
+      "typing$en": true,
+      "text$en": "You want to proceed with booking?"
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-10-29T11:01:25.966Z",
+    "modifiedOn": "2025-10-29T11:01:25.966Z"
+  }
+]

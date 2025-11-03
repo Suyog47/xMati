@@ -1,0 +1,21 @@
+{
+  "name": "cancel-details",
+  "utterances": {
+    "en": [
+      "I want to cancel my appointment"
+    ]
+  },
+  "slots": [
+    {
+      "id": "_NZEfVX_9m2ew0ZO9mtry",
+      "name": "appointment_id",
+      "entities": [
+        "any"
+      ],
+      "color": 1
+    }
+  ],
+  "contexts": [
+    "global"
+  ]
+}

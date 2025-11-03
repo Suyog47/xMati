@@ -79,6 +79,7 @@ class CreateBotModal extends Component<Props, State> {
   state: State = {
     templates: [
       { id: 'insurance-bot', name: 'Insurance Bot' },
+      { id: 'salon-bot', name: 'Salon Bot' },
       { id: 'empty-bot', name: 'Empty Bot' },
     ],
     ...defaultState,

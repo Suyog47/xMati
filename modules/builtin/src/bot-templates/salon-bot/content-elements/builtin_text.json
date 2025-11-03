@@ -1,0 +1,222 @@
+[
+  {
+    "id": "builtin_text-eYZGR4",
+    "formData": {
+      "text$en": "Welcome to Expert Salon Services",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-09-25T07:54:21.253Z",
+    "modifiedOn": "2025-09-25T07:54:21.253Z"
+  },
+  {
+    "id": "builtin_text-T9rdam",
+    "formData": {
+      "text$en": "please select correct option",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-09-25T10:10:27.181Z",
+    "modifiedOn": "2025-09-25T10:10:27.181Z"
+  },
+  {
+    "id": "builtin_text-jTljdX",
+    "formData": {
+      "text$en": "Please enter you full name",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-09-25T10:14:05.707Z",
+    "modifiedOn": "2025-09-25T10:14:05.707Z"
+  },
+  {
+    "id": "builtin_text-FRHLeX",
+    "formData": {
+      "text$en": "Please enter your valid full name",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-09-25T10:14:25.865Z",
+    "modifiedOn": "2025-09-25T10:14:25.865Z"
+  },
+  {
+    "id": "builtin_text-5ANIHP",
+    "formData": {
+      "text$en": "Please enter you email id",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-09-25T10:15:02.542Z",
+    "modifiedOn": "2025-09-25T10:15:02.542Z"
+  },
+  {
+    "id": "builtin_text-Doy4JN",
+    "formData": {
+      "text$en": "Please enter your correct email id",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-09-25T10:15:18.119Z",
+    "modifiedOn": "2025-09-25T10:15:18.119Z"
+  },
+  {
+    "id": "builtin_text-H9oobk",
+    "formData": {
+      "text$en": "Please enter your phone number",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-09-25T10:15:49.226Z",
+    "modifiedOn": "2025-09-25T10:15:49.226Z"
+  },
+  {
+    "id": "builtin_text-THLu1a",
+    "formData": {
+      "text$en": "Please enter your valid phone number",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-09-25T10:16:10.518Z",
+    "modifiedOn": "2025-09-25T10:16:10.518Z"
+  },
+  {
+    "id": "builtin_text-wj6zTD",
+    "formData": {
+      "text$en": "Your appointment for {{temp.service}} has been successfully booked for 4th december.",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-09-25T10:22:24.292Z",
+    "modifiedOn": "2025-10-30T05:53:02.165Z"
+  },
+  {
+    "id": "builtin_text-xb2fOX",
+    "formData": {
+      "text$en": "Unfortunately, your appointment was not booked due to some reason. You can try again after sometime.",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-09-25T10:23:29.742Z",
+    "modifiedOn": "2025-09-25T10:23:29.742Z"
+  },
+  {
+    "id": "builtin_text-gpa59E",
+    "formData": {
+      "text$en": "Please confirm your details once before confirming - \nGender - {{temp.gender}}\nService - {{temp.service}}\nName - {{temp.name}}\nEmail - {{temp.email}}\nPhone - {{temp.phone}}",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-09-25T11:49:14.965Z",
+    "modifiedOn": "2025-10-29T11:39:41.064Z"
+  },
+  {
+    "id": "builtin_text-F_pmJh",
+    "formData": {
+      "text$en": "Welcome to Smart Sallon...How can I help you?",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-10-06T13:33:35.383Z",
+    "modifiedOn": "2025-10-22T10:18:44.316Z"
+  },
+  {
+    "id": "builtin_text-IFKlNw",
+    "formData": {
+      "text$en": "let me collect your basic details.",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-10-22T10:21:34.515Z",
+    "modifiedOn": "2025-10-22T11:13:08.961Z"
+  },
+  {
+    "id": "builtin_text-id5S5P",
+    "formData": {
+      "text$en": "Please enter your fullname",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-10-22T10:47:36.757Z",
+    "modifiedOn": "2025-10-22T10:47:36.757Z"
+  },
+  {
+    "id": "builtin_text-c438oX",
+    "formData": {
+      "text$en": "Please provide your appointment Id",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-10-22T12:03:57.467Z",
+    "modifiedOn": "2025-10-22T12:03:57.467Z"
+  },
+  {
+    "id": "builtin_text-0aYrkw",
+    "formData": {
+      "text$en": "Your appointment of 4th July has been successfully cancelled ",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-10-22T12:50:33.555Z",
+    "modifiedOn": "2025-10-22T12:50:40.463Z"
+  },
+  {
+    "id": "builtin_text-fkrBYx",
+    "formData": {
+      "text$en": "please confirm your appointment id - {{temp.app_id}}",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-10-22T13:00:49.199Z",
+    "modifiedOn": "2025-10-29T06:51:55.505Z"
+  },
+  {
+    "id": "builtin_text-cVaf23",
+    "formData": {
+      "text$en": "{{temp.initial_choice}}",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-10-24T06:47:59.488Z",
+    "modifiedOn": "2025-10-24T06:47:59.488Z"
+  },
+  {
+    "id": "builtin_text-Ps0-qN",
+    "formData": {
+      "text$en": "please provide your valid appointment Id",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-10-29T06:48:34.892Z",
+    "modifiedOn": "2025-10-29T06:48:34.892Z"
+  },
+  {
+    "id": "builtin_text-unFoqy",
+    "formData": {
+      "text$en": "Appointment cancellation process stopped",
+      "markdown$en": false,
+      "typing$en": true
+    },
+    "createdBy": "admin",
+    "createdOn": "2025-10-29T10:44:37.194Z",
+    "modifiedOn": "2025-10-29T10:44:37.194Z"
+  }
+]

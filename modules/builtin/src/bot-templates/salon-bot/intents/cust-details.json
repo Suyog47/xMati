@@ -1,0 +1,37 @@
+{
+  "name": "cust-details",
+  "utterances": {
+    "en": [
+      "P﻿lease enter you name, phone and email"
+    ]
+  },
+  "slots": [
+    {
+      "id": "1YM1O2C3RIa2F48lGg1GM",
+      "name": "name",
+      "entities": [
+        "any"
+      ],
+      "color": 1
+    },
+    {
+      "id": "BdL_ux9xMT9kWAGRAGzZM",
+      "name": "phone",
+      "entities": [
+        "any"
+      ],
+      "color": 2
+    },
+    {
+      "id": "xOi-kwQ30NHVUNymmLyr8",
+      "name": "email",
+      "entities": [
+        "email"
+      ],
+      "color": 3
+    }
+  ],
+  "contexts": [
+    "global"
+  ]
+}
