@@ -72,9 +72,41 @@ const UserDropdownMenu: FC<Props> = props => {
 
   const toggleProfile = () => setProfileOpen(!isProfileOpen)
   const toggleCard = () => setCardOpen(!isCardOpen)
-  const toggleSubscription = () => setSubscriptionOpen(!isSubscriptionOpen)
-  const toggleGemini = () => setGemini(!isGemini)
-  const toggleAdminControl = () => setAdminControl(!isAdminControl)
+  const toggleSubscription = () => {
+    const subData = localStorage.getItem('subData') || '{}'
+    const formData = localStorage.getItem('formData') || '{}'
+    const token = localStorage.getItem('token') || ''
+
+    const dataObject = {
+      formData,
+      subData,
+      token
+    }
+
+    const params = new URLSearchParams({
+      data: JSON.stringify(dataObject)
+    })
+
+    window.open(`http://localhost:7001/subscription?${params.toString()}`, '_blank')
+  }
+  // const toggleGemini = () => setGemini(!isGemini)
+  const toggleAdminControl = () => {
+    const subData = localStorage.getItem('subData') || '{}'
+    const formData = localStorage.getItem('formData') || '{}'
+    const token = localStorage.getItem('token') || ''
+
+    const dataObject = {
+      formData,
+      subData,
+      token
+    }
+
+    const params = new URLSearchParams({
+      data: JSON.stringify(dataObject)
+    })
+
+    window.open(`http://localhost:7001/admin?${params.toString()}`, '_blank')
+  }
   const togglePassword = () => setPasswordOpen(!isPasswordOpen)
   const toggleLanguage = () => setLanguageOpen(!isLanguageOpen)
   const toggleLicense = () => setLicenseOpen(!isLicenseOpen)

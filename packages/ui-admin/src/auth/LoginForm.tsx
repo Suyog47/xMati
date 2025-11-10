@@ -110,8 +110,10 @@ export const LoginForm: FC<Props> = props => {
       </div>
 
       <div className='button-container' style={{ width: '80%' }}>
-        <Link
-          to="/botCreation"
+        <a
+          href="http://localhost:7001/"
+          target="_blank"
+          rel="noopener noreferrer"
           onClick={e => loading && e.preventDefault()}
           style={{
             pointerEvents: loading ? 'none' : 'auto',
@@ -136,7 +138,7 @@ export const LoginForm: FC<Props> = props => {
           >
             Create Account
           </button>
-        </Link>
+        </a>
       </div>
     </form>
   )
