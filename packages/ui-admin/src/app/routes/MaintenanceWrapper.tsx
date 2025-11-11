@@ -111,7 +111,61 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
     scheduleVersionCheck()
   }, [])
 
-  // Check for stale version incompatibility state (optional: auto-clear after some time)
+  // WebSocket connection for real-time communication - only on /admin/workspace route
+  useEffect(() => {
+    // Only connect WebSocket if user is on any workspace route
+    const workspaceRouteRegex = /^\/(?:workspace|studio)/
+    if (!workspaceRouteRegex.test(location.pathname)) {
+      return
+    }
+
+    let socket: WebSocket | null = null
+    let reconnectTimeout: NodeJS.Timeout | null = null
+
+    const connectWebSocket = () => {
+      socket = new WebSocket('ws://localhost:8000')
+
+      socket.onopen = () => {
+        // Get user email from localStorage, fallback to default if not available
+        const formData = JSON.parse(localStorage.getItem('formData') || '{}')
+        const userId = formData.email || 'child-ui-admin-anonymous'
+        console.log('WebSocket connected, registering userId:', userId)
+        socket?.send(JSON.stringify({ type: 'REGISTER_CHILD', userId }))
+      }
+
+      socket.onmessage = (event) => {
+        const data = JSON.parse(event.data)
+        if (data.type === 'FORCE_LOGOUT') {
+          handleLogout()
+        }
+      }
+
+      socket.onclose = () => {
+        // Attempt to reconnect after 1 second, but only if still on workspace route
+        reconnectTimeout = setTimeout(() => {
+          const workspaceRouteRegex = /^\/(?:workspace|studio)/
+          if (workspaceRouteRegex.test(location.pathname)) {
+            connectWebSocket()
+          }
+        }, 1000)
+      }
+
+      socket.onerror = (error) => {
+        console.error('WebSocket error:', error)
+      }
+    }
+
+    connectWebSocket()
+
+    return () => {
+      if (reconnectTimeout) {
+        clearTimeout(reconnectTimeout)
+      }
+      socket?.close()
+    }
+  }, [location.pathname]) // Depend on pathname to reconnect when navigating to/from workspace
+
+  // Check for stale version incompatibility state
   useEffect(() => {
     if (isVersionIncompatible) {
       const savedVersionState = localStorage.getItem('versionIncompatible')
@@ -128,6 +182,7 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
       }
     }
   }, [isVersionIncompatible])
+
 
   useEffect(() => {
     const checkMaintenanceStatus = async () => {
