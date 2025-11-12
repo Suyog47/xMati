@@ -296,7 +296,7 @@ class BotsRouter extends CustomAdminRouter {
 
         try {
           await this.botService.deleteBot(botId)
-          this.botService.deleteFromS3(`${owner}_${botId}`, fullName)
+          // void this.botService.deleteFromS3(`${owner}_${botId}`, fullName)
           await this.workspaceService.deleteBotRef(botId)
           return sendSuccess(res, 'Removed bot from team', { botId })
         } catch (err) {

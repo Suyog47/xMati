@@ -458,7 +458,7 @@ export class BotService {
         }
 
         BotService.fullName = fullName
-        await this._convertBot(`${(email === '-') ? originalConfig.owner : email}_${newBotId}`, newBotId)
+        // await this._convertBot(`${(email === '-') ? originalConfig.owner : email}_${newBotId}`, newBotId)
         this.logger.forBot(botId).info(`Import of bot ${newBotId} successful`)       // newBotId
       } else {
         this.logger.forBot(newBotId).info(`Import of bot ${newBotId} was denied by hook validation`)    // newBotId
@@ -813,14 +813,6 @@ export class BotService {
   private async _saveFiles(id, files) {
     const scopedGhost = this.ghostService.forBot(id)
     await scopedGhost.upsertFiles('/', files, { ignoreLock: true })
-
-    // const baseDirectory = path.resolve(`./data/bots`)
-    // Write files
-    // await Promise.all(files.map(file =>
-    //   fse.writeFile(
-    //     path.join(baseDirectory, botName, file.name),
-    //     file.content
-    //   )))
   }
 
   // Helper: Save files to disk
@@ -828,12 +820,12 @@ export class BotService {
     const scopedGhost = this.ghostService.forBot(id)
     await scopedGhost.upsertFiles('/', files, { ignoreLock: true })
     await scopedGhost.upsertFile('/', BOT_CONFIG_FILENAME, stringify(mergedConfigs))
-    void this._convertBot(`${owner}_${id}`, id)
+    //void this._convertBot(`${owner}_${id}`, id)
   }
 
   private async _convertBot(key, id, from = 'user') {
     const botFile = await this._serializeFolder(`./data/bots/${id}`)
-    await this._saveData(key, botFile, from)
+    //await this._saveData(key, botFile, from)
   }
 
   private async _createBotFromLLM(botConfig: BotConfig, botDesc: string) {
@@ -912,7 +904,7 @@ export class BotService {
         await scopedGhost.ensureDirs('/', BOT_DIRECTORIES)
         await scopedGhost.upsertFile('/', BOT_CONFIG_FILENAME, stringify(mergedConfigs))
         await scopedGhost.upsertFiles('/', files, { ignoreLock: true })
-        await this._convertBot(`${email}_${botConfig.id}`, botConfig.id)
+        //await this._convertBot(`${email}_${botConfig.id}`, botConfig.id)
 
         return mergedConfigs
       } else {
@@ -961,7 +953,7 @@ export class BotService {
   //   });
   // };
 
-  // // Decompress the response body
+  // Decompress the response body
   // private async _decompressResponse(buffer) {
   //   try {
   //     const decompressed = zlib.gunzipSync(buffer);
