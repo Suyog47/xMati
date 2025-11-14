@@ -1,3 +1,4 @@
+import { is } from 'bluebird'
 import { auth } from 'botpress/shared'
 import React, { useEffect, useState, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
@@ -6,12 +7,16 @@ import api from '~/app/api'
 import packageJson from '../../../../../package.json'
 import logo from './xmati.png'
 
-const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
+// const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 const CURRENT_VERSION = packageJson.version
 
 const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true)
-  const [isMaintenance, setIsMaintenance] = useState(true)
+  const [isMaintenance, setIsMaintenance] = useState(() => {
+    // Check localStorage on initial load for maintenance status
+    const savedMaintenanceState = localStorage.getItem('maintenance')
+    return savedMaintenanceState ? JSON.parse(savedMaintenanceState).status : false
+  })
 
   const [isBlocked, setIsBlocked] = useState(() => {
     // Check localStorage on initial load for blocked status
@@ -35,10 +40,14 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
     }
     return { server: '', client: CURRENT_VERSION }
   })
+
   const location = useLocation()
-  const versionCheckTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-  const lastVersionCheckRef = useRef<number>(0)
-  //const isLoggedOutRef = useRef(false)
+  // const excludedRouteRegex = /admin123/
+  // const isExcludedRoute = excludedRouteRegex.test(location.pathname)
+
+  //const formData = JSON.parse(localStorage.getItem('formData') || '{}')
+  const subData = JSON.parse(localStorage.getItem('subData') || '{}')
+  // const isAdminUser = formData.email === 'xmatiservice@gmail.com'
 
   // Function to compare semantic versions
   const compareVersions = (version1: string, version2: string): number => {
@@ -56,169 +65,82 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
     return 0
   }
 
-  // Function to check version from server
-  const checkServerVersion = async () => {
-    try {
-      // Prevent multiple simultaneous calls (debounce with 5 seconds)
-      const currentTime = Date.now()
-      if (currentTime - lastVersionCheckRef.current < 5000) {
-        return
-      }
-      lastVersionCheckRef.current = currentTime
-
-      const response = await fetch(`${API_URL}/get-versions`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      })
-
-      const data = await response.json()
-
-      if (data.success && data.data && data.data['child-node']) {
-        const serverVersion = data.data['child-node'] // Version from server response
-        const currentProjectVersion = CURRENT_VERSION // Version from package.json
-
-        // If version comparison returns < 0, show incompatibility screen
-        if (compareVersions(serverVersion, currentProjectVersion) < 0) {
-          const versionData = { server: serverVersion, client: currentProjectVersion }
-          // setVersionInfo(versionData)
-          // setIsVersionIncompatible(true)
-
-          // Save to localStorage to persist across page reloads
-          localStorage.setItem('versionIncompatible', JSON.stringify({
-            isIncompatible: true,
-            versionInfo: versionData,
-            timestamp: Date.now()
-          }))
-        } else {
-          // If versions are compatible, clear any previous incompatibility state
-          localStorage.removeItem('versionIncompatible')
-          setIsVersionIncompatible(false)
-        }
-      }
-    } catch (error) {
-      console.error('Error checking server version:', error)
-    }
-  }
-
-  // Recursive function to schedule next version check
-  const scheduleVersionCheck = () => {
-    if (versionCheckTimeoutRef.current) {
-      clearTimeout(versionCheckTimeoutRef.current)
-    }
-
-    versionCheckTimeoutRef.current = setTimeout(() => {
-      void checkServerVersion()
-      scheduleVersionCheck() // Recursive call
-    }, 10000) // Check every 10 seconds (faster detection)
-  }
-
-  // Start the recursive version checking
+  const workspaceRouteRegex = /^\/(?:workspace|studio)/
+  // WebSocket connection for real-time communication - keep alive regardless of which screen is shown
   useEffect(() => {
-    scheduleVersionCheck()
-  }, [])
-
-  // WebSocket connection for real-time communication - only on /admin/workspace route
-  useEffect(() => {
-    // Only connect WebSocket if user is on any workspace route
-    const workspaceRouteRegex = /^\/(?:workspace|studio)/
+    const formData = JSON.parse(localStorage.getItem('formData') || '{}')
     if (!workspaceRouteRegex.test(location.pathname)) {
-      return
+      return // Only connect if logged in
     }
 
     let socket: WebSocket | null = null
     let reconnectTimeout: NodeJS.Timeout | null = null
+    let isMounted = true
 
     const connectWebSocket = () => {
+      if (!isMounted) {
+        return
+      }
+
       socket = new WebSocket('ws://localhost:8000')
 
       socket.onopen = () => {
-        // Get user email from localStorage, fallback to default if not available
-        const formData = JSON.parse(localStorage.getItem('formData') || '{}')
         const userId = formData.email || 'child-ui-admin-anonymous'
-        console.log('WebSocket connected, registering userId:', userId)
-        socket?.send(JSON.stringify({ type: 'REGISTER_CHILD', userId }))
+        socket?.send(JSON.stringify({
+          type: 'REGISTER_CHILD',
+          userId,
+          clientVersion: CURRENT_VERSION,
+        }))
       }
 
       socket.onmessage = (event) => {
-        const data = JSON.parse(event.data)
-        if (data.type === 'FORCE_LOGOUT') {
-          handleLogout()
+        if (!isMounted) {
+          return
         }
-        if (data.type === 'BLOCK_STATUS') {
-          handleBlockStatus(data.message)
+        const data = JSON.parse(event.data)
+
+        switch (data.type) {
+          case 'FORCE_LOGOUT':
+            handleLogout()
+            break
+          case 'BLOCK_STATUS':
+            handleBlockStatus(data.message)
+            break
+          case 'VERSION_UPDATE':
+            handleVersionUpdate(data.message)
+            break
+          case 'MAINTENANCE_STATUS':
+            handleMaintenanceUpdate(data.message)
+            break
+          default:
+            break
         }
       }
 
       socket.onclose = () => {
-        // Attempt to reconnect after 1 second, but only if still on workspace route
-        reconnectTimeout = setTimeout(() => {
-          const workspaceRouteRegex = /^\/(?:workspace|studio)/
-          if (workspaceRouteRegex.test(location.pathname)) {
-            connectWebSocket()
-          }
-        }, 1000)
-      }
-
-      socket.onerror = (error) => {
-        console.error('WebSocket error:', error)
+        if (!isMounted) {
+          return
+        }
+        reconnectTimeout = setTimeout(connectWebSocket, 1000)
       }
     }
 
     connectWebSocket()
 
     return () => {
+      isMounted = false
       if (reconnectTimeout) {
         clearTimeout(reconnectTimeout)
       }
       socket?.close()
     }
-  }, [location.pathname]) // Depend on pathname to reconnect when navigating to/from workspace
+  }, [location.pathname])
 
-  // Check for stale version incompatibility state
+  // Set loading to false on component mount
   useEffect(() => {
-    if (isVersionIncompatible) {
-      const savedVersionState = localStorage.getItem('versionIncompatible')
-      if (savedVersionState) {
-        const parsed = JSON.parse(savedVersionState)
-        const timestamp = parsed.timestamp || 0
-        const now = Date.now()
-
-        // Optional: Auto-clear incompatibility state after 30 minutes
-        if (now - timestamp > 30 * 60 * 1000) {
-          localStorage.removeItem('versionIncompatible')
-          setIsVersionIncompatible(false)
-        }
-      }
-    }
-  }, [isVersionIncompatible])
-
-
-  useEffect(() => {
-    const checkMaintenanceStatus = async () => {
-      try {
-        const response = await fetch(`${API_URL}/get-maintenance`, {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json', 'X-App-Version': CURRENT_VERSION },
-        })
-        const data = await response.json()
-        setIsMaintenance(data.data) // Set the maintenance status
-        localStorage.setItem('maintenance', JSON.stringify({ status: data.data })) // Store the status in localStorage
-      } catch (error) {
-        console.error('Error fetching maintenance status:', error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    void checkMaintenanceStatus()
+    setIsLoading(false)
+    //handleMaintenanceUpdate(false)
   }, [])
-
-  const excludedRouteRegex = /admin123/
-  const isExcludedRoute = excludedRouteRegex.test(location.pathname)
-
-  const formData = JSON.parse(localStorage.getItem('formData') || '{}')
-  const subData = JSON.parse(localStorage.getItem('subData') || '{}')
-  const isAdminUser = formData.email === 'xmatiservice@gmail.com'
 
   const handleLogout = () => {
     localStorage.clear()
@@ -230,6 +152,33 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.setItem('accountBlocked', JSON.stringify({
       isBlocked: status === 'Blocked' ? true : false,
     }))
+  }
+
+  const handleVersionUpdate = (serverVersion: string) => {
+    const currentProjectVersion = CURRENT_VERSION
+
+    // If version comparison returns < 0, show incompatibility screen
+    if (compareVersions(serverVersion, currentProjectVersion) < 0) {
+      const versionData = { server: serverVersion, client: currentProjectVersion }
+      setVersionInfo(versionData)
+      setIsVersionIncompatible(true)
+
+      // Save to localStorage to persist across page reloads
+      localStorage.setItem('versionIncompatible', JSON.stringify({
+        isIncompatible: true,
+        versionInfo: versionData,
+        timestamp: Date.now()
+      }))
+    } else {
+      // If versions are compatible, clear any previous incompatibility state
+      localStorage.removeItem('versionIncompatible')
+      setIsVersionIncompatible(false)
+    }
+  }
+
+  const handleMaintenanceUpdate = (status: boolean) => {
+    setIsMaintenance(status)
+    localStorage.setItem('maintenance', JSON.stringify({ status }))
   }
 
   // Excluded routes: if location.pathname starts with one of these, skip the check.
@@ -262,15 +211,6 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
     return () => clearInterval(tokenCheckInterval)
   }, [location.pathname])
 
-  // Cleanup on component unmount
-  useEffect(() => {
-    return () => {
-      if (versionCheckTimeoutRef.current) {
-        clearTimeout(versionCheckTimeoutRef.current)
-      }
-    }
-  }, [])
-
   if (isLoading) {
     return (
       <div
@@ -289,7 +229,7 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
     )
   }
 
-  if (isBlocked) {
+  if (isBlocked && workspaceRouteRegex.test(location.pathname)) {
     return (
       <div
         style={{
@@ -378,7 +318,7 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
     )
   }
 
-  if (isVersionIncompatible) {
+  if (isVersionIncompatible && workspaceRouteRegex.test(location.pathname)) {
     return (
       <div
         style={{
@@ -444,7 +384,7 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
     )
   }
 
-  if (subData.subsChanged) {
+  if (subData.subsChanged && workspaceRouteRegex.test(location.pathname)) {
     return (
       <div
         style={{
@@ -495,7 +435,7 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
     )
   }
 
-  if (isMaintenance && !isExcludedRoute && !isAdminUser) {
+  if (isMaintenance && workspaceRouteRegex.test(location.pathname)) {
     return (
       <div
         style={{
