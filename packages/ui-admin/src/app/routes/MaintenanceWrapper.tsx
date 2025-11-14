@@ -112,28 +112,28 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
                   request: 'status',
                 }),
               })
-              const json = await res.json()
-              const accountData = json?.data || json?.account || json
+              // const json = await res.json()
+              // const accountData = json?.data || json?.account || json
 
-              if (accountData) {
-                // Block status handling (string or boolean)
-                const blockStatus = accountData.blockStatus || accountData.status
-                if (typeof blockStatus === 'string') {
-                  handleBlockStatus(blockStatus)
-                } else if (typeof blockStatus === 'boolean') {
-                  handleBlockStatus(blockStatus ? 'Blocked' : 'Active')
-                }
+              // if (accountData) {
+              //   // Block status handling (string or boolean)
+              //   const blockStatus = accountData.blockStatus || accountData.status
+              //   if (typeof blockStatus === 'string') {
+              //     handleBlockStatus(blockStatus)
+              //   } else if (typeof blockStatus === 'boolean') {
+              //     handleBlockStatus(blockStatus ? 'Blocked' : 'Active')
+              //   }
 
-                // Maintenance flag (boolean)
-                if (typeof accountData.maintenance === 'boolean') {
-                  handleMaintenanceUpdate(accountData.maintenance)
-                }
+              //   // Maintenance flag (boolean)
+              //   if (typeof accountData.maintenance === 'boolean') {
+              //     handleMaintenanceUpdate(accountData.maintenance)
+              //   }
 
-                // Server version (for incompatibility checks)
-                if (accountData.serverVersion) {
-                  handleVersionUpdate(accountData.serverVersion)
-                }
-              }
+              //   // Server version (for incompatibility checks)
+              //   if (accountData.serverVersion) {
+              //     handleVersionUpdate(accountData.serverVersion)
+              //   }
+              // }
             } catch (err) {
               // Silently ignore errors; WebSocket remains available
             }
