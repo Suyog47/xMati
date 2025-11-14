@@ -1,4 +1,3 @@
-import { is } from 'bluebird'
 import { auth } from 'botpress/shared'
 import React, { useEffect, useState, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
@@ -7,8 +6,9 @@ import api from '~/app/api'
 import packageJson from '../../../../../package.json'
 import logo from './xmati.png'
 
-// const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 const CURRENT_VERSION = packageJson.version
+// Base API URL (reintroduced for account status check)
+const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
 const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true)
@@ -42,6 +42,7 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
   })
 
   const location = useLocation()
+  const didCheckAccountRef = useRef(false)
   // const excludedRouteRegex = /admin123/
   // const isExcludedRoute = excludedRouteRegex.test(location.pathname)
 
@@ -91,6 +92,53 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
           userId,
           clientVersion: CURRENT_VERSION,
         }))
+
+        // Immediately call /check-account-status after successful WebSocket connection
+        if (!didCheckAccountRef.current) {
+          didCheckAccountRef.current = true
+          void (async () => {
+            try {
+              if (!formData.email) {
+                return
+              }
+              const res = await fetch(`${API_URL}/check-account-status`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-App-Version': CURRENT_VERSION,
+                },
+                body: JSON.stringify({
+                  email: formData.email,
+                  request: 'status',
+                }),
+              })
+              const json = await res.json()
+              const accountData = json?.data || json?.account || json
+
+              if (accountData) {
+                // Block status handling (string or boolean)
+                const blockStatus = accountData.blockStatus || accountData.status
+                if (typeof blockStatus === 'string') {
+                  handleBlockStatus(blockStatus)
+                } else if (typeof blockStatus === 'boolean') {
+                  handleBlockStatus(blockStatus ? 'Blocked' : 'Active')
+                }
+
+                // Maintenance flag (boolean)
+                if (typeof accountData.maintenance === 'boolean') {
+                  handleMaintenanceUpdate(accountData.maintenance)
+                }
+
+                // Server version (for incompatibility checks)
+                if (accountData.serverVersion) {
+                  handleVersionUpdate(accountData.serverVersion)
+                }
+              }
+            } catch (err) {
+              // Silently ignore errors; WebSocket remains available
+            }
+          })()
+        }
       }
 
       socket.onmessage = (event) => {
