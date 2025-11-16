@@ -241,23 +241,84 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
     '/chatAuthResult'
   ]
 
-  // Check localStorage fields every 2 seconds and logout if any is empty (unless on an excluded route)
+  // Check localStorage fields continuously using listeners
+  // it also checks every 10 seconds and logout if any is empty (unless on an excluded route)
   useEffect(() => {
-    const tokenCheckInterval = setInterval(() => {
-      // Skip check if current pathname starts with any excluded route
-      const skipCheck = excludedRoutes.some(route => location.pathname.startsWith(route))
+    const safeParse = (raw) => {
+      try {
+        return JSON.parse(raw || '{}')
+      } catch {
+        return {}
+      }
+    }
+
+    const doLogout = () => {
+      handleLogout()        // your existing logout logic
+    }
+
+    const validate = () => {
+      const currentPath = window.location.pathname
+
+      // Skip on excluded routes (login, register, etc.)
+      const skipCheck = excludedRoutes.some(route => currentPath.startsWith(route))
       if (skipCheck) {
         return
       }
 
       const formDataRaw = localStorage.getItem('formData')
       const subDataRaw = localStorage.getItem('subData')
-      if (!formDataRaw || formDataRaw === '{}' || !subDataRaw || subDataRaw === '{}') {
-        handleLogout()
+      const tokenDataRaw = localStorage.getItem('token')
+
+      const formData = safeParse(formDataRaw)
+      const subData = safeParse(subDataRaw)
+      const tokenData = safeParse(tokenDataRaw)
+
+      const invalid =
+        !formDataRaw ||
+        !subDataRaw ||
+        !tokenDataRaw ||
+        Object.keys(formData).length === 0 ||
+        Object.keys(subData).length === 0 ||
+        Object.keys(tokenData).length === 0 ||
+        !formData.email
+
+      if (invalid) {
+        doLogout()
       }
-    }, 2000)
-    return () => clearInterval(tokenCheckInterval)
-  }, [location.pathname])
+    }
+
+    const handleStorageChange = (event) => {
+      const currentPath = window.location.pathname
+      const skipCheck = excludedRoutes.some(route => currentPath.startsWith(route))
+      if (skipCheck) {
+        return
+      }
+
+      // If ALL of localStorage was cleared
+      if (event.key === null) {
+        doLogout()
+        return
+      }
+
+      // If one of the critical keys changed
+      if (event.key === 'formData' || event.key === 'subData' || event.key === 'token') {
+        validate()
+      }
+    }
+
+    // Listen for storage events
+    window.addEventListener('storage', handleStorageChange)
+
+    // Run validation every 10 seconds
+    const interval = setInterval(validate, 10000)
+
+    // cleanup
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      clearInterval(interval)
+    }
+  }, [])   // ← Runs only once on mount
+
 
   if (isLoading) {
     return (
