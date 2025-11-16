@@ -300,7 +300,7 @@ export const Subs = () => {
                 ['Start Date', formatDate(createdAt)],
                 ['End Date', formatDate(till)],
                 ['Amount Paid', amount === '0' ? '-' : amount],
-                ['Duration', duration === '15d' ? '15 Days' : duration === '5d' ? '5 Days' : duration],
+                ['Duration', duration === '30d' ? '30 Days' : duration === '5d' ? '5 Days' : duration],
               ].map(([label, value], idx, arr) => (
                 <React.Fragment key={idx}>
                   <div

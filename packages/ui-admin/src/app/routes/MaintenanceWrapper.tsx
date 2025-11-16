@@ -112,28 +112,7 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
                   request: 'status',
                 }),
               })
-              // const json = await res.json()
-              // const accountData = json?.data || json?.account || json
 
-              // if (accountData) {
-              //   // Block status handling (string or boolean)
-              //   const blockStatus = accountData.blockStatus || accountData.status
-              //   if (typeof blockStatus === 'string') {
-              //     handleBlockStatus(blockStatus)
-              //   } else if (typeof blockStatus === 'boolean') {
-              //     handleBlockStatus(blockStatus ? 'Blocked' : 'Active')
-              //   }
-
-              //   // Maintenance flag (boolean)
-              //   if (typeof accountData.maintenance === 'boolean') {
-              //     handleMaintenanceUpdate(accountData.maintenance)
-              //   }
-
-              //   // Server version (for incompatibility checks)
-              //   if (accountData.serverVersion) {
-              //     handleVersionUpdate(accountData.serverVersion)
-              //   }
-              // }
             } catch (err) {
               // Silently ignore errors; WebSocket remains available
             }
@@ -310,12 +289,12 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
     window.addEventListener('storage', handleStorageChange)
 
     // Run validation every 10 seconds
-    const interval = setInterval(validate, 10000)
+    //const interval = setInterval(validate, 10000)
 
     // cleanup
     return () => {
       window.removeEventListener('storage', handleStorageChange)
-      clearInterval(interval)
+      //clearInterval(interval)
     }
   }, [])   // ← Runs only once on mount
 

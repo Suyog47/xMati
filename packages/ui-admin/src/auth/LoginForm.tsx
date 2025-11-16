@@ -110,7 +110,34 @@ export const LoginForm: FC<Props> = props => {
       </div>
 
       <div className='button-container' style={{ width: '80%' }}>
-        <a
+        <Link
+          to="/botCreation"
+          onClick={e => loading && e.preventDefault()}
+          style={{
+            pointerEvents: loading ? 'none' : 'auto',
+            textDecoration: 'none',
+            width: '100%'
+          }}
+        >
+          <button
+            type="button"
+            disabled={loading}
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '10px',
+              backgroundColor: loading ? '#ccc' : 'transparent',
+              border: `1px solid ${loading ? '#ccc' : '#05a8e1'}`,
+              color: loading ? '#666' : '#05a8e1',
+              cursor: loading ? 'not-allowed' : 'pointer'
+            }}
+          >
+            Create Account
+          </button>
+        </Link>
+        {/* <a
           href="http://localhost:7001/"
           target="_blank"
           rel="noopener noreferrer"
@@ -138,7 +165,7 @@ export const LoginForm: FC<Props> = props => {
           >
             Create Account
           </button>
-        </a>
+        </a> */}
       </div>
     </form>
   )

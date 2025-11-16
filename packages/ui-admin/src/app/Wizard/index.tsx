@@ -513,7 +513,7 @@ const CustomerWizard: React.FC = () => {
     try {
       const result = await fetch(`${API_URL}/create-payment-intent`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-App-Version': CURRENT_VERSION},
+        headers: { 'Content-Type': 'application/json', 'X-App-Version': CURRENT_VERSION },
         body: JSON.stringify({
           amount: price * 100, currency: 'usd',
           customerId: { id: customerId },
@@ -651,7 +651,7 @@ const CustomerWizard: React.FC = () => {
         tillDateUTC.setFullYear(currentDate.getFullYear() + 1)
       }
     } else {
-      tillDateUTC.setDate(currentDate.getDate() + 5)
+      tillDateUTC.setDate(currentDate.getDate() + 30) // 30 days free trial
     }
 
     const tillDate = new Date(tillDateUTC.toISOString().split('T')[0]) // Ensure it's in the same format
@@ -668,7 +668,7 @@ const CustomerWizard: React.FC = () => {
       daysRemaining,
       promptRun: false,  // set the prompt run to false
       amount: (selectedPlan === 'Starter') ? price : 0,
-      duration: (selectedPlan === 'Starter') ? selectedDuration : '5d',
+      duration: (selectedPlan === 'Starter') ? selectedDuration : '30d',
       canCancel: true,
       subsChanged: false,
       isCancelled: false, // Default to false

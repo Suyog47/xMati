@@ -58,10 +58,10 @@ const debug = DEBUG('services:bots')
 const CURRENT_VERSION = '12.31.9'
 
 // Localhost url
-const API_URL = 'http://localhost:8000'
+// const API_URL = 'http://localhost:8000'
 
 // Production url
-// const API_URL = 'https://www.app.xmati.ai/apis'
+const API_URL = 'https://www.app.xmati.ai/apis'
 
 @injectable()
 export class BotService {
