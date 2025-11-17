@@ -72,26 +72,26 @@ const UserDropdownMenu: FC<Props> = props => {
 
   const toggleProfile = () => setProfileOpen(!isProfileOpen)
   const toggleCard = () => setCardOpen(!isCardOpen)
-  // const toggleSubscription = () => {
-  //   const subData = localStorage.getItem('subData') || '{}'
-  //   const formData = localStorage.getItem('formData') || '{}'
-  //   const token = localStorage.getItem('token') || ''
+  const toggleSubscription = () => {
+    const subData = localStorage.getItem('subData') || '{}'
+    const formData = localStorage.getItem('formData') || '{}'
+    const token = localStorage.getItem('token') || ''
 
-  //   const dataObject = {
-  //     formData,
-  //     subData,
-  //     token
-  //   }
+    const dataObject = {
+      formData,
+      subData,
+      token
+    }
 
-  //   const params = new URLSearchParams({
-  //     data: JSON.stringify(dataObject)
-  //   })
+    const params = new URLSearchParams({
+      data: JSON.stringify(dataObject)
+    })
 
-  //   window.open(`http://localhost:7001/subscription?${params.toString()}`, '_blank')
-  // }
+    window.open(`http://localhost:7001/subscription?${params.toString()}`, '_blank')
+  }
+
   // const toggleGemini = () => setGemini(!isGemini)
-
-  const toggleSubscription = () => setSubscriptionOpen(!isSubscriptionOpen)
+  // const toggleSubscription = () => setSubscriptionOpen(!isSubscriptionOpen)
   const toggleAdminControl = () => {
     const subData = localStorage.getItem('subData') || '{}'
     const formData = localStorage.getItem('formData') || '{}'

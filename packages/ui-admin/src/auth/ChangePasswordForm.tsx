@@ -103,7 +103,7 @@ export const ChangePasswordForm: FC<Props> = props => {
         const message = resend ? `Your OTP has been resent to ${email}` : `Your OTP has been sent to ${email}`
         setOtpSentMessage(message)
         setResendCountdown(30) // Start the 30 sec timer
-      } else { // Unregistered email
+      } else if (result.status === 400) { // Unregistered email
         setEmailValid(false)
         setEmailChecked(true)
       }

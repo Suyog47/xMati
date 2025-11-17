@@ -221,7 +221,6 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
   ]
 
   // Check localStorage fields continuously using listeners
-  // it also checks every 10 seconds and logout if any is empty (unless on an excluded route)
   useEffect(() => {
     const safeParse = (raw) => {
       try {
@@ -288,13 +287,9 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
     // Listen for storage events
     window.addEventListener('storage', handleStorageChange)
 
-    // Run validation every 10 seconds
-    //const interval = setInterval(validate, 10000)
-
     // cleanup
     return () => {
       window.removeEventListener('storage', handleStorageChange)
-      //clearInterval(interval)
     }
   }, [])   // ← Runs only once on mount
 
