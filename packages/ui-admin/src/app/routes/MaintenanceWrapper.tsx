@@ -67,6 +67,7 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
   }
 
   const workspaceRouteRegex = /^\/(?:workspace|studio)/
+
   // WebSocket connection for real-time communication - keep alive regardless of which screen is shown
   useEffect(() => {
     const formData = JSON.parse(localStorage.getItem('formData') || '{}')
@@ -109,7 +110,6 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
                 },
                 body: JSON.stringify({
                   email: formData.email,
-                  request: 'status',
                 }),
               })
 
