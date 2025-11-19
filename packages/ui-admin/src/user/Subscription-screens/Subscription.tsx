@@ -8,8 +8,8 @@ import {
 import { loadStripe, PaymentRequest } from '@stripe/stripe-js'
 import { toast } from 'botpress/shared'
 import React, { FC, useState, useEffect, useMemo, useCallback, useRef } from 'react'
-import packageJson from '../../../../../package.json'
 import BasicAuthentication from '~/auth/basicAuth'
+import packageJson from '../../../../../package.json'
 import CheckoutForm from './CheckoutForm'
 import CancellationFailedDialog from './dialogs/CancellationFailedDialog'
 import SubscriptionInvoiceLicenseDialog from './dialogs/LicenseInvoiceDialog'
@@ -32,7 +32,7 @@ const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PROMISE || 'pk_liv
 const Subscription: FC<Props> = ({ isOpen, toggle }) => {
   let savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
   const savedSubData = JSON.parse(localStorage.getItem('subData') || '{}')
-  const token = JSON.parse(localStorage.getItem('token') || '{}')
+  const token = sessionStorage.getItem('token') || ''
 
   const [actualAmount, setActualAmount] = useState<any>(null)
   const [clientSecret, setClientSecret] = useState<string>('')

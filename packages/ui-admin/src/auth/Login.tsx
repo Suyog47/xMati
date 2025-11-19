@@ -259,9 +259,8 @@ const Login: FC<Props> = props => {
 
     localStorage.setItem('formData', JSON.stringify(updatedFormData))
     localStorage.setItem('subData', JSON.stringify(updatedSubData))
-    localStorage.setItem('token', JSON.stringify(formData.token))
+    sessionStorage.setItem('token', formData.token)
   }
-
 
   return (
     <div className='parent-wizard-container' style={{

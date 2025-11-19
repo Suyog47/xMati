@@ -676,7 +676,7 @@ const CustomerWizard: React.FC = () => {
 
     localStorage.setItem('formData', JSON.stringify(updatedFormData))
     localStorage.setItem('subData', JSON.stringify(updatedSubData))
-    localStorage.setItem('token', JSON.stringify(formData.token))
+    localStorage.setItem('token', formData.token)
   }
 
   const verifyCard = async () => {

@@ -69,7 +69,7 @@ const UpdateUserProfile: FC<Props> = props => {
   const [countryCode, setCountryCode] = useState<string>(countryOptions[0].code)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
-  const token = JSON.parse(localStorage.getItem('token') || '{}')
+  const token = sessionStorage.getItem('token') || ''
   const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
 
   useEffect(() => {

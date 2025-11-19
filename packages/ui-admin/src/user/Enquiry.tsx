@@ -30,7 +30,7 @@ const Enquiry: FC<Props> = ({ isOpen, toggle }) => {
     setIsLoadingEnquiries(true)
     try {
       const formData = JSON.parse(localStorage.getItem('formData') || '{}')
-      const token = JSON.parse(localStorage.getItem('token') || '{}')
+      const token = sessionStorage.getItem('token') || ''
       const userEmail = formData.email || ''
 
       const response = await fetch(`${API_URL}/get-user-enquiries`, {
@@ -66,7 +66,7 @@ const Enquiry: FC<Props> = ({ isOpen, toggle }) => {
 
     try {
       const formData = JSON.parse(localStorage.getItem('formData') || '{}')
-      const token = JSON.parse(localStorage.getItem('token') || '{}')
+      const token = sessionStorage.getItem('token') || ''
       const userEmail = formData.email || ''
 
       const response = await fetch(`${API_URL}/submit-enquiry`, {

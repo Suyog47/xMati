@@ -21,7 +21,7 @@ const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 const EnquiryDialog: FC<Props> = ({ isOpen, onClose }) => {
   const [enquiries, setEnquiries] = useState<Enquiry[]>([])
   const [isLoading, setLoading] = useState(false)
-  const token = JSON.parse(localStorage.getItem('token') || '{}')
+  const token = sessionStorage.getItem('token') || ''
 
   const getEnquiries = async () => {
     setLoading(true)

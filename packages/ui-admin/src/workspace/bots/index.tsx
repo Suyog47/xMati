@@ -54,7 +54,7 @@ type Props = ConnectedProps<typeof connector> & RouteComponentProps
 class Bots extends Component<Props> {
   formData = JSON.parse(localStorage.getItem('formData') || '{}')
   subData = JSON.parse(localStorage.getItem('subData') || '{}')
-  token = JSON.parse(localStorage.getItem('token') || '{}')
+  token = sessionStorage.getItem('token') || ''
   state = {
     isCreateBotModalOpen: false,
     isRollbackModalOpen: false,

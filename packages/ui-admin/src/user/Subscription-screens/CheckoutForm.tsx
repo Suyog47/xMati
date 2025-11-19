@@ -46,7 +46,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
 }) => {
   const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
   const savedSubData = JSON.parse(localStorage.getItem('subData') || '{}')
-  const token = JSON.parse(localStorage.getItem('token') || '{}')
+  const token = sessionStorage.getItem('token') || ''
 
   const stripe = useStripe()
   const elements = useElements()

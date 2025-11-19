@@ -17,7 +17,7 @@ const UpdatePassword: FC<Props> = props => {
   const [newPassword, setNewPassword] = useState<string>('')
   const [confirmPassword, setConfirmPassword] = useState<string>('')
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const token = JSON.parse(localStorage.getItem('token') || '{}')
+  const token = sessionStorage.getItem('token') || ''
 
   const loaderOverlayStyle: React.CSSProperties = {
     position: 'fixed',

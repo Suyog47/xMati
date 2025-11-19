@@ -51,7 +51,7 @@ const UpdateCardDetails: FC<Props> = props => {
   const [cardDetails, setCardDetails] = useState<CardDetails | null>(null)
   const [isLoadingCard, setIsLoadingCard] = useState(false)
   const formData = JSON.parse(localStorage.getItem('formData') || '{}')
-  const token = JSON.parse(localStorage.getItem('token') || '{}')
+  const token = sessionStorage.getItem('token') || ''
 
   // Fetch card details on dialog open using POST; loader added for the card area
   useEffect(() => {

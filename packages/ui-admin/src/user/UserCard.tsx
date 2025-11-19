@@ -1,8 +1,8 @@
 import { Card, Elevation, Icon, Dialog, Button, Spinner, Divider } from '@blueprintjs/core'
 import { confirmDialog, lang, toast } from 'botpress/shared'
 import React, { useEffect, useState } from 'react'
-import packageJson from '../../../../package.json'
 import api from '~/app/api'
+import packageJson from '../../../../package.json'
 import TransactionHistory from './Subscription-screens/TransactionHistory'
 
 interface UserData {
@@ -48,7 +48,7 @@ const UserCard: React.FC<UserCardProps> = ({ email, userData, subscriptionData, 
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
   const savedSubData = JSON.parse(localStorage.getItem('subData') || '{}')
-  const token = JSON.parse(localStorage.getItem('token') || '{}')
+  const token = sessionStorage.getItem('token') || ''
 
   // Dummy transaction state and functions for UI demo
   const [transactions, setTransactions] = useState<any[]>([])

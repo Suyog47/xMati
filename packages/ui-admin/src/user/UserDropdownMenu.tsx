@@ -75,7 +75,7 @@ const UserDropdownMenu: FC<Props> = props => {
   const toggleSubscription = () => {
     const subData = localStorage.getItem('subData') || '{}'
     const formData = localStorage.getItem('formData') || '{}'
-    const token = localStorage.getItem('token') || ''
+    const token = sessionStorage.getItem('token') || ''
 
     const dataObject = {
       formData,
@@ -95,7 +95,7 @@ const UserDropdownMenu: FC<Props> = props => {
   const toggleAdminControl = () => {
     const subData = localStorage.getItem('subData') || '{}'
     const formData = localStorage.getItem('formData') || '{}'
-    const token = localStorage.getItem('token') || ''
+    const token = sessionStorage.getItem('token') || ''
 
     const dataObject = {
       formData,

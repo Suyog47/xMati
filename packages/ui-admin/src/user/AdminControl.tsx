@@ -22,7 +22,7 @@ const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
 
 const AdminControl: FC<Props> = ({ isOpen, toggle }) => {
   const savedFormData = JSON.parse(localStorage.getItem('formData') || '{}')
-  const token = JSON.parse(localStorage.getItem('token') || '{}')
+  const token = sessionStorage.getItem('token') || ''
   const maintenanceStatus = JSON.parse(localStorage.getItem('maintenance') || '{}')
   const [isDialogLoading, setDialogLoading] = useState(false)
   const [isMaintenanceActive, setMaintenanceActive] = useState(maintenanceStatus.status)
