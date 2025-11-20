@@ -76,11 +76,13 @@ const UserDropdownMenu: FC<Props> = props => {
     const subData = localStorage.getItem('subData') || '{}'
     const formData = localStorage.getItem('formData') || '{}'
     const token = sessionStorage.getItem('token') || ''
+    const aesKey = sessionStorage.getItem('aes-key') || ''
 
     const dataObject = {
       formData,
       subData,
-      token
+      token,
+      aesKey
     }
 
     const params = new URLSearchParams({
@@ -96,11 +98,13 @@ const UserDropdownMenu: FC<Props> = props => {
     const subData = localStorage.getItem('subData') || '{}'
     const formData = localStorage.getItem('formData') || '{}'
     const token = sessionStorage.getItem('token') || ''
+    const aesKey = sessionStorage.getItem('aes-key') || ''
 
     const dataObject = {
       formData,
       subData,
-      token
+      token,
+      aesKey
     }
 
     const params = new URLSearchParams({
