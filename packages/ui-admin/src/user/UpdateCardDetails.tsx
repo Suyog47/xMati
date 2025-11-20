@@ -67,7 +67,7 @@ const UpdateCardDetails: FC<Props> = props => {
               'Authorization': `Bearer ${token}`,
               'X-App-Version': CURRENT_VERSION
             },
-            body: JSON.stringify({ paymentMethodId: formData.stripePayementId })
+            body: JSON.stringify({ payload: encryptPayload({ paymentMethodId: formData.stripePayementId }) })
           })
           const data = await res.json()
           setCardDetails(data.cardDetails)

@@ -5,6 +5,7 @@ import React, { FC, useState } from 'react'
 import api from '~/app/api'
 import { PasswordStrengthMeter } from '~/auth/PasswordStrengthMeter/PasswordStrengthMeter'
 import packageJson from '../../../../package.json'
+import { encryptPayload } from '../../aes-encryption'
 
 interface Props {
   isOpen: boolean
@@ -78,9 +79,7 @@ const UpdatePassword: FC<Props> = props => {
           'Authorization': `Bearer ${token}`,
           'X-App-Version': CURRENT_VERSION
         },
-        body: JSON.stringify({
-          data,
-        }),
+        body: JSON.stringify({ payload: encryptPayload({ data }) }),
       })
 
       return result.json()

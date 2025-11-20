@@ -36,6 +36,7 @@ import Subscription from '~/user/Subscription-screens/Subscription'
 import { fetchBotHealth, fetchBots, fetchBotNLULanguages } from '~/workspace/bots/reducer'
 import { filterList } from '~/workspace/util'
 import packageJson from '../../../../../package.json'
+import { encryptPayload } from '../../../aes-encryption'
 import BotItemCompact from './BotItemCompact'
 import BotItemPipeline from './BotItemPipeline'
 import CreateBotModal from './CreateBot-screens/CreateBotModal'
@@ -109,11 +110,13 @@ class Bots extends Component<Props> {
           'X-App-Version': CURRENT_VERSION
         },
         body: JSON.stringify({
-          email,
-          plan,
-          duration: upgradeSelectedDuration,
-          price: upgradePrice,
-          isDowngrade: false // Default to false
+          payload: encryptPayload({
+            email,
+            plan,
+            duration: upgradeSelectedDuration,
+            price: upgradePrice,
+            isDowngrade: false // Default to false
+          })
         })
       })
 

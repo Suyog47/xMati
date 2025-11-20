@@ -2,6 +2,7 @@ import { Button, Classes, Dialog, Intent, TextArea, Spinner, Card, Elevation, Ta
 import { lang, toast } from 'botpress/shared'
 import React, { FC, useState, useEffect } from 'react'
 import packageJson from '../../../../package.json'
+import { encryptPayload } from '../../aes-encryption'
 
 const CURRENT_VERSION = packageJson.version
 const API_URL = process.env.REACT_APP_API_URL || 'https://www.app.xmati.ai/apis'
@@ -40,7 +41,7 @@ const Enquiry: FC<Props> = ({ isOpen, toggle }) => {
           'Authorization': `Bearer ${token}`,
           'X-App-Version': CURRENT_VERSION
         },
-        body: JSON.stringify({ email: userEmail })
+        body: JSON.stringify({ payload: encryptPayload({ email: userEmail }) })
       })
 
       const result = await response.json()
@@ -77,8 +78,10 @@ const Enquiry: FC<Props> = ({ isOpen, toggle }) => {
           'X-App-Version': CURRENT_VERSION
         },
         body: JSON.stringify({
-          email: userEmail,
-          enquiry: enquiryText,
+          payload: encryptPayload({
+            email: userEmail,
+            enquiry: enquiryText,
+          })
         })
       })
 
