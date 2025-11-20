@@ -4,6 +4,7 @@ import { loadStripe } from '@stripe/stripe-js'
 import { lang, toast } from 'botpress/shared'
 import React, { FC, useState, useEffect } from 'react'
 import packageJson from '../../../../package.json'
+import { encryptPayload } from '../../aes-encryption'
 import CardForm from './CardForm'
 
 const CURRENT_VERSION = packageJson.version
@@ -100,14 +101,14 @@ const UpdateCardDetails: FC<Props> = props => {
           'X-App-Version': CURRENT_VERSION
         },
         body: JSON.stringify({
-          email: formData.email,
-          customerId: formData.stripeCustomerId,
-          paymentMethodId,
-          data: updatedFormData
+          payload: encryptPayload({
+            email: formData.email,
+            customerId: formData.stripeCustomerId,
+            paymentMethodId,
+            data: updatedFormData
+          })
         })
       })
-
-      console.log(result)
       const data = await result.json()
 
       if (!data.success) {

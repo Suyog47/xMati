@@ -4,6 +4,7 @@ import { UserProfile } from 'common/typings'
 import React, { FC, useEffect, useState } from 'react'
 import api from '~/app/api'
 import packageJson from '../../../../package.json'
+import { encryptPayload } from '../../aes-encryption'
 
 interface Props {
   isOpen: boolean
@@ -133,7 +134,7 @@ const UpdateUserProfile: FC<Props> = props => {
 
     setIsLoading(true)
     try {
-      const res = await s3Call(formData)
+      const res = await dbCall(formData)
       if (!res.success) {
         toast.failure(res.msg)
         setIsLoading(false)
@@ -153,8 +154,9 @@ const UpdateUserProfile: FC<Props> = props => {
     }
   }
 
-  const s3Call = async (data) => {
+  const dbCall = async (data) => {
     try {
+      console.log(sessionStorage.getItem('aes-key'))
       const result = await fetch(`${API_URL}/update-profile`, {
         method: 'POST',
         headers: {
@@ -162,14 +164,12 @@ const UpdateUserProfile: FC<Props> = props => {
           'Authorization': `Bearer ${token}`,
           'X-App-Version': CURRENT_VERSION
         },
-        body: JSON.stringify({
-          data,
-        }),
+        body: JSON.stringify({ payload: encryptPayload({ data }) }),
       })
 
       return result.json()
     } catch (error) {
-      return { success: false, msg: 'Error uploading credentials to S3' }
+      return { success: false, msg: error.message || 'Error saving data to db' }
     }
   }
 
@@ -301,3 +301,5 @@ const UpdateUserProfile: FC<Props> = props => {
 }
 
 export default UpdateUserProfile
+
+

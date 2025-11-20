@@ -260,6 +260,7 @@ const Login: FC<Props> = props => {
     localStorage.setItem('formData', JSON.stringify(updatedFormData))
     localStorage.setItem('subData', JSON.stringify(updatedSubData))
     sessionStorage.setItem('token', formData.token)
+    sessionStorage.setItem('aes-key', formData.aesKey)
   }
 
   return (
