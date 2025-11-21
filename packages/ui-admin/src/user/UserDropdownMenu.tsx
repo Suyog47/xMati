@@ -19,7 +19,7 @@ import BasicAuthentication from '~/auth/basicAuth'
 import ChangeLanguage from '~/user/ChangeLanguage'
 import AdminControl from './AdminControl'
 import Enquiry from './Enquiry'
-import LicenseAgreement from './LicenseAgreement'
+import PrivacyAgreement from './PrivacyAgreement'
 import { fetchProfile } from './reducer'
 import style from './style.scss'
 import Subscription from './Subscription-screens/Subscription'
@@ -39,7 +39,7 @@ const UserDropdownMenu: FC<Props> = props => {
   const [isCardOpen, setCardOpen] = useState(false)
   const [isPasswordOpen, setPasswordOpen] = useState(false)
   const [isLanguageOpen, setLanguageOpen] = useState(false)
-  const [isLicenseOpen, setLicenseOpen] = useState(false)
+  const [isPrivacyOpen, setPrivacyOpen] = useState(false)
   const [isEnquiryOpen, setEnquiryOpen] = useState(false)
   const [isExpired, setExpiry] = useState(false)
 
@@ -115,7 +115,7 @@ const UserDropdownMenu: FC<Props> = props => {
   }
   const togglePassword = () => setPasswordOpen(!isPasswordOpen)
   const toggleLanguage = () => setLanguageOpen(!isLanguageOpen)
-  const toggleLicense = () => setLicenseOpen(!isLicenseOpen)
+  const togglePrivacy = () => setPrivacyOpen(!isPrivacyOpen)
   const toggleEnquiry = () => setEnquiryOpen(!isEnquiryOpen)
 
   const { email, fullName, strategyType, picture_url } = props.profile
@@ -149,7 +149,7 @@ const UserDropdownMenu: FC<Props> = props => {
             <MenuItem id="btn-changepass" icon="key" text={lang.tr('admin.changePassword')} onClick={togglePassword} />
           )}
 
-          <MenuItem id="btn-license" icon="document" text={'License Agreement'} onClick={toggleLicense} />
+          <MenuItem id="btn-privacy" icon="document" text={'Privacy Policy'} onClick={togglePrivacy} />
 
           {savedFormData.email !== 'xmatiservice@gmail.com' && (<MenuItem id="btn-enquiry" icon="help" text={'Submit Enquiry'} onClick={toggleEnquiry} />)}
 
@@ -189,9 +189,9 @@ const UserDropdownMenu: FC<Props> = props => {
         toggle={toggleAdminControl}>
       </AdminControl>
 
-      <LicenseAgreement
-        isOpen={isLicenseOpen}
-        toggle={toggleLicense}
+      <PrivacyAgreement
+        isOpen={isPrivacyOpen}
+        toggle={togglePrivacy}
       />
 
       <Enquiry

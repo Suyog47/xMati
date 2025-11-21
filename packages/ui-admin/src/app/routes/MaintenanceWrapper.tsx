@@ -67,6 +67,17 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
   }
 
   const workspaceRouteRegex = /^\/(?:workspace|studio)/
+  // Excluded routes: if location.pathname starts with one of these, skip the check.
+  const excludedRoutes = [
+    '/botCreation',
+    '/botCreation/admin123',
+    '/login',
+    '/register',
+    '/setToken',
+    '/changePassword',
+    '/noAccess',
+    '/chatAuthResult'
+  ]
 
   // WebSocket connection for real-time communication - keep alive regardless of which screen is shown
   useEffect(() => {
@@ -230,10 +241,87 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [location.pathname])
 
+  // Check localStorage fields continuously using listeners
+  useEffect(() => {
+    const safeParse = (raw) => {
+      try {
+        return JSON.parse(raw || '{}')
+      } catch {
+        return {}
+      }
+    }
+
+    const doLogout = () => {
+      handleLogout()        // your existing logout logic
+    }
+
+    const validate = () => {
+      const currentPath = window.location.pathname
+
+      // Skip on excluded routes (login, register, etc.)
+      const skipCheck = excludedRoutes.some(route => currentPath.startsWith(route))
+      if (skipCheck) {
+        return
+      }
+
+      const formDataRaw = localStorage.getItem('formData')
+      const subDataRaw = localStorage.getItem('subData')
+      const tokenDataRaw = sessionStorage.getItem('token')
+      const aesKeyRaw = sessionStorage.getItem('aes-key')
+
+      const formData = safeParse(formDataRaw)
+      const subData = safeParse(subDataRaw)
+
+      const invalid =
+        !formDataRaw ||
+        !subDataRaw ||
+        !tokenDataRaw ||
+        !aesKeyRaw ||
+        Object.keys(formData).length === 0 ||
+        Object.keys(subData).length === 0 ||
+        !formData.email
+
+      if (invalid) {
+        doLogout()
+      }
+    }
+
+    const handleStorageChange = (event) => {
+      const currentPath = window.location.pathname
+      const skipCheck = excludedRoutes.some(route => currentPath.startsWith(route))
+      if (skipCheck) {
+        return
+      }
+
+      // If ALL of localStorage was cleared
+      if (event.key === null) {
+        doLogout()
+        return
+      }
+
+      // If one of the critical keys changed
+      if (event.key === 'formData' || event.key === 'subData' || event.key === 'token' || event.key === 'aes-key') {
+        validate()
+      }
+    }
+
+    // Run validation on mount and periodically (every 5 seconds)
+    // validate()
+    //const intervalId = setInterval(validate, 5000)
+
+    // Listen for storage events
+    window.addEventListener('storage', handleStorageChange)
+
+    // cleanup
+    return () => {
+      // clearInterval(intervalId)
+      window.removeEventListener('storage', handleStorageChange)
+    }
+  }, [])   // ← Runs only once on mount
+
   // Set loading to false on component mount
   useEffect(() => {
     setIsLoading(false)
-    //handleMaintenanceUpdate(false)
   }, [])
 
   const handleLogout = () => {
@@ -274,91 +362,6 @@ const MaintenanceWrapper: React.FC<{ children: React.ReactNode }> = ({ children 
     setIsMaintenance(status)
     localStorage.setItem('maintenance', JSON.stringify({ status }))
   }
-
-  // Excluded routes: if location.pathname starts with one of these, skip the check.
-  const excludedRoutes = [
-    '/botCreation',
-    '/botCreation/admin123',
-    '/login',
-    '/register',
-    '/setToken',
-    '/changePassword',
-    '/noAccess',
-    '/chatAuthResult'
-  ]
-
-  // Check localStorage fields continuously using listeners
-  useEffect(() => {
-    const safeParse = (raw) => {
-      try {
-        return JSON.parse(raw || '{}')
-      } catch {
-        return {}
-      }
-    }
-
-    const doLogout = () => {
-      handleLogout()        // your existing logout logic
-    }
-
-    const validate = () => {
-      const currentPath = window.location.pathname
-
-      // Skip on excluded routes (login, register, etc.)
-      const skipCheck = excludedRoutes.some(route => currentPath.startsWith(route))
-      if (skipCheck) {
-        return
-      }
-
-      const formDataRaw = localStorage.getItem('formData')
-      const subDataRaw = localStorage.getItem('subData')
-      const tokenDataRaw = sessionStorage.getItem('token')
-
-      const formData = safeParse(formDataRaw)
-      const subData = safeParse(subDataRaw)
-      const tokenData = safeParse(tokenDataRaw)
-
-      const invalid =
-        !formDataRaw ||
-        !subDataRaw ||
-        !tokenDataRaw ||
-        Object.keys(formData).length === 0 ||
-        Object.keys(subData).length === 0 ||
-        Object.keys(tokenData).length === 0 ||
-        !formData.email
-
-      if (invalid) {
-        doLogout()
-      }
-    }
-
-    const handleStorageChange = (event) => {
-      const currentPath = window.location.pathname
-      const skipCheck = excludedRoutes.some(route => currentPath.startsWith(route))
-      if (skipCheck) {
-        return
-      }
-
-      // If ALL of localStorage was cleared
-      if (event.key === null) {
-        doLogout()
-        return
-      }
-
-      // If one of the critical keys changed
-      if (event.key === 'formData' || event.key === 'subData' || event.key === 'token') {
-        validate()
-      }
-    }
-
-    // Listen for storage events
-    window.addEventListener('storage', handleStorageChange)
-
-    // cleanup
-    return () => {
-      window.removeEventListener('storage', handleStorageChange)
-    }
-  }, [])   // ← Runs only once on mount
 
 
   if (isLoading) {
