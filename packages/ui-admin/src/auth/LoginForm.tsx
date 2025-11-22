@@ -138,7 +138,7 @@ export const LoginForm: FC<Props> = props => {
           </button>
         </Link> */}
         <a
-          href="http://localhost:7001/"
+          href="https://www.app.xmati.ai/utils/"
           target="_blank"
           rel="noopener noreferrer"
           onClick={e => loading && e.preventDefault()}

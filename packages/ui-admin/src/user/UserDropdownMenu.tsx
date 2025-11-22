@@ -89,7 +89,7 @@ const UserDropdownMenu: FC<Props> = props => {
       data: JSON.stringify(dataObject)
     })
 
-    window.open(`http://localhost:7001/subscription?${params.toString()}`, '_blank')
+    window.open(`https://www.app.xmati.ai/utils/subscription?${params.toString()}`, '_blank')
   }
 
   // const toggleGemini = () => setGemini(!isGemini)
@@ -111,7 +111,7 @@ const UserDropdownMenu: FC<Props> = props => {
       data: JSON.stringify(dataObject)
     })
 
-    window.open(`http://localhost:7001/admin?${params.toString()}`, '_blank')
+    window.open(`https://www.app.xmati.ai/utils/admin?${params.toString()}`, '_blank')
   }
   const togglePassword = () => setPasswordOpen(!isPasswordOpen)
   const toggleLanguage = () => setLanguageOpen(!isLanguageOpen)
